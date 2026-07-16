@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="fa-IR" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>احسان دیبازر | مربی موی‌تای، دفاع شخصی و بنیان‌گذار هوش رزمی</title>
+<meta name="description" content="احسان دیبازر، مربی موی‌تای و دفاع شخصی با ۱۲ سال سابقه آموزش، دارای مدرک بین‌المللی موی‌تای از بانکوک و بنیان‌گذار مفهوم هوش رزمی.">
+<style>
+:root{--gold:#d9bb75;--dark:#0e0e0e;--dark2:#161616;}
+*{box-sizing:border-box;}
+html{overflow-x:hidden;max-width:100%;}
+body{margin:0;max-width:100%;background:var(--dark);color:#eee;font-family:Tahoma,Vazir,sans-serif;overflow-x:hidden;}
+.preview-note{background:#000;color:var(--gold);text-align:center;padding:10px;font-size:13px;position:sticky;top:0;z-index:999;}
+section{padding:70px 20px;position:relative;}
+.container{max-width:920px;margin:0 auto;}
+h1,h2{margin:0;}
+
+/* ===== هیرو ===== */
+.hero{min-height:75vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;position:relative;}
+.glow{position:absolute;width:min(360px,90vw);height:min(360px,90vw);border-radius:50%;background:radial-gradient(circle,rgba(217,187,117,.35),transparent 70%);filter:blur(10px);top:8%;left:50%;transform:translateX(-50%);animation:pulse 6s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:.6;transform:translateX(-50%) scale(1);}50%{opacity:1;transform:translateX(-50%) scale(1.15);}}
+.hero-photo-wrap{width:170px;height:170px;perspective:600px;margin-bottom:22px;position:relative;z-index:2;}
+.hero-photo{width:100%;height:100%;border-radius:50%;object-fit:cover;border:3px solid var(--gold);transition:transform .15s ease-out;box-shadow:0 20px 50px rgba(0,0,0,.5);}
+.hero h1{font-size:34px;font-weight:800;position:relative;z-index:2;opacity:0;animation:fadeUp .7s ease forwards .15s;}
+.hero .sub{color:var(--gold);font-weight:600;margin:10px 0 18px;font-size:15.5px;position:relative;z-index:2;opacity:0;animation:fadeUp .7s ease forwards .3s;}
+.hero .txt{max-width:600px;line-height:2;color:#cfcfcf;font-size:14.5px;position:relative;z-index:2;opacity:0;animation:fadeUp .7s ease forwards .45s;}
+.stat-row{display:flex;gap:14px;justify-content:center;margin-top:34px;flex-wrap:wrap;position:relative;z-index:2;}
+.glass{background:rgba(255,255,255,.06);backdrop-filter:blur(12px);border:1px solid rgba(217,187,117,.35);border-radius:16px;padding:16px 22px;text-align:center;min-width:120px;opacity:0;animation:fadeUp .6s ease forwards;}
+.glass:nth-child(1){animation-delay:.6s;}
+.glass:nth-child(2){animation-delay:.75s;}
+.glass:nth-child(3){animation-delay:.9s;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+.glass b{display:block;color:var(--gold);font-size:22px;}
+.glass span{font-size:12px;color:#ccc;}
+
+/* ===== نقل قول ===== */
+.quote{text-align:center;background:var(--dark2);}
+.quote p{max-width:600px;margin:0 auto;font-size:18px;font-weight:700;line-height:2.1;}
+.quote i{color:var(--gold);font-size:22px;}
+
+/* ===== تایم‌لاین ===== */
+.tl-wrap h2{text-align:center;font-size:24px;font-weight:800;margin-bottom:50px;}
+.tl-wrap h2::after{content:"";display:block;width:60px;height:3px;background:var(--gold);margin:14px auto 0;border-radius:3px;}
+.tl{position:relative;padding-right:26px;border-right:2px solid #2a2a2a;max-width:560px;margin:0 auto;}
+.tl-item{position:relative;padding-bottom:38px;opacity:0;transform:translateY(24px);transition:opacity .6s ease,transform .6s ease;overflow:hidden;}
+.tl-item.show{opacity:1;transform:translateY(0);}
+.tl-item::before{content:"";position:absolute;right:-33px;top:3px;width:14px;height:14px;border-radius:50%;background:var(--gold);box-shadow:0 0 0 4px rgba(217,187,117,.2);}
+.tl-year{color:var(--gold);font-weight:800;font-size:17px;}
+.tl-label{font-weight:700;font-size:14.5px;margin:2px 0 4px;}
+.tl-desc{font-size:13px;color:#999;line-height:1.8;}
+.tl-thumb{width:64px;height:64px;border-radius:10px;object-fit:cover;float:left;margin-left:12px;border:1.5px solid rgba(217,187,117,.4);}
+
+/* ===== هوش رزمی - دیاگرام ===== */
+.hr-wrap h2{text-align:center;font-size:24px;font-weight:800;margin-bottom:10px;}
+.hr-wrap h2::after{content:"";display:block;width:60px;height:3px;background:var(--gold);margin:14px auto 40px;border-radius:3px;}
+.diagram{position:relative;width:100%;max-width:420px;height:420px;margin:0 auto;}
+.core{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:120px;height:120px;border-radius:50%;background:radial-gradient(circle,var(--gold),#8a6d2f);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;color:#111;text-align:center;box-shadow:0 0 40px rgba(217,187,117,.5);z-index:3;}
+.node{position:absolute;width:100px;height:100px;border-radius:50%;background:var(--dark2);border:1.5px solid rgba(217,187,117,.4);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;text-align:center;cursor:pointer;z-index:3;transition:.25s;padding:8px;line-height:1.5;}
+.node:hover,.node.active{background:var(--gold);color:#111;transform:scale(1.08);}
+.diagram svg{position:absolute;inset:0;width:100%;height:100%;z-index:1;}
+.diagram svg line{stroke:rgba(217,187,117,.4);stroke-width:1.5;stroke-dasharray:6 4;animation:dash 3s linear infinite;}
+@keyframes dash{to{stroke-dashoffset:-20;}}
+
+/* ===== مدارک ===== */
+.gallery h2{text-align:center;font-size:24px;font-weight:800;margin-bottom:40px;}
+.gallery h2::after{content:"";display:block;width:60px;height:3px;background:var(--gold);margin:14px auto 0;border-radius:3px;}
+.masonry{column-count:1;column-gap:14px;}
+@media(min-width:576px){.masonry{column-count:2;}}
+@media(min-width:992px){.masonry{column-count:4;}}
+.cred{break-inside:avoid;margin-bottom:14px;position:relative;border-radius:14px;overflow:hidden;cursor:pointer;transform-style:preserve-3d;transition:transform .3s,box-shadow .3s;}
+.cred:hover{transform:perspective(600px) rotateX(4deg) rotateY(-4deg) translateY(-6px);box-shadow:0 20px 40px rgba(217,187,117,.25);}
+.cred img{width:100%;display:block;}
+.cred .cap{position:absolute;bottom:0;right:0;left:0;background:linear-gradient(0deg,rgba(0,0,0,.9),transparent 80%);color:#fff;padding:20px 10px 8px;font-size:12px;font-weight:600;}
+
+/* مودال */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.9);display:none;align-items:center;justify-content:center;z-index:1000;padding:20px;}
+.modal.open{display:flex;}
+.modal img{max-width:100%;max-height:70vh;border-radius:10px;}
+.modal .cap2{color:var(--gold);text-align:center;margin-top:14px;font-size:15px;font-weight:700;}
+.modal-close{position:absolute;top:20px;left:20px;color:#fff;font-size:30px;background:none;border:none;cursor:pointer;}
+
+/* ===== CTA مگنتیک ===== */
+.cta{background:linear-gradient(135deg,#1a1a1a,#000);text-align:center;}
+.cta h3{font-size:20px;font-weight:800;margin-bottom:20px;}
+.magnetic-wrap{display:flex;justify-content:center;}
+.magnetic{position:relative;display:inline-flex;align-items:center;gap:8px;background:var(--gold);color:#111;padding:14px 34px;border-radius:32px;font-weight:800;text-decoration:none;font-size:15px;transition:transform .15s ease-out;}
+
+@media (prefers-reduced-motion: reduce){
+    .glow{animation:none;}
+    .hero-photo{transition:none;}
+    .tl-item{transition:none;opacity:1;transform:none;}
+    .cred{transition:none;}
+    .cred:hover{transform:none;}
+    .magnetic{transition:none;}
+    .hero h1,.hero .sub,.hero .txt,.glass{animation:none;opacity:1;}
+}
+</style>
+</head>
+<body>
+<main>
+
+<!-- هیرو -->
+<header class="hero">
+    <div class="glow"></div>
+    <div class="hero-photo-wrap"><img id="heroPhoto" class="hero-photo" src="https://ehsandibazar.com/public/storage/files/shares/ehsan-profile.jpg" alt="احسان دیبازر" fetchpriority="high" decoding="async"></div>
+    <h1>احسان دیبازر</h1>
+    <div class="sub">مربی هنرهای رزمی و دفاع شخصی، کارشناس ارشد علوم ورزشی و توسعه‌دهنده مفهوم هوش رزمی</div>
+    <div class="txt">همواره یکی از لذت بخش ترین کارها برای من آموزش ورزش های رزمی و بالا بردن توانمندی های دفاع شخصی در افراد است. کمک به قوی تر شدن انسان ها به زندگی من معنا می بخشد. مهم ترین دغدغه من این است که کیفیت تمرین و آموزش تو حوزه ورزش های رزمی و دفاع شخصی برای افراد به خصوص مبتدی بالا ببرم تا با لذت و پایداری بیش تری ادامه بدهند و نتایج و ثمرات مفیدی تو زندگی برایشان داشته باشد. ایمان دارم ورزش های رزمی اگر درست تمرین داده شود حال انسان ها را بهتر خواهد کرد.</div>
+    <div class="stat-row">
+        <div class="glass"><b>۱۲+</b><span>سال سابقه</span></div>
+        <div class="glass"><b>هزاران</b><span>هنرجوی حضوری و آنلاین</span></div>
+        <div class="glass"><b>چندین</b><span>مدرک بین‌المللی</span></div>
+    </div>
+</header>
+
+<!-- مدارک -->
+<section class="gallery" aria-label="مدارک و افتخارات">
+    <div class="container">
+        <h2>مدارک و افتخارات</h2>
+        <div class="masonry" id="masonry">
+            <figure class="cred" data-cap="مدرک دفاع شخصی جوجیتسو برزیلی از آمریکا" tabindex="0" role="button"><img loading="lazy" decoding="async" src="https://ehsandibazar.com/public/storage/photos/shares/CamScanner 04-10-2022 22.05_7-min.jpg"><figcaption class="cap">مدرک دفاع شخصی جوجیتسو برزیلی از آمریکا</figcaption></figure>
+            <figure class="cred" data-cap="مدرک فنی موی تای از آموزش و پرورش تایلند" tabindex="0" role="button"><img loading="lazy" decoding="async" src="https://ehsandibazar.com/public/storage/photos/shares/CamScanner 04-10-2022 22.05_4-min.jpg"><figcaption class="cap">مدرک فنی موی تای از آموزش و پرورش تایلند</figcaption></figure>
+            <figure class="cred" data-cap="دیپلم بادیگاردی از دانشگاه افسری ترکیه" tabindex="0" role="button"><img loading="lazy" decoding="async" src="https://ehsandibazar.com/public/storage/photos/shares/CamScanner 04-10-2022 22.05_9-min.jpg"><figcaption class="cap">دیپلم بادیگاردی از دانشگاه افسری ترکیه</figcaption></figure>
+            <figure class="cred" data-cap="دیپلم مبانی بادیگاردی" tabindex="0" role="button"><img loading="lazy" decoding="async" src="https://ehsandibazar.com/public/storage/photos/shares/CamScanner 04-10-2022 22.05_11-min.jpg"><figcaption class="cap">دیپلم مبانی بادیگاردی</figcaption></figure>
+            <figure class="cred" data-cap="عکس یادگاری بعد از گرفتن مدارک بادیگاردی در ترکیه" tabindex="0" role="button"><img loading="lazy" decoding="async" src="https://ehsandibazar.com/public/storage/photos/shares/Screenshot_20220520-133235_Instagram.jpg"><figcaption class="cap">عکس یادگاری بعد از گرفتن مدارک بادیگاردی در ترکیه</figcaption></figure>
+            <figure class="cred" data-cap="عکس یادگاری با استاد بعد قبولی در آزمون فنی موی تای، تایلند" tabindex="0" role="button"><img loading="lazy" decoding="async" src="https://ehsandibazar.com/public/storage/photos/shares/67843285_362717954673819_7637302872660929839_n.jpg"><figcaption class="cap">عکس یادگاری با استاد بعد قبولی در آزمون فنی موی تای، تایلند</figcaption></figure>
+            <figure class="cred" data-cap="با حریفم در مسابقات جهانی جوجیتسو برزیلی، روسیه" tabindex="0" role="button"><img loading="lazy" decoding="async" src="https://ehsandibazar.com/public/storage/photos/shares/Screenshot_20220422-000410_Instagram-min.jpg"><figcaption class="cap">با حریفم در مسابقات جهانی جوجیتسو برزیلی، روسیه</figcaption></figure>
+            <figure class="cred" data-cap="حضور در مسابقات جهانی جوجیتسو برزیلی، روسیه" tabindex="0" role="button"><img loading="lazy" decoding="async" src="https://ehsandibazar.com/public/storage/photos/shares/IMG_20220521_143201_797.jpg"><figcaption class="cap">حضور در مسابقات جهانی جوجیتسو برزیلی، روسیه</figcaption></figure>
+            <figure class="cred" data-cap="کارنامه قبولی آزمون فنی موی تای، دانشگاه موی تای بانکوک" tabindex="0" role="button"><img loading="lazy" decoding="async" src="https://ehsandibazar.com/public/storage/photos/shares/CamScanner 04-10-2022 22.05_10-min.jpg"><figcaption class="cap">کارنامه قبولی آزمون فنی موی تای، دانشگاه موی تای بانکوک</figcaption></figure>
+            <figure class="cred" data-cap="گواهی تمرینات موی تای در استانبول" tabindex="0" role="button"><img loading="lazy" decoding="async" src="https://ehsandibazar.com/public/storage/photos/shares/CamScanner 04-10-2022 22.05_2-min.jpg"><figcaption class="cap">گواهی تمرینات موی تای در استانبول</figcaption></figure>
+            <figure class="cred" data-cap="کارگاه دانش‌افزایی دانشکده تربیت بدنی، دانشگاه تهران" tabindex="0" role="button"><img loading="lazy" decoding="async" src="https://ehsandibazar.com/public/storage/photos/5/IMG_20220810_145313_640.jpg"><figcaption class="cap">کارگاه دانش‌افزایی دانشکده تربیت بدنی، دانشگاه تهران</figcaption></figure>
+            <figure class="cred" data-cap="حضور در سمینار آنلاین موی بوران، آمریکا" tabindex="0" role="button"><img loading="lazy" decoding="async" src="https://ehsandibazar.com/public/storage/photos/shares/CamScanner 04-10-2022 22.05_12-min.jpg"><figcaption class="cap">حضور در سمینار آنلاین موی بوران، آمریکا</figcaption></figure>
+        </div>
+    </div>
+</section>
+
+<!-- تایم‌لاین -->
+<section class="tl-wrap">
+    <div class="container">
+        <h2>مسیر من</h2>
+        <div class="tl" id="tlList">
+            <div class="tl-item"><div class="tl-year">۲۰۱۳</div><div class="tl-label">مدرک بادیگاردی و دفاع شخصی</div><div class="tl-desc">پس از مدت‌ها تمرین و تلاش، از مقامات وقت استانبول مدرک بادیگاردی و دفاع شخصی دریافت کردم؛ نقطه آغاز مسیری که علاقه‌ام به آموزش‌های رزمی و دفاع شخصی را بیشتر از پیش شعله‌ور کرد. در کنار ادامه تمرینات شخصی تحت نظر بهترین مربیان رزمی، آموزش‌های خود را به علاقه‌مندان این حوزه نیز ارائه دادم.</div></div>
+            <div class="tl-item"><div class="tl-year">۲۰۱۶</div><div class="tl-label">افتتاح باشگاه رزمی</div><div class="tl-desc">باشگاه رزمی خصوصی خود را افتتاح کردم و در کنار آن، یک دفتر گردشگری و طبیعت‌گردی را نیز راه‌اندازی کردم. فعالیت‌های شبانه‌روزی‌ام در این دو حوزه، به‌ویژه آموزش شاگردان متعدد، نهایتاً مرا به موفقیتی بزرگ رساند.</div></div>
+            <div class="tl-item"><div class="tl-year">۲۰۱۹</div><div class="tl-label">مدرک فنی موی‌تای، بانکوک</div><div class="tl-desc">پس از فعالیت‌های گسترده در عرصه مربی‌گری و باشگاه‌داری، از دانشگاه موی تای بانکوک مدرک فنی موی تای را دریافت کردم. زندگی و تمرین در تایلند و شرکت در مسابقات، سطح کیفی آموزش‌های من را در باشگاه خودم به مراتب بالاتر برد. هم‌زمان، در دانشگاه تربیت بدنی تهران نیز آموزش های علم ورزش و مربی‌گری دنبال کردم.</div></div>
+            <div class="tl-item"><div class="tl-year">۲۰۲۲</div><div class="tl-label">مدرک فنی دفاع شخصی جوجیتسو برزیلی، کالیفرنیا</div><div class="tl-desc">از یکی از معتبرترین دانشگاه‌های دفاع شخصی آمریکا مدرک فنی بسیار معتبری را دریافت کردم و توانستم شاگردانم را با خود در این مسیر همراه کنم. عشق به این کار باعث شد هیچ‌وقت در کلاس‌های آموزشی‌ام گذر زمان را احساس نکنم.</div></div>
+            <div class="tl-item"><div class="tl-year">۲۰۲۴</div><div class="tl-label">کارشناسی ارشد فیزیولوژی ورزشی</div><div class="tl-desc">با هدف پیوند دادن علم روز ورزش با هنرهای رزمی، تحصیلاتم را در مقطع کارشناسی ارشد رشته فیزیولوژی ورزشی در دانشگاه فنرباغچه استانبول آغاز کردم و تمرکزم را بر ارزیابی شاخص‌های فیزیولوژیک در تمرینات ورزشی قرار دادم.</div></div>
+            <div class="tl-item"><div class="tl-year">۲۰۲۶</div><div class="tl-label">خلق مفهوم هوش رزمی</div><div class="tl-desc">در راستای ترویج رویکردی عمیق‌تر و شناختی‌تر به ورزش‌های مبارزه‌ای، مفهوم تخصصی «هوش رزمی» را خلق کردم و تولید محتوای هدفمند برای این مجموعه را کلید زدم تا مسیر جدیدی در آموزش اصولی باز کنم.</div></div>
+        </div>
+    </div>
+</section>
+
+<!-- هوش رزمی -->
+<section class="hr-wrap">
+    <div class="container">
+        <h2>هوش رزمی</h2>
+        <div class="diagram" id="diagram">
+            <svg id="lines"></svg>
+            <div class="core">هوش<br>رزمی</div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA مگنتیک -->
+<section class="cta">
+    <div class="magnetic-wrap">
+        <a class="magnetic" id="magneticBtn" href="https://www.instagram.com/ehsandibazarcoaching" target="_blank" rel="noopener">دنبال کردن در اینستاگرام</a>
+    </div>
+</section>
+
+</main>
+
+<!-- مودال مدرک -->
+<div class="modal" id="modal" role="dialog" aria-modal="true" aria-label="نمایش بزرگ مدرک">
+    <button class="modal-close" id="modalClose" aria-label="بستن">&times;</button>
+    <div>
+        <img id="modalImg" src="" alt="">
+        <div class="cap2" id="modalCap"></div>
+    </div>
+</div>
+
+<script>
+// ===== Parallax تصویر هیرو با موس/لمس =====
+const photo = document.getElementById('heroPhoto');
+const isTouch = matchMedia('(pointer:coarse)').matches;
+const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+if(!reduceMotion){
+    document.addEventListener('mousemove', e => {
+        const x = (e.clientX / window.innerWidth - .5) * 16;
+        const y = (e.clientY / window.innerHeight - .5) * 16;
+        photo.style.transform = `rotateY(${x}deg) rotateX(${-y}deg)`;
+    });
+    document.addEventListener('touchmove', e => {
+        const t = e.touches[0];
+        if(!t) return;
+        const x = (t.clientX / window.innerWidth - .5) * 16;
+        const y = (t.clientY / window.innerHeight - .5) * 16;
+        photo.style.transform = `rotateY(${x}deg) rotateX(${-y}deg)`;
+    }, {passive:true});
+}
+
+// ===== تایم‌لاین: نمایش تدریجی هنگام اسکرول =====
+const tlItems = document.querySelectorAll('.tl-item');
+const io = new IntersectionObserver(entries=>{
+    entries.forEach(en=>{ if(en.isIntersecting) en.target.classList.add('show'); });
+},{threshold:.3});
+tlItems.forEach(i=>io.observe(i));
+
+// ===== دیاگرام هوش رزمی =====
+const concepts = [
+    'تناوب در سرعت',
+    'وضعیت زیر فشار',
+    'جریان پایدار',
+    'قاعده هرم',
+    'بازگشت نیرو',
+    'صدها هوش رزمی در حال تولید محتوا'
+];
+const diagram = document.getElementById('diagram');
+const svg = document.getElementById('lines');
+
+function renderDiagram(){
+    diagram.querySelectorAll('.node').forEach(n=>n.remove());
+    svg.innerHTML = '';
+    const size = diagram.clientWidth; // عرض واقعی کانتینر در همین لحظه
+    const center = size / 2;
+    const nodeSize = Math.max(64, Math.min(100, size * 0.24));
+    const R = size / 2 - nodeSize / 2 - 6; // فاصله مرکز تا گره، طوری که از لبه بیرون نزنه
+
+    concepts.forEach((label,i)=>{
+        const angle = (i / concepts.length) * 2 * Math.PI - Math.PI/2;
+        const cx = center + R*Math.cos(angle);
+        const cy = center + R*Math.sin(angle);
+        const x = cx - nodeSize/2;
+        const y = cy - nodeSize/2;
+
+        const node = document.createElement('div');
+        node.className='node';
+        node.textContent=label;
+        node.style.left = x+'px';
+        node.style.top = y+'px';
+        node.style.width = nodeSize+'px';
+        node.style.height = nodeSize+'px';
+        node.style.fontSize = (nodeSize*0.115)+'px';
+        node.setAttribute('tabindex','0');
+        node.addEventListener('click', ()=>{
+            document.querySelectorAll('.node').forEach(n=>n.classList.remove('active'));
+            node.classList.add('active');
+        });
+        node.addEventListener('keydown', e=>{
+            if(e.key==='Enter' || e.key===' '){ e.preventDefault(); node.click(); }
+        });
+        diagram.appendChild(node);
+
+        const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+        line.setAttribute('x1',center); line.setAttribute('y1',center);
+        line.setAttribute('x2', cx); line.setAttribute('y2', cy);
+        svg.appendChild(line);
+    });
+}
+
+renderDiagram();
+let resizeTimer;
+window.addEventListener('resize', ()=>{
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(renderDiagram, 200);
+});
+
+// ===== مودال مدارک =====
+const modal = document.getElementById('modal');
+const modalImg = document.getElementById('modalImg');
+const modalCap = document.getElementById('modalCap');
+let lastFocused = null;
+document.querySelectorAll('.cred').forEach(c=>{
+    c.setAttribute('tabindex','0');
+    c.setAttribute('role','button');
+    c.addEventListener('click', ()=>{
+        lastFocused = document.activeElement;
+        modalImg.src = c.querySelector('img').src;
+        modalCap.textContent = c.dataset.cap;
+        modal.classList.add('open');
+        document.getElementById('modalClose').focus();
+    });
+    c.addEventListener('keydown', e=>{
+        if(e.key==='Enter' || e.key===' '){ e.preventDefault(); c.click(); }
+    });
+});
+document.getElementById('modalClose').addEventListener('click', ()=>closeModal());
+modal.addEventListener('click', e=>{ if(e.target===modal) closeModal(); });
+document.addEventListener('keydown', e=>{
+    if(e.key === 'Escape' && modal.classList.contains('open')) closeModal();
+});
+function closeModal(){
+    modal.classList.remove('open');
+    if(lastFocused) lastFocused.focus();
+}
+
+// ===== دکمه مگنتیک =====
+document.querySelectorAll('.magnetic').forEach(btn=>{
+    if(!isTouch && !reduceMotion){
+        btn.addEventListener('mousemove', e=>{
+            const r = btn.getBoundingClientRect();
+            const x = e.clientX - r.left - r.width/2;
+            const y = e.clientY - r.top - r.height/2;
+            btn.style.transform = `translate(${x*0.3}px, ${y*0.3}px)`;
+        });
+        btn.addEventListener('mouseleave', ()=>{ btn.style.transform='translate(0,0)'; });
+    }
+});
+</script>
+</body>
+</html>

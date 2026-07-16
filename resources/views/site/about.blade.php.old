@@ -1,0 +1,70 @@
+@extends('site.layout.master')
+@section('site.css')
+    <link rel="stylesheet" type="text/css" href="{{ url('') }}/site_themes/css/internal/style.css"/>
+@endsection
+@section('content')
+    <!--About Us Page-->
+
+    @if(isset($music) && !empty($music))
+        <audio id="my_audio" src="{{ $music->code }}" loop="loop"></audio>
+    @endif
+
+    <div class="container-fluid wrapper default">
+        <div class="about-page-image ">
+            @if(isset($about[0]))
+                <img src="{{ url($about[0]->code5) }}" alt="{{ $about[0]->name }}">
+                <div class="about-page-abs">
+                    <h2>{{ $about[0]->name }}</h2>
+                    <p>{!! $about[0]->code4  !!}</p>
+                </div>
+            @endif
+            {{--        <div class="about-page-abs2">--}}
+            {{--            <div class="w50">--}}
+            {{--                <ul>--}}
+            {{--                    @foreach($about as $key => $value)--}}
+            {{--                       @if($key != 0)--}}
+            {{--                            <li><a href="#bio{{$key}}">{{ $value->name }}</a></li>--}}
+            {{--                        @endif--}}
+            {{--                    @endforeach--}}
+            {{--                </ul>--}}
+            {{--            </div>--}}
+            {{--        </div>--}}
+        </div>
+
+        @foreach($about as $key => $value)
+            @if($key != 0)
+                <div id="bio{{$key}}" class="about-us-page container">
+                    @if(!empty($value->name))
+                        <div class="page-header-about">
+                            <h6>{{ $value->name }}</h6>
+                        </div>
+                    @endif
+                    <div class="about-us-header">
+                        <div class="about25">
+                            <img src="{{ $value->code5 }}" alt="{{ $value->name }}">
+                        </div>
+                        <div class="about75">
+                            <h3>{{ $value->name }}</h3>
+                            <p>
+                                {!! $value->code4 !!}
+                            </p>
+                        </div>
+
+                    </div>
+                </div>
+            @endif
+        @endforeach
+
+
+    </div>
+    <!--About Us Page-->
+
+    @if(isset($music) && !empty($music))
+
+        <script>
+            $(document).ready(function () {
+                $("#my_audio").get(0).play();
+            });
+        </script>
+    @endif
+@endsection

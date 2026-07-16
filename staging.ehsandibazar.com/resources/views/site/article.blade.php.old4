@@ -1,0 +1,480 @@
+@extends('site.layout.master')
+@section('site.css')
+    <link rel="stylesheet" type="text/css" href="{{ url('') }}/site_themes/css/internal/style.css"/>
+    <style>
+        img{ max-width: 100%; height: auto; }
+
+        /* CLS Fix: تصاویر داخل متن مقاله */
+        #article-content img { height: auto !important; width: 100% !important; max-width: 100% !important; }
+
+        /* Progress Bar */
+        #reading-progress{
+            position:fixed !important;
+            top:0 !important;
+            left:0 !important;
+            right:auto !important;
+            width:0 !important;
+            height:4px !important;
+            background:linear-gradient(to right,#d9bb75,#f5e27a) !important;
+            z-index:2147483647 !important;
+            pointer-events:none !important;
+            transition:width 0.15s linear;
+            direction:ltr !important;
+        }
+        .c-header.js-header{ z-index:99 !important; }
+        .c-header, .js-header, header { z-index:9998 !important; }
+
+        /* CLS Fix: تصویر اصلی مقاله */
+        .site-blog-post__box__body__image{
+            aspect-ratio: 16/9;
+            overflow: hidden;
+            background: #f0f0f0;
+        }
+        .site-blog-post__box__body__image img{
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Meta Bar */
+        .article-meta{display:flex;flex-wrap:wrap;align-items:center;gap:14px;padding:10px 0;border-top:1px solid #eee;border-bottom:1px solid #eee;margin-bottom:1.2rem;font-size:13px;color:#666;direction:rtl;}
+        .article-meta span{display:flex;align-items:center;gap:5px;}
+        .article-meta i{color:#d9bb75;font-size:13px;}
+
+        /* TOC */
+        .toc-box{background:#fafaf8;border:1px solid #e8e3d5;border-right:4px solid #d9bb75;border-radius:8px;padding:18px 22px;margin:1.5rem 0;direction:rtl;}
+        .toc-box h5{font-size:14px;font-weight:700;margin-bottom:10px;color:#333;display:flex;align-items:center;gap:7px;}
+        .toc-box ul{list-style:none;padding:0;margin:0;counter-reset:toc-c;}
+        .toc-box ul li{counter-increment:toc-c;padding:5px 0;font-size:13px;border-bottom:1px dashed #e5e5e5;color:#444;}
+        .toc-box ul li:last-child{border-bottom:none;}
+        .toc-box ul li::before{content:counter(toc-c) ". ";color:#d9bb75;font-weight:700;margin-left:5px;}
+        .toc-box ul li a{color:#444;text-decoration:none;}
+        .toc-box ul li a:hover{color:#d9bb75;}
+
+        /* CLS Fix: TOC پنهان با visibility به جای display:none */
+        .toc-box--hidden{
+    visibility: hidden !important;
+    height: 0 !important;
+    overflow: hidden !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+        /* Share */
+        .share-box{background:#f9f7f2;border:1px solid #e8e3d5;border-radius:10px;padding:16px 18px;margin:1.5rem 0;direction:rtl;}
+        .share-box h6{font-size:13px;color:#888;margin-bottom:10px;font-weight:600;}
+        .share-buttons{display:flex;flex-wrap:wrap;gap:9px;}
+        .share-btn{display:inline-flex;align-items:center;gap:6px;padding:7px 16px;border-radius:25px;font-size:13px;font-weight:600;text-decoration:none;border:none;cursor:pointer;transition:opacity 0.2s,transform 0.15s;}
+        .share-btn:hover{opacity:0.85;transform:translateY(-1px);}
+        .share-btn-tg{background:#0088cc;color:#fff;}
+        .share-btn-wa{background:#25D366;color:#fff;}
+        .share-btn-cp{background:#f0f0f0;color:#333;}
+        .share-btn-cp.copied{background:#d9bb75;color:#fff;}
+        .badge-danger{background:#d9bb75 !important;color:#1a1a1a !important;}
+        .badge-dark{background:#333 !important;color:#fff !important;}
+
+        /* Author+Hoosh Box */
+        .hoosh-box{background:linear-gradient(135deg,#1a1a1a 0%,#2d2410 100%);border-radius:14px;padding:26px;margin:1.5rem 0;direction:rtl;position:relative;overflow:hidden;}
+        .hoosh-box::before{content:'';position:absolute;top:-30px;left:-30px;width:110px;height:110px;border-radius:50%;background:rgba(212,175,55,0.07);}
+        .hoosh-box p{font-size:14px;color:#bbb;line-height:2;margin-bottom:10px;}
+        .hoosh-box p.hl{color:#d9bb75;font-weight:600;}
+        .hoosh-box p strong{color:#d9bb75;}
+        .hoosh-btn{display:inline-flex;align-items:center;gap:7px;background:#d9bb75;color:#1a1a1a;font-size:14px;font-weight:700;padding:11px 22px;border-radius:8px;text-decoration:none;transition:background 0.2s,transform 0.15s;margin-top:18px;}
+        .hoosh-btn:hover{background:#c9a227;color:#1a1a1a;transform:translateY(-2px);text-decoration:none;}
+    </style>
+    
+
+
+@endsection
+
+ <!--add new-->
+@section('site-js-header')
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0/jquery.min.js"></script>
+@endsection
+
+@section('content')
+
+{{-- Progress Bar --}}
+<div id="reading-progress"></div>
+
+    <main class="site-blog-post wrapper default">
+        <div class="container">
+            <div class="site-blog-post__path">
+                <ul>
+                    <li>
+                        <a href="{{ route('site.index') }}">خانه</a>
+                    </li>
+                    @if($article->categories->count())
+                    <li>
+                        <a href="#">
+                            {{ $article->categories[0]->title }}
+                        </a>
+                    </li>
+                    @endif
+                    <li>
+                        <a href="{{ $article->path() }}">
+                            {{ $article->title }}
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="site-blog-post__box">
+                <div class="row">
+                    <div class="col-12 col-md-8">
+
+                        <div class="site-blog-post__box__body">
+                            {{-- CLS Fix: تصویر اصلی - بدون loading=lazy، با fetchpriority=high --}}
+                            <div class="site-blog-post__box__body__image">
+                                <img src="{{ isset($article->image[0]) ? url($article->image[0]->url) : null }}"
+                                     alt="{{ $article->title }}"
+                                     fetchpriority="high"
+                                     decoding="async"
+                                     width="800" height="450">
+                            </div>
+                            @if(isset($article->tags))
+                            <!--<div class="site-blog-post__box__body__cat">-->
+                            <!--    <ul>-->
+                            <!--        @foreach($article->tags as $tag)-->
+                            <!--        <li class="badge badge-info">-->
+                            <!--            <a href="{{ $tag->path() }}">{{ $tag->title }}</a>-->
+                            <!--        </li>-->
+                            <!--        @endforeach-->
+                            <!--    </ul>-->
+                            <!--</div>-->
+                            @endif
+                            <div class="site-blog-post__box__body__title">
+                                <h1>{{ $article->title }}</h1>
+                            </div>
+
+                            {{-- Meta Bar --}}
+                            <div class="article-meta">
+                                @if($article->user->first_name)
+                                <span><i class="fas fa-user-circle"></i> {{ $article->user->first_name }}</span>
+                                @endif
+                                <span><i class="fas fa-calendar-alt"></i> {{ $article->created_at }}</span>
+                                @if($article->study_time)
+                                <span><i class="fas fa-clock"></i> {{ $article->study_time }} دقیقه مطالعه</span>
+                                @endif
+                                <span><i class="fas fa-eye"></i> {{ number_format($article->viewCount) }} بازدید</span>
+                            </div>
+
+                            {{-- CLS Fix: TOC با کلاس به جای display:none --}}
+                            <div id="toc-container" class="toc-box toc-box--hidden">
+                                <h5><i class="fas fa-list-ul"></i> فهرست مطالب</h5>
+                                <ul id="toc-list"></ul>
+                            </div>
+                            
+                            <!--<div class="site-blog-post__box__body__info">-->
+                            <!--    <ul>-->
+                            <!--        <li class="badge badge-pill badge-dark">-->
+                            <!--            <i class="fas fa-user"></i>-->
+                            <!--            <span>{{ $article->user->name }}</span>-->
+                            <!--        </li>-->
+                            <!--        <li class="badge badge-pill badge-dark">-->
+                            <!--            <i class="fas fa-date"></i>-->
+                            <!--            <span>{{ $article->created_at }}</span>-->
+                            <!--        </li>-->
+                            <!--        <li class="badge badge-pill badge-dark">-->
+                            <!--            <i class="fas fa-comment"></i>-->
+                            <!--            <span>{{ $article->commentCount }}</span>-->
+                            <!--        </li>-->
+                            <!--    </ul>-->
+                            <!--</div>-->
+                            
+                            <!--<a href="https://ehsandibazar.com/page/%D8%A2%D9%85%D9%88%D8%B2%D8%B4-%D8%AE%D8%B5%D9%88%D8%B5%DB%8C-%D9%88%D8%B1%D8%B2%D8%B4-%D9%87%D8%A7%DB%8C-%D8%B1%D8%B2%D9%85%DB%8C-%D9%88-%D8%AF%D9%81%D8%A7%D8%B9-%D8%B4%D8%AE%D8%B5%DB%8C" target="_blank">-->
+                            <!--        <img src="{{ asset('site_themes/images/dibazar-banner.gif') }}" loading="lazy" />-->
+                            <!--</a>-->
+                            
+                            
+                            <div class="site-blog-post__box__body__detail" id="article-content">
+                                <p>{!! $article->body !!}</p>
+                            </div>
+
+
+<!--<style>.h_iframe-aparat_embed_frame{position:relative;}.h_iframe-aparat_embed_frame .ratio{display:block;width:100%;height:auto;}.h_iframe-aparat_embed_frame iframe{position:absolute;top:0;left:0;width:100%;height:100%;}</style><div class="h_iframe-aparat_embed_frame"><span style="display: block;padding-top: 57%"></span><iframe src="https://www.aparat.com/video/video/embed/videohash/UqbKW/vt/frame"  allowFullScreen="true" webkitallowfullscreen="true" mozallowfullscreen="true"></iframe></div>-->
+
+
+			          @if($article->faq)
+                                        <div class="accordion my-5" id="accordionExample1">
+                                            <h4 class="text-center text-secondary"><span class="fa fa-question-circle"></span> سوالات متداول</h4>
+                                            @foreach($article->faq as $f)
+                                                <div class="accordion-item">
+                                                    <h5 class="accordion-header" id="heading{{ $loop->iteration }}">
+                                                        <button class="accordion-button"
+                                                                type="button"
+                                                                data-bs-toggle="collapse"
+                                                                data-bs-target="#collapse{{ $loop->iteration }}"
+                                                                aria-expanded="true"
+                                                                aria-controls="collapse{{ $loop->iteration }}">
+                                                            {{ $f['question'] }}
+                                                        </button>
+                                                    </h5>
+                                                    <div id="collapse{{ $loop->iteration }}"
+                                                         class="accordion-collapse collapse {{ $loop->first ? 'show' : '' }}"
+                                                         aria-labelledby="heading{{ $loop->iteration }}"
+                                                         data-bs-parent="#accordionExample1">
+                                                        <div class="accordion-body">
+                                                            {{ $f['answer'] }}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    @endif
+									
+
+                            {{-- Share --}}
+                            <div class="share-box">
+                                <h6><i class="fas fa-share-alt" style="color:#d9bb75;"></i> این مقاله رو به اشتراک بذار</h6>
+                                <div class="share-buttons">
+                                    <a href="https://t.me/share/url?url={{ urlencode(url($article->path())) }}&text={{ urlencode($article->title) }}" target="_blank" rel="noopener" class="share-btn share-btn-tg"><i class="fab fa-telegram-plane"></i> تلگرام</a>
+                                    <a href="https://wa.me/?text={{ urlencode($article->title . ' ' . url($article->path())) }}" target="_blank" rel="noopener" class="share-btn share-btn-wa"><i class="fab fa-whatsapp"></i> واتساپ</a>
+                                    <button class="share-btn share-btn-cp" onclick="copyLink(this)" data-url="{{ url($article->path()) }}"><i class="fas fa-link"></i> کپی لینک</button>
+                                </div>
+                            </div>
+
+                            {{-- Author + Hoosh Razmi --}}
+                            <div class="hoosh-box">
+                                <div style="display:flex;align-items:center;gap:16px;margin-bottom:18px;">
+                                    <div style="width:60px;height:60px;border-radius:50%;background:#d9bb75;flex-shrink:0;"></div>
+                                    <div>
+                                        <div style="font-size:16px;font-weight:800;color:#fff;">سلام، من {{ $article->user->first_name ?? 'احسان دیبازر' }} هستم</div>
+                                        <div style="font-size:12px;color:#d9bb75;margin-top:3px;">مربی هنرهای رزمی و دفاع شخصی | کارشناس ارشد علوم ورزشی | توسعه‌دهنده مفهوم هوش رزمی</div>
+                                    </div>
+                                </div>
+                                <p>سال‌هاست زندگی من با ورزش‌های رزمی گره خورده؛ اما چیزی که همیشه بیشتر از مدال، مدرک یا مسابقه برایم اهمیت داشته، رشد انسان‌ها بوده است.</p>
+                                <p>من باور دارم هنرهای رزمی فقط برای مبارزه نیستند. اگر درست آموزش داده شوند، اعتمادبه‌نفس می‌سازند، قدرت تصمیم‌گیری را بالا می‌برند، ذهن را تحت فشار آرام‌تر می‌کنند و به آدم‌ها یاد می‌دهند در موقعیت‌های سخت بهتر عمل کنند.</p>
+                                <p>امروز تمام این تجربه‌ها را در یک مسیر واحد به کار گرفته‌ام؛ مسیری که آن را <strong>«هوش رزمی»</strong> می‌نامم — توانایی حفظ آرامش زیر فشار، تصمیم‌گیری درست، کنترل ذهن و محافظت مؤثر از خود و عزیزانت.</p>
+                                <p class="hl">اگر این صفحه را می‌بینی، یعنی احتمالاً تو هم فقط دنبال یاد گرفتن چند تکنیک نیستی؛ می‌خواهی قوی‌تر فکر کنی و توانمندتر عمل کنی.</p>
+                                <a href="https://www.instagram.com/ehsandibazarcoaching" target="_blank" rel="noopener" onclick="gtag('event', 'click', {event_category: 'outbound', event_label: 'احسان_دیبازر', value: 1});" class="hoosh-btn">
+                                    <i class="fab fa-instagram"></i> برای کشف هوش رزمی کلیک کن
+                                </a>
+                            </div>
+
+                            @include('site.product.partials.comment')
+                        </div>
+
+
+					
+
+									
+
+                        @if(isset($similarArticles) && count($similarArticles) > 0)
+                            <div class="site-blog-post__related">
+                                <div class="site-blog__sidebar__item__header">
+                                    <fieldset>
+                                        <legend>
+                                            مطالب مرتبط
+                                        </legend>
+                                    </fieldset>
+                                </div>
+                                <div class="row">
+                                    @foreach($similarArticles as $itemArticle)
+                                        <div class="col-12 col-md-4">
+                                            <div class="site-blog__posts__item">
+                                                <div class="site-blog__posts__item__image">
+                                                    <a href="{{ $itemArticle->path() }}">
+                                                        <img src="{{ isset($itemArticle->image[0]) ? url($itemArticle->image[0]->url) : null }}"
+                                                             alt="{{ $itemArticle->title }}" loading="lazy">
+                                                    </a>
+                                                    <div class="site-blog__posts__item__cat">
+                                            <span class="site-blog__posts__item__cat__label">
+                                                 {{ $itemArticle->categories[0]->title }}
+                                            </span>
+                                                    </div>
+
+                                                </div>
+                                                <div class="site-blog__posts__item__desc">
+                                                    <h4 class="site-blog__posts__item__desc__title">
+                                                        <a href="{{ $itemArticle->path() }}">
+                                                            {{ $itemArticle->title }}
+                                                        </a>
+                                                    </h4>
+                                                    <ul class="site-blog__posts__item__desc__list">
+													@if($itemArticle->user->first_name)
+                                                        <li>
+                                                            {{ $itemArticle->user->first_name }}
+                                                        </li>
+														@endif
+
+                                                        <li>
+                                                            {{ $itemArticle->created_at }}
+                                                        </li>
+                                                    </ul>
+                                                    <p class="site-blog__posts__item__desc__detail">
+                                                        {!! \Illuminate\Support\Str::limit(strip_tags($itemArticle->body),100) !!}
+
+                                                    </p>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endif
+                    </div>
+
+                    @if(isset($lastArticles) && count($lastArticles) > 0)
+                        <div class="col-12 col-md-4">
+                            <div class="site-blog__sidebar__item__header">
+                                <fieldset>
+                                    <legend>
+                                        آخرین مطالب
+                                    </legend>
+                                </fieldset>
+                            </div>
+                            <div class="site-blog-post__last">
+                                @foreach($lastArticles as $itemLastArticle)
+                                    <div class="site-blog-post__last__item">
+                                        <div class="row">
+                                            <div class="col-4">
+                                                <div class="site-blog-post__last__item__image">
+                                                    <a href="{{ $itemLastArticle->path() }}">
+                                                        <img src="{{ isset($itemLastArticle->image[0]) ? url($itemLastArticle->image[0]->url) : null }}"
+                                                             alt="{{ $itemLastArticle->title }}" loading="lazy">
+                                                    </a>
+                                                </div>
+                                            </div>
+                                            <div class="col-8">
+                                                <div class="site-blog-post__last__item__desc">
+                                                    <h6>
+                                                        <a href="{{ $itemLastArticle->path() }}">{{ $itemLastArticle->title }}</a>
+                                                    </h6>
+                                                    <ul>
+                                                        <li class="badge badge-danger">
+                                                            <i class="fas fa-date"></i>
+                                                            <span>{{ $itemLastArticle->created_at }}</span>
+                                                        </li>
+
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+@endsection
+
+    @section('site-json-ld')
+    <script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "NewsArticle",
+    "headline": "{{ $article->title }}",
+    "url": "{{ url($article->path()) }}",
+    "datePublished": "{{ $article->updated_at ? $article->updated_at->toIso8601String() : '' }}",
+    "dateModified": "{{ $article->updated_at ? $article->updated_at->toIso8601String() : '' }}",
+    "image": "{{ isset($article->image[0]) ? url($article->image[0]->url) : '' }}",
+    "author": {
+        "@type": "Person",
+        "name": "{{ $article->user->first_name ?? 'احسان دیبازر' }}"
+    },
+    "publisher": {
+        "@type": "Organization",
+        "name": "آکادمی احسان دیبازر",
+        "url": "https://ehsandibazar.com"
+    }
+}
+</script>
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        "name": "احسان دیبازر",
+        "alternateName": "Ehsan Dibazar",
+        "url": "https://ehsandibazar.com",
+        "jobTitle": "مربی هنرهای رزمی و دفاع شخصی",
+        "description": "کارشناس ارشد علوم ورزشی و توسعه‌دهنده مفهوم هوش رزمی",
+        "sameAs": ["https://www.instagram.com/ehsandibazarcoaching","https://ehsandibazar.com"],
+        "knowsAbout": ["موی‌تای","جوجیتسو برزیلی","دفاع شخصی","هوش رزمی","علوم ورزشی"]
+    }
+    </script>
+    @if($article->faq)
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            @foreach($article->faq as $f)
+            {"@type":"Question","name":"{{ addslashes($f['question']) }}","acceptedAnswer":{"@type":"Answer","text":"{{ addslashes($f['answer']) }}"}}{{ !$loop->last ? ',' : '' }}
+            @endforeach
+        ]
+    }
+    </script>
+    @endif
+    @endsection
+
+    @section('site-js')
+    <script>
+
+    // Progress Bar
+    (function progressBar() {
+        var bar = document.getElementById('reading-progress');
+        if (!bar) { setTimeout(progressBar, 500); return; }
+        var lastPos = -1;
+        function update() {
+            var s = window.pageYOffset || document.documentElement.scrollTop;
+            if (s !== lastPos) {
+                lastPos = s;
+                var d = document.documentElement.scrollHeight - window.innerHeight;
+                bar.style.width = (d > 0 ? (s / d * 100) : 0) + 'vw';
+            }
+            requestAnimationFrame(update);
+        }
+        requestAnimationFrame(update);
+    })();
+
+    // TOC - CLS Fix: حذف display:none، استفاده از کلاس
+    var content = document.getElementById('article-content');
+    var tocList = document.getElementById('toc-list');
+    var tocBox = document.getElementById('toc-container');
+    if (content && tocList) {
+        var headings = content.querySelectorAll('h2, h3');
+        if (headings.length >= 2) {
+            headings.forEach(function(h, i) {
+                h.id = 'sec-' + i;
+                var li = document.createElement('li');
+                var a = document.createElement('a');
+                a.href = '#sec-' + i;
+                a.textContent = h.textContent;
+                if (h.tagName === 'H3') li.style.paddingRight = '14px';
+                a.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    document.getElementById('sec-' + i).scrollIntoView({behavior:'smooth'});
+                });
+                li.appendChild(a);
+                tocList.appendChild(li);
+            });
+            tocBox.classList.remove('toc-box--hidden');
+        }
+    }
+
+    // Copy link
+    function copyLink(btn) {
+        var url = btn.getAttribute('data-url');
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(url).then(function() { showCopied(btn); });
+        } else {
+            var ta = document.createElement('textarea');
+            ta.value = url; document.body.appendChild(ta); ta.select();
+            document.execCommand('copy'); document.body.removeChild(ta);
+            showCopied(btn);
+        }
+    }
+    function showCopied(btn) {
+        btn.classList.add('copied');
+        btn.innerHTML = '<i class="fas fa-check"></i> کپی شد!';
+        setTimeout(function() { btn.classList.remove('copied'); btn.innerHTML = '<i class="fas fa-link"></i> کپی لینک'; }, 2500);
+    }
+</script>
+@endsection
