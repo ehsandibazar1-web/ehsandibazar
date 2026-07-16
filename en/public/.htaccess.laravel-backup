@@ -1,14 +1,23 @@
-# English section is retired. Permanently redirect every /en request to the
-# dedicated English site (trainwithehsan.com). A 301 preserves SEO value by
-# passing the authority of the old English pages to the new site.
 <IfModule mod_rewrite.c>
-    RewriteEngine On
-    RewriteRule ^ https://trainwithehsan.com/ [L,R=301]
-</IfModule>
+    <IfModule mod_negotiation.c>
+        Options -MultiViews -Indexes
+    </IfModule>
 
-# Fallback for servers where mod_rewrite is unavailable.
-<IfModule !mod_rewrite.c>
-    Redirect 301 / https://trainwithehsan.com/
+    RewriteEngine On
+
+    # Handle Authorization Header
+    RewriteCond %{HTTP:Authorization} .
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
+    # Redirect Trailing Slashes If Not A Folder...
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_URI} (.+)/$
+    RewriteRule ^ %1 [L,R=301]
+
+    # Handle Front Controller...
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^ index.php [L]
 </IfModule>
 
 # BEGIN cPanel-generated php ini directives, do not edit

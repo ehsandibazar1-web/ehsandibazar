@@ -124,7 +124,7 @@
                 <div class="col-12 d-xl-none d-lg-none p-0 col-mob">
                     <ul class="list-link">
                         <li class="lng  align-items-center">
-                             <a href="/en" aria-label="English">
+                             <a href="https://trainwithehsan.com" aria-label="English">
                                 <span>
                                     <img src="{{asset('site_themes/images/en.svg')}}" width="24" height="24" alt="English">
                                 </span>
@@ -159,7 +159,7 @@
                     <div class="cssmenu" id="cssmenu1">
                         <ul class="">
                             <li class="lng  align-items-center">
-                                 <a href="/en" aria-label="English">
+                                 <a href="https://trainwithehsan.com" aria-label="English">
                                 <span class="iconen"></span>
                                 <span>
                                     <img alt="زبان انگلیسی آموزش دفاع شخصی دیبازر " src="{{asset('site_themes/images/en.svg')}}" width="24" height="24">
