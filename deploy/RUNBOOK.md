@@ -23,11 +23,11 @@
   `claude/website-code-github-upload-xn3z2n` تغییر بده → **Update**
 - تأیید: HEAD Commit باید مربوط به Laravel 12 باشد.
 
-### ۱.۳ کپی پوشه‌های asset (همه در staging آماده‌اند)
-- File Manager → برو به `public_html/staging-app/public`
-- این پوشه‌ها را انتخاب کن:
-  `site_themes` · `users_theme` · `admin` · `storage` · `upload` · `public`
-- **Copy** → مقصد: `/public_html/main-app/public`
+### ۱.۳ ~~کپی پوشه‌های asset~~ — لازم نیست! ✅
+برای production هیچ کپی‌ای لازم نیست: بلوک سوییچ (فاز ۲) طوری نوشته شده که
+پوشه‌های asset (`site_themes`، `users_theme`، `admin`، `upload`، `storage`،
+`public`، `css`، `js`، `general`، `vendor`) از **همان جای فعلی‌شان در
+`public_html`** سرو شوند. صفر مصرف دیسک اضافه، صفر ریسک جاافتادن فایل.
 
 ### ۱.۴ فایل `.env` production
 - File Manager → `public_html` → فایل `.env` فعلی سایت را **Copy** → مقصد: `/public_html/main-app`
@@ -68,14 +68,22 @@
 
 ```apache
 # ---- NEW SITE (Laravel 12): route main-domain traffic into main-app/public ----
+# Asset folders are excluded and keep serving from their current locations
+# in public_html (no duplication needed).
 <IfModule mod_rewrite.c>
     RewriteEngine On
     RewriteCond %{HTTP_HOST} ^(www\.)?ehsandibazar\.com$ [NC]
     RewriteCond %{REQUEST_URI} !^/main-app/public/
+    RewriteCond %{REQUEST_URI} !^/(site_themes|users_theme|admin|upload|storage|public|css|js|general|vendor|site_theme)/
+    RewriteCond %{REQUEST_URI} !^/(google[a-z0-9]*\.html|ads\.txt|favicon\.ico)$
     RewriteRule ^(.*)$ main-app/public/$1 [L]
 </IfModule>
 # ---- END NEW SITE ----
 ```
+
+> نکته: با این نسخه، فایل تأیید Search Console و ads.txt و favicon هم از جای
+> فعلی‌شان سرو می‌شوند — کار ۱.۵ هم عملاً حذف می‌شود (فقط مطمئن شو در
+> public_html هستند).
 
 ذخیره کن. از این لحظه سایت اصلی از کد جدید سرو می‌شود.
 
