@@ -1,0 +1,24 @@
+[11-Oct-2024 17:01:07 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/ehsandib/public_html/config/database.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/ehsandib/public_html/config/database.php on line 16
+[30-Nov-2025 19:20:08 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/ehsandib/public_html/config/database.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/ehsandib/public_html/config/database.php on line 16
+[30-Nov-2025 19:20:09 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/ehsandib/public_html/config/app.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/ehsandib/public_html/config/app.php on line 16
+[30-Nov-2025 19:20:09 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/ehsandib/public_html/config/mail.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/ehsandib/public_html/config/mail.php on line 16
+[10-Jul-2026 23:00:34 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/ehsandib/public_html/config/app.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/ehsandib/public_html/config/app.php on line 16
+[10-Jul-2026 23:00:34 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/ehsandib/public_html/config/mail.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/ehsandib/public_html/config/mail.php on line 16

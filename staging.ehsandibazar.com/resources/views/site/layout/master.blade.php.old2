@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="fa-IR" dir="rtl">
+<head>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    {!! SEOMeta::generate() !!}
+    {!! OpenGraph::generate() !!}
+    {!! Twitter::generate() !!}
+    <link rel="preload" href="{{ asset('site_themes/fonts/Vazir-Medium.woff2') }}" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="{{ asset('site_themes/fonts/Vazir.woff2') }}" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="{{ asset('site_themes/webfonts/fa-solid-900.woff2') }}" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="{{ asset('site_themes/webfonts/fa-light-300.woff2') }}" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="{{ asset('site_themes/webfonts/fa-brands-400.woff2') }}" as="font" type="font/woff2" crossorigin>
+    <meta charset="utf-8">
+    
+<meta name="robots" content="index,follow" />
+    @if(request()->url()=='https://ehsandibazar.com/category/Self-Defense')
+         <link rel="canonical" href="https://ehsandibazar.com/page/%D8%A2%D9%85%D9%88%D8%B2%D8%B4-%D8%AF%D9%81%D8%A7%D8%B9-%D8%B4%D8%AE%D8%B5%DB%8C">
+    @else
+   
+       <link rel="canonical" href="{{request()->url()}}">
+    @endif
+    
+    
+    
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#d9bb75">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="msapplication-TileImage" content="/ms-icon-144x144.png">
+    <meta name="theme-color" content="#ffffff">
+    <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
+<link rel="preconnect" href="https://www.google-analytics.com" crossorigin>
+<link rel="preconnect" href="https://www.clarity.ms" crossorigin>
+
+<link rel="stylesheet" href="{{ asset('site_themes/css/main.min.css') }}"/>
+<link rel="stylesheet" href="{{ asset('site_themes/css/template.css') }}"/>
+    <style>
+        @font-face{font-family:Vazir-Medium;src:url("{{ asset('site_themes/fonts/Vazir-Medium.woff2') }}") format("woff2"),url("{{ asset('site_themes/fonts/Vazir-Medium.woff') }}") format("woff");font-weight:500;font-display:swap}
+        @font-face{font-family:Vazir-Medium;src:url("{{ asset('site_themes/fonts/Vazir.woff2') }}") format("woff2"),url("{{ asset('site_themes/fonts/Vazir.woff') }}") format("woff");font-weight:400;font-display:swap}
+    </style>
+     
+
+    @yield('site.css')
+    <script src="{{ asset('site_themes/js/main-min.js') }}"></script>
+    @yield('site-js-header')
+    @yield('site-json-ld')
+
+    <!--
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-229939247-2"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-229939247-2');
+</script>
+-->
+<!-- Google tag (gtag.js) --> <script async src="https://www.googletagmanager.com/gtag/js?id=G-FM9K8D8P3E"></script> <script> window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'G-FM9K8D8P3E'); </script>
+
+    <!-- Global site tag (gtag.js) - Google Ads: AW-18235155408 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=AW-18235155408"></script>
+    <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    
+    gtag('config', 'AW-18235155408');
+    </script>
+    
+    
+    
+    
+    
+    
+  
+ <!--   
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-FMJ1DZ4F80"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+    
+      gtag('config', 'G-FMJ1DZ4F80');
+    </script>
+ --> 
+  
+    
+    <!-- Microsoft Clarity -->
+<script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "x7v6ymnw5g");
+</script>
+
+<!-- jQuery Lazyload plugin -->
+<script src="{{ asset('site_themes/js/jquery.lazyload.js') }}"></script>
+
+</head>
+
+<body class=" t-index has-top-banner">
+<div class="page container-fluid p-0">
+@include('site.layout.partials.header')
+@yield('content')
+@include('site.layout.partials.footer')
+<!--
+    <div class="box-search">
+        <div class="search-inner">
+            <form action="{{ route('site.search') }}" method="get" class="search-form">
+                <div class="frm">
+                    <input type="text" placeholder="جستجو کنید..." class="input-search" name="title">
+                    <button class="btn-serch icon-theme"><i class="fal fa-search"></i></button>
+                </div>
+            </form>
+            <div class="btSearchInnerClose icon-theme">
+                <i class="fal fa-times-circle"></i>
+            </div>
+        </div>
+    </div>
+    -->
+
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    
+                    <span class="modal-title" id="exampleModalLabel"></span>
+                    
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <video controls width="100%">
+                        <source src="" type="video/mp4">
+                    </video>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    
+
+   
+ <div style="display: none" class="chaty chaty-id-0 chaty-widget-0 chaty-key-0 first_click active" id="chaty-widget-0" data-key="0" data-id="0" data-identifier="0" data-nonce="451a2b2cf6">
+	<div class="chaty-widget left-position">
+		<div class="chaty-channels">
+			<div class="chaty-channel-list">
+			    <div class="chaty-channel Instagram-channel" id="Instagram-0-channel" data-id="Instagram-0" data-widget="0" data-channel="Instagram"><a href="https://www.instagram.com/Ehsandibazarcoaching" target="_blank" class="chaty-tooltip pos-right" data-form="chaty-form-0-Instagram" data-hover="Instagram"><span class="chaty-icon channel-icon-Instagram"><span class="chaty-svg"><svg width="39" height="39" viewBox="0 0 39 39" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="linear-gradient" x1="0.892" y1="0.192" x2="0.128" y2="0.85" gradientUnits="objectBoundingBox"><stop offset="0" stop-color="#4a64d5"></stop><stop offset="0.322" stop-color="#9737bd"></stop><stop offset="0.636" stop-color="#f15540"></stop><stop offset="1" stop-color="#fecc69"></stop></linearGradient></defs><circle class="color-element" cx="19.5" cy="19.5" r="19.5" fill="url(#linear-gradient)"></circle><path id="Path_1923" data-name="Path 1923" d="M13.177,0H5.022A5.028,5.028,0,0,0,0,5.022v8.155A5.028,5.028,0,0,0,5.022,18.2h8.155A5.028,5.028,0,0,0,18.2,13.177V5.022A5.028,5.028,0,0,0,13.177,0Zm3.408,13.177a3.412,3.412,0,0,1-3.408,3.408H5.022a3.411,3.411,0,0,1-3.408-3.408V5.022A3.412,3.412,0,0,1,5.022,1.615h8.155a3.412,3.412,0,0,1,3.408,3.408v8.155Z" transform="translate(10 10.4)" fill="#fff"></path><path id="Path_1924" data-name="Path 1924" d="M45.658,40.97a4.689,4.689,0,1,0,4.69,4.69A4.695,4.695,0,0,0,45.658,40.97Zm0,7.764a3.075,3.075,0,1,1,3.075-3.075A3.078,3.078,0,0,1,45.658,48.734Z" transform="translate(-26.558 -26.159)" fill="#fff"></path></svg><path id="Path_1925" data-name="Path 1925" d="M120.105,28.251a1.183,1.183,0,1,0,.838.347A1.189,1.189,0,0,0,120.105,28.251Z" transform="translate(-96.119 -14.809)" fill="#fff"></path></span></span></a></div>
+                <div class="chaty-channel Telegram-channel" id="Telegram-0-channel" data-id="Telegram-0" data-widget="0" data-channel="Telegram"><a href="https://t.me/Ehsandibazar" target="_blank" class="chaty-tooltip pos-right" data-form="chaty-form-0-Telegram" data-hover="Telegram"><span class="chaty-icon channel-icon-Telegram"><span class="chaty-svg"><svg width="39" height="39" viewBox="0 0 39 39" fill="none" xmlns="http://www.w3.org/2000/svg"><circle class="color-element" cx="19.4395" cy="19.4395" r="19.4395" fill="#3E99D8"></circle><path d="M3.56917 -2.55497e-07L0 6.42978L7.5349 1.87535L3.56917 -2.55497e-07Z" transform="translate(13.9704 24.6145)" fill="#E0E0E0"></path><path d="M20.8862 0.133954C20.754 0 20.4897 0 20.2253 0L0.396574 8.03723C0.132191 8.17118 0 8.43909 0 8.707C0 8.97491 0.132191 9.24282 0.396574 9.37677L17.5814 17.414C17.7136 17.414 17.7136 17.414 17.8458 17.414C17.978 17.414 18.1102 17.414 18.1102 17.28C18.2424 17.1461 18.3746 17.0121 18.5068 16.7442L21.1506 0.669769C21.1506 0.535815 21.1506 0.267908 20.8862 0.133954Z" transform="translate(7.36069 10.9512)" fill="white"></path><path d="M13.8801 0L0 11.52V19.4233L3.70136 13.2614L13.8801 0Z" transform="translate(13.9704 11.6208)" fill="#F2F2F2"></path></svg></span></span></a></div>
+                 {{--<div class="chaty-channel Whatsapp-channel" id="Whatsapp-0-channel" data-id="Whatsapp-0" data-widget="0" data-channel="Whatsapp"><a href="https://wa.me/989128936406?text=" target="_blank" class="chaty-tooltip pos-right" data-form="chaty-form-0-Whatsapp" data-hover="WhatsApp"><span class="chaty-icon channel-icon-Whatsapp"><span class="chaty-svg"><svg width="39" height="39" viewBox="0 0 39 39" fill="none" xmlns="http://www.w3.org/2000/svg"><circle class="color-element" cx="19.4395" cy="19.4395" r="19.4395" fill="#49E670"></circle><path d="M12.9821 10.1115C12.7029 10.7767 11.5862 11.442 10.7486 11.575C10.1902 11.7081 9.35269 11.8411 6.84003 10.7767C3.48981 9.44628 1.39593 6.25317 1.25634 6.12012C1.11674 5.85403 2.13001e-06 4.39053 2.13001e-06 2.92702C2.13001e-06 1.46351 0.83755 0.665231 1.11673 0.399139C1.39592 0.133046 1.8147 1.01506e-06 2.23348 1.01506e-06C2.37307 1.01506e-06 2.51267 1.01506e-06 2.65226 1.01506e-06C2.93144 1.01506e-06 3.21063 -2.02219e-06 3.35022 0.532183C3.62941 1.19741 4.32736 2.66092 4.32736 2.79397C4.46696 2.92702 4.46696 3.19311 4.32736 3.32616C4.18777 3.59225 4.18777 3.59224 3.90858 3.85834C3.76899 3.99138 3.6294 4.12443 3.48981 4.39052C3.35022 4.52357 3.21063 4.78966 3.35022 5.05576C3.48981 5.32185 4.18777 6.38622 5.16491 7.18449C6.42125 8.24886 7.39839 8.51496 7.81717 8.78105C8.09636 8.91409 8.37554 8.9141 8.65472 8.648C8.93391 8.38191 9.21309 7.98277 9.49228 7.58363C9.77146 7.31754 10.0507 7.1845 10.3298 7.31754C10.609 7.45059 12.2841 8.11582 12.5633 8.38191C12.8425 8.51496 13.1217 8.648 13.1217 8.78105C13.1217 8.78105 13.1217 9.44628 12.9821 10.1115Z" transform="translate(12.9597 12.9597)" fill="#FAFAFA"></path><path d="M0.196998 23.295L0.131434 23.4862L0.323216 23.4223L5.52771 21.6875C7.4273 22.8471 9.47325 23.4274 11.6637 23.4274C18.134 23.4274 23.4274 18.134 23.4274 11.6637C23.4274 5.19344 18.134 -0.1 11.6637 -0.1C5.19344 -0.1 -0.1 5.19344 -0.1 11.6637C-0.1 13.9996 0.624492 16.3352 1.93021 18.2398L0.196998 23.295ZM5.87658 19.8847L5.84025 19.8665L5.80154 19.8788L2.78138 20.8398L3.73978 17.9646L3.75932 17.906L3.71562 17.8623L3.43104 17.5777C2.27704 15.8437 1.55796 13.8245 1.55796 11.6637C1.55796 6.03288 6.03288 1.55796 11.6637 1.55796C17.2945 1.55796 21.7695 6.03288 21.7695 11.6637C21.7695 17.2945 17.2945 21.7695 11.6637 21.7695C9.64222 21.7695 7.76778 21.1921 6.18227 20.039L6.17557 20.0342L6.16817 20.0305L5.87658 19.8847Z" transform="translate(7.7758 7.77582)" fill="white" stroke="white" stroke-width="0.2"></path></svg></span></span></a></div>--}}
+                 {{--
+					<div class="chaty-channel Phone-channel" id="Phone-0-channel" data-id="Phone-0" data-widget="0" data-channel="sms"><a href="sms:+989128936406" target="" class="chaty-tooltip pos-right" data-form="chaty-form-0-Phone" data-hover="sms"><span class="chaty-icon channel-icon-Phone"><span class="chaty-svg">
+					    <svg width="39" height="39" viewBox="0 0 39 39" fill="none" xmlns="http://www.w3.org/2000/svg"><circle class="color-element" cx="19.4395" cy="19.4395" r="19.4395" fill="#FF549C"></circle><path fill-rule="evenodd" clip-rule="evenodd" d="M2.60298 0H16.9194C18.351 0 19.5224 1.19321 19.5224 2.65158V14.5838C19.5224 16.0421 18.351 17.2354 16.9194 17.2354H7.4185L3.64418 20.4173C3.51402 20.5499 3.38388 20.5499 3.25372 20.5499H2.99344C2.73314 20.4173 2.60298 20.1521 2.60298 19.887V17.2354C1.17134 17.2354 0 16.0421 0 14.5838V2.65158C0 1.19321 1.17134 0 2.60298 0ZM2.60316 11.2696C2.60316 11.6673 2.86346 11.9325 3.25391 11.9325H4.5554C5.5966 11.9325 6.50764 11.0044 6.50764 9.94376C6.50764 8.88312 5.5966 7.95505 4.5554 7.95505C4.16496 7.95505 3.90465 7.68991 3.90465 7.29218C3.90465 6.89441 4.16496 6.62927 4.5554 6.62927H5.85689C6.24733 6.62927 6.50764 6.36411 6.50764 5.96637C6.50764 5.56863 6.24733 5.30347 5.85689 5.30347H4.5554C3.51421 5.30347 2.60316 6.23154 2.60316 7.29218C2.60316 8.35281 3.51421 9.28085 4.5554 9.28085C4.94585 9.28085 5.20613 9.54602 5.20613 9.94376C5.20613 10.3415 4.94585 10.6067 4.5554 10.6067H3.25391C2.86346 10.6067 2.60316 10.8718 2.60316 11.2696ZM14.9678 11.9325H13.6664C13.2759 11.9325 13.0156 11.6673 13.0156 11.2696C13.0156 10.8718 13.2759 10.6067 13.6664 10.6067H14.9678C15.3583 10.6067 15.6186 10.3415 15.6186 9.94376C15.6186 9.54602 15.3583 9.28085 14.9678 9.28085C13.9267 9.28085 13.0156 8.35281 13.0156 7.29218C13.0156 6.23154 13.9267 5.30347 14.9678 5.30347H16.2693C16.6598 5.30347 16.9201 5.56863 16.9201 5.96637C16.9201 6.36411 16.6598 6.62927 16.2693 6.62927H14.9678C14.5774 6.62927 14.3171 6.89441 14.3171 7.29218C14.3171 7.68991 14.5774 7.95505 14.9678 7.95505C16.009 7.95505 16.9201 8.88312 16.9201 9.94376C16.9201 11.0044 16.009 11.9325 14.9678 11.9325ZM10.4126 11.2697C10.4126 11.6674 10.6729 11.9326 11.0633 11.9326C11.4538 11.9326 11.7141 11.6674 11.8442 11.2697V5.96649C11.8442 5.70135 11.5839 5.43619 11.3236 5.30362C10.9332 5.30362 10.6729 5.43619 10.5427 5.70135L9.76186 7.15973L8.98094 5.70135C8.85081 5.43619 8.46034 5.17102 8.20006 5.30362C7.93977 5.43619 7.67946 5.70135 7.67946 5.96649V11.2697C7.67946 11.6674 7.93977 11.9326 8.33022 11.9326C8.72066 11.9326 8.98094 11.6674 8.98094 11.2697V8.75067L9.1111 8.88327C9.37138 9.28101 10.0221 9.28101 10.2825 8.88327L10.4126 8.75067V11.2697Z" transform="translate(9.67801 10.4601)" fill="white"></path></svg>
+					</span></span></a></div>
+
+			<div class="chaty-channel Phone-channel" id="Phone-0-channel" data-id="Phone-0" data-widget="0" data-channel="Phone"><a href="tel:+989128936406" target="" class="chaty-tooltip pos-right" data-form="chaty-form-0-Phone" data-hover="Phone"><span class="chaty-icon channel-icon-Phone"><span class="chaty-svg"><svg width="39" height="39" viewBox="0 0 39 39" fill="none" xmlns="http://www.w3.org/2000/svg"><circle class="color-element" cx="19.4395" cy="19.4395" r="19.4395" fill="#03E78B"></circle><path d="M19.3929 14.9176C17.752 14.7684 16.2602 14.3209 14.7684 13.7242C14.0226 13.4259 13.1275 13.7242 12.8292 14.4701L11.7849 16.2602C8.65222 14.6193 6.11623 11.9341 4.47529 8.95057L6.41458 7.90634C7.16046 7.60799 7.45881 6.71293 7.16046 5.96705C6.56375 4.47529 6.11623 2.83435 5.96705 1.34259C5.96705 0.596704 5.22117 0 4.47529 0H0.745882C0.298353 0 5.69062e-07 0.298352 5.69062e-07 0.745881C5.69062e-07 3.72941 0.596704 6.71293 1.93929 9.3981C3.87858 13.575 7.30964 16.8569 11.3374 18.7962C14.0226 20.1388 17.0061 20.7355 19.9896 20.7355C20.4371 20.7355 20.7355 20.4371 20.7355 19.9896V16.4094C20.7355 15.5143 20.1388 14.9176 19.3929 14.9176Z" transform="translate(9.07179 9.07178)" fill="white"></path></svg></span></span></a></div>--}}
+			</div>
+			<div class="chaty-i-trigger">
+				<div class="chaty-channel chaty-cta-main has-on-hover pos-right" data-widget="0"><span class="on-hover-text">ارتباط با ما</span>
+					<div class="chaty-cta-button">
+						<button type="button" class="open-chaty"><span class="chaty-svg"><svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="-496 507.7 54 54" style="enable-background-color:new -496 507.7 54 54;" xml:space="preserve"><style type="text/css">.chaty-sts1{fill: #FFFFFF;}.chaty-st0{fill: #808080;}</style><g><circle cx="-469" cy="534.7" r="27" fill="#d9bb75"></circle></g><path class="chaty-sts1" d="M-459.9,523.7h-20.3c-1.9,0-3.4,1.5-3.4,3.4v15.3c0,1.9,1.5,3.4,3.4,3.4h11.4l5.9,4.9c0.2,0.2,0.3,0.2,0.5,0.2 h0.3c0.3-0.2,0.5-0.5,0.5-0.8v-4.2h1.7c1.9,0,3.4-1.5,3.4-3.4v-15.3C-456.5,525.2-458,523.7-459.9,523.7z"></path><path class="chaty-st0" d="M-477.7,530.5h11.9c0.5,0,0.8,0.4,0.8,0.8l0,0c0,0.5-0.4,0.8-0.8,0.8h-11.9c-0.5,0-0.8-0.4-0.8-0.8l0,0C-478.6,530.8-478.2,530.5-477.7,530.5z"></path><path class="chaty-st0" d="M-477.7,533.5h7.9c0.5,0,0.8,0.4,0.8,0.8l0,0c0,0.5-0.4,0.8-0.8,0.8h-7.9c-0.5,0-0.8-0.4-0.8-0.8l0,0C-478.6,533.9-478.2,533.5-477.7,533.5z"></path></svg></span></button>
+						<button type="button" class="open-chaty-channel"></button>
+					</div>
+				</div>
+				<div class="chaty-channel chaty-cta-close chaty-tooltip pos-right" data-hover="Hide">
+					<div class="chaty-cta-button">
+						<button type="button"><span class="chaty-svg"><svg viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="26" cy="26" rx="26" ry="26" fill="#d9bb75"></ellipse><rect width="27.1433" height="3.89857" rx="1.94928" transform="translate(18.35 15.6599) scale(0.998038 1.00196) rotate(45)" fill="white"></rect><rect width="27.1433" height="3.89857" rx="1.94928" transform="translate(37.5056 18.422) scale(0.998038 1.00196) rotate(135)" fill="white"></rect></svg></span></button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>  
+   
+   
+
+
+<script src="{{ asset('site_themes/js/script.js') }}"></script>
+{{--Delete Basket Item--}}
+<script>
+    $('.cart-remove-span').on('click', function (e) {
+        e.preventDefault();
+        /* id product in session */
+        var variationID = $(this).attr('attr-id');
+
+        var CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');
+
+        $.ajax({
+            type: "post",
+            url: "{{route('site.deleteFromBasket')}}",
+            data: {
+                variation_id: variationID,
+                _token: CSRF_TOKEN
+            },
+
+            success: function (data) {
+                console.log(data);
+
+                if (data.status == 100) {
+                    Swal.fire({
+                        title: "خطا!",
+                        text: "محصولی با این مشخصه یافت نشد.",
+                        icon: "error",
+                        button: "تایید",
+                    });
+                }
+
+                if (data.status == 200) {
+
+                    Swal.fire({
+                        title: "موفقیت آمیز!",
+                        text: "محصول مورد نظر از سبد خرید شما حذف شد.",
+                        icon: "success",
+                        showCancelButton: false,
+                        closeOnConfirm: false,
+                        showLoaderOnConfirm: false,
+                        confirmButtonClass: "btn-danger",
+                        confirmButtonText: "بستن",
+                    }).then(function () {
+                        location.reload();
+                    });
+                }
+
+                // location.reload();
+
+                // $(".cart").load(" .cart > *");
+
+            },
+            error: function (error) {
+                //alert(error);
+                alert("لطفا چند لحظه دیگر وارد شوید.");
+            }
+        });
+    });
+</script>
+{{--Delete Basket Item--}}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+@include('sweetalert::alert')
+@yield('site-js')
+
+<script>
+    function compare(id, reload = 100) {
+        var CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');
+        if (id != "") {
+            $.ajax({
+                type: "post",
+                url: "{{ route('site.add.compare') }}",
+                data: {
+                    id: id,
+                    reload: reload,
+                    _token: CSRF_TOKEN
+                },
+                success: function (data) {
+                    if (data.status == 200) {
+                        $('.count-compare').text(data.count);
+                        if (data.reload == 100) {
+                            Swal.fire({
+                                title: "@lang('cms.success')",
+                                text: data.message,
+                                icon: "success",
+                                button: "@lang('cms.accept-2')",
+                            });
+                        } else {
+                            Swal.fire({
+                                title: "@lang('cms.success')",
+                                text: data.message,
+                                icon: "success",
+                                button: "@lang('cms.accept-2')",
+                            }).then(function () {
+                                location.reload();
+                            });
+                        }
+                    }
+                    if (data.status == 150) {
+                        Swal.fire({
+                            title: "کاربر گرامی",
+                            text: data.message,
+                            icon: "warning",
+                            button: "@lang('cms.accept-2')",
+                        });
+                    }
+
+
+                },
+                error: function (error) {
+
+                    Swal.fire({
+                        title: "@lang('cms.error')",
+                        text: "@lang('cms.try-again-few-moments')",
+                        icon: "error",
+                        button: "@lang('cms.accept-2')",
+                    });
+                }
+            });
+
+        }
+    }
+
+    function removeCompare(id) {
+        var CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');
+        if (id != "") {
+            $.ajax({
+                type: "post",
+                url: "{{ route('site.remove.compare') }}",
+                data: {
+                    id: id,
+                    _token: CSRF_TOKEN
+                },
+                success: function (data) {
+                    if (data.status == 404) {
+                        Swal.fire({
+                            title: "@lang('cms.alert')",
+                            text: data.message,
+                            icon: "error",
+                            button: "@lang('cms.accept-2')",
+                        });
+                    }
+                    if (data.status == 200) {
+                        Swal.fire({
+                            title: "@lang('cms.success')",
+                            text: data.message,
+                            icon: "success",
+                            button: "@lang('cms.accept-2')",
+                        }).then(function () {
+                            location.reload();
+                        });
+                    }
+                },
+                error: function (error) {
+                    Swal.fire({
+                        title: "@lang('cms.error')",
+                        text: "@lang('cms.try-again-few-moments')",
+                        icon: "error",
+                        button: "@lang('cms.accept-2')",
+                    });
+                }
+            });
+
+        }
+    }
+
+    function favorite(id) {
+        var CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');
+        if (id != "") {
+            $.ajax({
+                type: "post",
+                url: "{{ route('add.favorites') }}",
+                data: {
+                    id: id,
+                    _token: CSRF_TOKEN
+                },
+                success: function (data) {
+                    if (data.status == 100) {
+                        Swal.fire({
+                            title: "@lang('cms.alert')",
+                            text: data.msg,
+                            icon: "error",
+                            button: "@lang('cms.accept-2')",
+                        });
+                    }
+                    if (data.status == 200) {
+                        Swal.fire({
+                            title: "@lang('cms.success')",
+                            text: data.msg,
+                            icon: "success",
+                            button: "@lang('cms.accept-2')",
+                        });
+                    }
+                    if (data.status == 101) {
+                        Swal.fire({
+                            title: "@lang('cms.alert')",
+                            text: data.msg,
+                            icon: "warning",
+                            button: "@lang('cms.accept-2')",
+                        });
+                    }
+
+
+                },
+                error: function (error) {
+                    Swal.fire({
+                        title: "@lang('cms.error')",
+                        text: "@lang('cms.try-again-few-moments')",
+                        icon: "error",
+                        button: "@lang('cms.accept-2')",
+                    });
+                }
+            });
+
+        }
+    }
+    
+</script>
+  @if(request()->url()=='https://ehsandibazar.com/page/%D8%A2%D9%85%D9%88%D8%B2%D8%B4-%D8%AF%D9%81%D8%A7%D8%B9-%D8%B4%D8%AE%D8%B5%DB%8C')
+ 
+ <script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+        {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "صفحه اصلی",
+            "item": "https://ehsandibazar.com/"
+        },
+        {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "آموزش دفاع شخصی",
+            "item": "https://ehsandibazar.com/page/%D8%A2%D9%85%D9%88%D8%B2%D8%B4-%D8%AF%D9%81%D8%A7%D8%B9-%D8%B4%D8%AE%D8%B5%DB%8C"
+        }
+    ]
+}
+</script>
+ 
+ 
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [{
+    "@type": "Question",
+    "name": "دوره های آموزش دفاع شخصی به چه صورتی برگزار میگردد؟",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "دوره های آموزش دفاع شخصی به دو صورت آموزش خصوصی و دوره های از پیش ضبط شده برگزار میگردد."
+    }
+  },{
+    "@type": "Question",
+    "name": "آموزش دفاع شخصی خصوصی مناسب چه کسانی است؟",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "این آموزش مخصوص افرادی است که قصد دارند دفاع شخصی را به صورت حرفه ای و تخصصی یاد بگیرند."
+    }
+  },{
+    "@type": "Question",
+    "name": "آموزش ویدیویی آیا کابردی است؟",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "بله آموزش ویدیویی از نظر کیفیت دارای کیفیت بالایی است و مدرس دوره استاد احسان دیبازر تمامی مفاهیم دفاع شخصی و فنون را به صورت کامل توضیح میدهد و سپس اجرا مینماید همچنین در صورتی که قصد دارید از کیفیت دوره اطمینان حاصل نمایید میتوانید دوره دمو را مشاهده کنید."
+    }
+  }]
+}
+</script>
+  @endif
+</body>
+
+</html>
