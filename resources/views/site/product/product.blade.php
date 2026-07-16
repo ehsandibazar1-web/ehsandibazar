@@ -39,7 +39,7 @@
     </script>
     <script type="application/ld+json">
 {
-"@context": "http://schema.org/",
+"@@context": "http://schema.org/",
   "@type": "Product",
   "name": "{{ $product->title }}",
   "image": "{{ Url($product->image[0]->url) }}",

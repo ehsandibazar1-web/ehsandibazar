@@ -260,7 +260,7 @@
 @section('site-json-ld')
 <script type="application/ld+json">
 {
-    "@context": "https://schema.org",
+    "@@context": "https://schema.org",
     "@type": "WebPage",
     "name": "{{ $page->title }}",
     "url": "{{ url($page->path()) }}",
@@ -274,7 +274,7 @@
 </script>
 <script type="application/ld+json">
 {
-    "@context": "https://schema.org",
+    "@@context": "https://schema.org",
     "@type": "BreadcrumbList",
     "itemListElement": [
         {"@type":"ListItem","position":1,"name":"صفحه اصلی","item":"https://ehsandibazar.com/"},

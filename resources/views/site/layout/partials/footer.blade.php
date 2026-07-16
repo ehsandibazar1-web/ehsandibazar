@@ -205,7 +205,7 @@
 
         <script type="application/ld+json">
         {
-        "@context": "https://schema.org",
+        "@@context": "https://schema.org",
         "@type": "Organization",
         "@id": "https://ehsandibazar.com/#organization",
         "name": "آکادمی احسان دیبازر",

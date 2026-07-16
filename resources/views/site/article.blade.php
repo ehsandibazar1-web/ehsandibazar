@@ -6935,7 +6935,7 @@ background-attachment: fixed;
     @section('site-json-ld')
     <script type="application/ld+json">
 {
-    "@context": "https://schema.org",
+    "@@context": "https://schema.org",
     "@type": "Article",
     "@id": "{{ url($article->path()) }}#article",
     "headline": "{{ $article->title }}",
@@ -6950,7 +6950,7 @@ background-attachment: fixed;
 </script>
     <script type="application/ld+json">
     {
-        "@context": "https://schema.org",
+        "@@context": "https://schema.org",
         "@type": "Person",
         "@id": "https://ehsandibazar.com/#person",
         "name": "احسان دیبازر",
@@ -6964,7 +6964,7 @@ background-attachment: fixed;
     </script>
     <script type="application/ld+json">
     {
-        "@context": "https://schema.org",
+        "@@context": "https://schema.org",
         "@type": "BreadcrumbList",
         "itemListElement": [
             {"@type": "ListItem", "position": 1, "name": "خانه", "item": "{{ route('site.index') }}"}
@@ -6977,7 +6977,7 @@ background-attachment: fixed;
     @if($article->faq)
     <script type="application/ld+json">
     {
-        "@context": "https://schema.org",
+        "@@context": "https://schema.org",
         "@type": "FAQPage",
         "mainEntity": [
             @foreach($article->faq as $f)

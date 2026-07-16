@@ -690,7 +690,7 @@ class SiteController extends Controller
     }
 
     /** list Product base on Category*/
-    public function CategoryList($slug = null, Request $request)
+    public function CategoryList(Request $request, $slug = null)
     {
         if (!empty($slug)) {
             $category = Category::with(['attributes' => function ($query) {

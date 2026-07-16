@@ -17,7 +17,6 @@ class sortPrice
         }
   
         if ($count <= 0 || count($product->variations->toArray()) <= 0) {
-               dd($count);
             return "<span class='red'>ناموجود</span></br>";
         }
         $sortPrice = collect($product->variations)->sortBy('price');

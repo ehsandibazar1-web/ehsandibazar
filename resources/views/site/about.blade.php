@@ -188,7 +188,7 @@ body{background:var(--dark) !important;}
 
 <script type="application/ld+json">
 {
-  "@context": "https://schema.org",
+  "@@context": "https://schema.org",
   "@type": "Person",
   "@id": "{{ url('about-us') }}#person",
   "name": "احسان دیبازر",
