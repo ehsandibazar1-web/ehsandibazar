@@ -1,0 +1,11 @@
+# This is a Laravel application root, not a public web directory.
+# Only the /public subfolder should ever be served. Deny all direct
+# web access to everything here so app code, .env, vendor, etc. are
+# never exposed if this folder sits under public_html.
+<IfModule mod_authz_core.c>
+    Require all denied
+</IfModule>
+<IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+</IfModule>
