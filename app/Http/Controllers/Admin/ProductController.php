@@ -1054,7 +1054,7 @@ class ProductController extends Controller
     // get timestamp and convert to jalali
     public static function convertToJalali($date)
     {
-        return Verta::createTimestamp($date)->format('Y/m/j H:i:s');
+        return (new Verta($date))->format('Y/m/j H:i:s');
     }
 
     // get timestamp and convert to Miladi

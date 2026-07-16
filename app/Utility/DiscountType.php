@@ -229,7 +229,7 @@ class DiscountType
     // get timestamp and convert to jalali
     public static function convertToJalali($date)
     {
-        return Verta::createTimestamp($date)->format('j/m/Y');
+        return (new Verta($date))->format('j/m/Y');
     }
 
     /*  get all category and brand base user */
