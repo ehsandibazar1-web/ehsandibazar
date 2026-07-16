@@ -16,8 +16,6 @@
         "laravel/helpers": "*",
         "laravel/tinker": "*",
         "laravel/ui": "*",
-        "league/flysystem-aws-s3-v3": "^3.0",
-        "league/flysystem-sftp-v3": "^3.0",
         "maatwebsite/excel": "*",
         "opcodesio/log-viewer": "*",
         "overtrue/laravel-like": "*",

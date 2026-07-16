@@ -1,0 +1,48 @@
+{
+    "name": "overtrue/laravel-like",
+    "description": "👍 User-like features for Laravel Application.",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "overtrue",
+            "email": "anzhengchao@gmail.com"
+        }
+    ],
+    "require": {
+        "laravel/framework": "^9.0|^10.0|^11.0|^12.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Overtrue\\LaravelLike\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests"
+        }
+    },
+    "require-dev": {
+        "mockery/mockery": "^1.4",
+        "phpunit/phpunit": "^11|^12",
+        "orchestra/testbench": "^10.0",
+        "friendsofphp/php-cs-fixer": "^3.0.0",
+        "laravel/pint": "^1.2"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Overtrue\\LaravelLike\\LikeServiceProvider"
+            ]
+        }
+    },
+    "scripts": {
+        "check-style": "vendor/bin/pint --test",
+        "fix-style": "vendor/bin/pint",
+        "test": "vendor/bin/phpunit --colors=always"
+    },
+    "scripts-descriptions": {
+        "test": "Run all tests.",
+        "check-style": "Run style checks (only dry run - no fixing!).",
+        "fix-style": "Run style checks and fix violations."
+    }
+}
