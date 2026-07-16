@@ -28,7 +28,7 @@ use Artesaos\SEOTools\Facades\SEOTools;
 
 ## or
 use SEO;
-use willvincent\Rateable\Rating;
+use App\Model\Rating;
 
 class ProductController extends Controller
 {

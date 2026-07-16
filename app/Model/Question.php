@@ -5,7 +5,7 @@ namespace App\Model;
 use App\Traits\HasComment;
 use App\Traits\HasFollow;
 use App\User;
-use Iatstuti\Database\Support\CascadeSoftDeletes;
+use Dyrynda\Database\Support\CascadeSoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 

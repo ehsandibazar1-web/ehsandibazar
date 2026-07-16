@@ -7,7 +7,7 @@ use App\Traits\HasImage;
 use App\Traits\HasSeo;
 use Cviebrock\EloquentSluggable\Services\SlugService;
 use Cviebrock\EloquentSluggable\Sluggable;
-use Iatstuti\Database\Support\CascadeSoftDeletes;
+use Dyrynda\Database\Support\CascadeSoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -19,7 +19,7 @@ class Brand extends Model
     ];
     protected $dates = ['deleted_at'];
     protected $cascadeDeletes = ['image','products'];
-//    public function sluggable()
+//    public function sluggable(): array
 //    {
 //        return [
 //            'slug' => [

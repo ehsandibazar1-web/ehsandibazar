@@ -14,7 +14,7 @@ use Cviebrock\EloquentSluggable\Sluggable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Carbon\Carbon;
-use willvincent\Rateable\Rateable;
+use App\Traits\Rateable;
 
 class Article extends Model
 {
@@ -25,7 +25,7 @@ class Article extends Model
     protected $guarded = ['id'];
     protected $dates = ['deleted_at'];
 
-//    public function sluggable()
+//    public function sluggable(): array
 //    {
 //        return [
 //            'slug' => [

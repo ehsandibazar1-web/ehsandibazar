@@ -14,10 +14,10 @@ use App\Traits\HasVideo;
 use App\User;
 use Cviebrock\EloquentSluggable\Services\SlugService;
 use Cviebrock\EloquentSluggable\Sluggable;
-use Iatstuti\Database\Support\CascadeSoftDeletes;
+use Dyrynda\Database\Support\CascadeSoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use willvincent\Rateable\Rateable;
+use App\Traits\Rateable;
 
 class Product extends Model
 {
@@ -60,7 +60,7 @@ class Product extends Model
 
 //    protected $cascadeDeletes = ['variations', 'Requestproducts', 'image', 'video', 'catalog', 'comments'];
 
-//    public function sluggable()
+//    public function sluggable(): array
 //    {
 //        return [
 //            'slug' => [

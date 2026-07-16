@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Searchable\Searchable;
-use willvincent\Rateable\Rateable;
+use App\Traits\Rateable;
 
 class Page extends Model
 {
@@ -32,7 +32,7 @@ class Page extends Model
         });
     }
 
-//    public function sluggable()
+//    public function sluggable(): array
 //    {
 //        return [
 //            'slug' => [

@@ -10,11 +10,11 @@ use App\User;
 use App\Model\Video;
 use App\Utility\paymentMethods;
 use App\Utility\Status;
-use Arcanedev\LogViewer\Http\Controllers\LogViewerController;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Str;
 use SEO;
 
-class AdminController extends LogViewerController
+class AdminController extends Controller
 {
 
     public function dashboard()

@@ -22,7 +22,7 @@ class Category extends Model
     public static $preventAttrSet = false;
 
 
-//    public function sluggable()
+//    public function sluggable(): array
 //    {
 //        return [
 //            'slug' => [
