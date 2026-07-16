@@ -15,3 +15,8 @@ staging.ehsandibazar.com/public/storage
 *.mov
 *.avi
 *.mkv
+
+/bootstrap/cache/*.php
+/storage/framework/cache/*
+/storage/framework/sessions/*
+/storage/framework/views/*

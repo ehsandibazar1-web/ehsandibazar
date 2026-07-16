@@ -150,17 +150,10 @@ return [
          * Package Service Providers...
          */
         UniSharp\LaravelFilemanager\LaravelFilemanagerServiceProvider::class,
-        Intervention\Image\ImageServiceProvider::class,
         Artesaos\SEOTools\Providers\SEOToolsServiceProvider::class,
-        Arcanedev\LogViewer\LogViewerServiceProvider::class,
         Maatwebsite\Excel\ExcelServiceProvider::class,
 
-
-        /* qr - code */
-        LaravelQRCode\Providers\QRCodeServiceProvider::class,
-        willvincent\Rateable\RateableServiceProvider::class,
-        Ipecompany\Smsirlaravel\SmsirlaravelServiceProvider::class,
-        Meneses\LaravelMpdf\LaravelMpdfServiceProvider::class,
+        Mccarlosen\LaravelMpdf\LaravelMpdfServiceProvider::class,
     	Shetabit\Payment\Provider\PaymentServiceProvider::class,
         RealRashid\SweetAlert\SweetAlertServiceProvider::class,
 
@@ -226,16 +219,13 @@ return [
         'URL' => Illuminate\Support\Facades\URL::class,
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
-        'Image' => Intervention\Image\Facades\Image::class,
         // other Facades ommited
         'SEOMeta'   => Artesaos\SEOTools\Facades\SEOMeta::class,
         'OpenGraph' => Artesaos\SEOTools\Facades\OpenGraph::class,
         'Twitter'   => Artesaos\SEOTools\Facades\TwitterCard::class,
         // or
         'SEO' => Artesaos\SEOTools\Facades\SEOTools::class,
-        'Smsirlaravel' => Ipecompany\Smsirlaravel\SmsirlaravelFacade::class,
-        'QRCode' => LaravelQRCode\Facades\QRCode::class,
-        'PDF' => Meneses\LaravelMpdf\Facades\LaravelMpdf::class,
+        'PDF' => Mccarlosen\LaravelMpdf\Facades\LaravelMpdf::class,
         'Excel' => Maatwebsite\Excel\Facades\Excel::class,
         'Payment' => Shetabit\Payment\Facade\Payment::class,
         'Alert' => RealRashid\SweetAlert\Facades\Alert::class,
