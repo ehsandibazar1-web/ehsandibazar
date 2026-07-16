@@ -1,3 +1,15 @@
+# Re-grant access here: the application root above this folder carries a
+# deny-all .htaccess (protecting .env, app/, vendor/ when deployed inside
+# public_html). Apache/LiteSpeed merge parent-directory rules into children,
+# so this public docroot must explicitly allow itself back.
+<IfModule mod_authz_core.c>
+    Require all granted
+</IfModule>
+<IfModule !mod_authz_core.c>
+    Order allow,deny
+    Allow from all
+</IfModule>
+
 <IfModule mod_rewrite.c>
     <IfModule mod_negotiation.c>
         Options -MultiViews -Indexes
