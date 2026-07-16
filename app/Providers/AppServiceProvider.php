@@ -21,6 +21,7 @@ use App\Utility\CommentStatus;
 use App\Utility\ProductType;
 use http\Client\Request;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Session;
@@ -37,6 +38,10 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot()
     {
+        // The site theme is Bootstrap-based; Laravel 8+ defaults pagination
+        // views to Tailwind, which renders giant unstyled SVG arrows here.
+        Paginator::useBootstrap();
+
         Schema::defaultStringLength(191);
         Relation::morphMap([
             'product' => Product::class,
