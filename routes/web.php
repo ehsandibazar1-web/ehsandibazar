@@ -2,6 +2,20 @@
 
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
+
+/*
+ * Environment-aware robots.txt (a physical public/robots.txt, if present,
+ * is served by the web server first and overrides this route).
+ * Non-production: block everything. Production: allow everything.
+ */
+Route::get('/robots.txt', function () {
+    $content = config('app.env') !== 'production'
+        ? "User-agent: *\nDisallow: /\n"
+        : "User-agent: *\nDisallow:\n\nSitemap: " . rtrim(config('app.url'), '/') . "/sitemap.xml\n";
+
+    return response($content, 200)->header('Content-Type', 'text/plain');
+});
+
 Route::get('/clear-cache-now', function () {
     Artisan::call('config:clear');
     Artisan::call('cache:clear');
