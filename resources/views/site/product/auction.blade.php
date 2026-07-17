@@ -118,7 +118,7 @@
                                     @foreach($product->image as $key => $image)
                                         <li {{ $key == 0 ? 'class="active"' : null }}>
                                             <a href="#">
-                                                <img src="{{ url($image->url) }}" alt="{{ $product->title }}">
+                                                <img loading="lazy" src="{{ url($image->url) }}" alt="{{ $product->title }}">
                                             </a>
                                         </li>
                                     @endforeach
@@ -129,7 +129,7 @@
                     <div class="col-9">
                         <div class="product-image-main">
                             <div class="img-zoom-container">
-                                <img id="myimage"
+                                <img loading="lazy" id="myimage"
                                      src="{{ isset($product->image[0]) ? url($product->image[0]->url) : '#' }}"
                                      alt="{{ $product->title }}">
                             </div>
@@ -138,7 +138,7 @@
                         </div>
                     </div>
                     <div class="productt-image-zoom">
-                        <img src="">
+                        <img loading="lazy" src="">
                     </div>
 
                 </div>

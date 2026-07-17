@@ -284,7 +284,7 @@
                                             </div>
 
                                             <canvas id="the-canvas"></canvas>
-                                            <img src="{{ asset('site_themess/loading.gif') }}" alt="loading"
+                                            <img loading="lazy" src="{{ asset('site_themess/loading.gif') }}" alt="loading"
                                                  id="loading-image">
 
                                         </div>

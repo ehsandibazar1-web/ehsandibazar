@@ -105,56 +105,45 @@ class AppServiceProvider extends ServiceProvider
 
 
         /* Footer */
+        // These settings rarely change; cache them so the footer does not run
+        // ~8 queries on every request. Admin edits show up within 5 minutes
+        // (or immediately after panel/manager/maintenance/cache-clear).
         view()->composer(['site.layout.partials.footer'], function ($view) {
-            $socialNetwork = Systeminfmanage::where('status', 1)->where('systeminf_id', 14)->get();
+            $data = \Cache::remember('composer.site.footer', 300, function () {
+                $withActive = ['systeminfmanage' => function ($q) {
+                    $q->whereStatus(1);
+                }];
 
-            $col1 = Systeminf::with(['systeminfmanage' => function ($q) {
-                $q->whereStatus(1);
-            }])->find(33);
-            $col2 = Systeminf::with(['systeminfmanage' => function ($q) {
-                $q->whereStatus(1);
-            }])->find(32);
-            $col3 = Systeminf::with(['systeminfmanage' => function ($q) {
-                $q->whereStatus(1);
-            }])->find(39);
-            $col4 = Systeminf::with(['systeminfmanage' => function ($q) {
-                $q->whereStatus(1);
-            }])->find(41);
+                return [
+                    'socialNetwork' => Systeminfmanage::where('status', 1)->where('systeminf_id', 14)->get(),
+                    'col1' => Systeminf::with($withActive)->find(33),
+                    'col2' => Systeminf::with($withActive)->find(32),
+                    'col3' => Systeminf::with($withActive)->find(39),
+                    'col4' => Systeminf::with($withActive)->find(41),
+                    'contactTopFooter' => Systeminfmanage::where('status', 1)->where('systeminf_id', 38)->latest()->get(),
+                    'logoFooter' => Systeminfmanage::where(['status' => 1])->find(134),
+                    'setting_contact' => Systeminfmanage::find(17),
+                    'setting_logo_footer' => Systeminfmanage::find(134),
+                ];
+            });
 
-            $contactTopFooter = Systeminfmanage::where('status', 1)->where('systeminf_id', 38)->latest()->get();
-            $logoFooter = Systeminfmanage::where(['status' => 1])->find(134);
-            $setting_contact = Systeminfmanage::find(17);
-            $setting_logo_footer = Systeminfmanage::find(134);
-            
-            $view->with([
-                'socialNetwork' => $socialNetwork,
-                'col1' => $col1,
-                'col2' => $col2,
-                'col3' => $col3,
-                'col4' => $col4,
-                'contactTopFooter' => $contactTopFooter,
-                'logoFooter' => $logoFooter,
-                'setting_contact' => $setting_contact,
-                'setting_logo_footer' => $setting_logo_footer,
-            ]);
+            $view->with($data);
         });
 
         /* site header */
         view()->composer(['site.layout.master', 'site.layout.partials.header', 'site.layout.partials.header-mobile'],
             function ($view) {
-                $logo = Systeminfmanage::where(['status' => 1])->find(108);
-                $menus = Menu::all();
-                $socialNetworks = Systeminfmanage::where(['status' => 1, 'systeminf_id' => 14])->latest()->get();
-                $categories = Category::query()->with(['categories'])->
-                whereType(Product::class)->whereStatus(1)->where('parent_id', 0)->orderBy('sorting', 'desc')->get();
+                $data = \Cache::remember('composer.site.header', 300, function () {
+                    return [
+                        'logo' => Systeminfmanage::where(['status' => 1])->find(108),
+                        'menus' => Menu::all(),
+                        'socialNetworks' => Systeminfmanage::where(['status' => 1, 'systeminf_id' => 14])->latest()->get(),
+                        'categories' => Category::query()->with(['categories'])->
+                            whereType(Product::class)->whereStatus(1)->where('parent_id', 0)->orderBy('sorting', 'desc')->get(),
+                    ];
+                });
 
-                $view->with([
-                    'logo' => $logo,
-                    'menus' => $menus,
-                    'socialNetworks' => $socialNetworks,
-                    'categories' => $categories,
-                ]);
-
+                $view->with($data);
             });
         /* site header */
 

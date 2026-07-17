@@ -40,7 +40,7 @@
                                         @foreach($products as $product)
                                             <li>
                                                 @if(isset($product->image[0]))
-                                                    <img src="{{ $product->image[0]->url }}"
+                                                    <img loading="lazy" src="{{ $product->image[0]->url }}"
                                                          alt="{{ $product->title }}">
                                                 @endif
                                                 <div class="uk-position-center uk-panel">

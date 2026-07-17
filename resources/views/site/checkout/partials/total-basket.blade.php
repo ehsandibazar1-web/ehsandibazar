@@ -6,7 +6,7 @@
             <p class="text-center shipping-section">
                 @if($shippingCost)
                     <span>
-                    <img class="delivery" src="{{ url('site_themes/assets/img/delivery.png') }}" alt="delivery">
+                    <img loading="lazy" class="delivery" src="{{ url('site_themes/assets/img/delivery.png') }}" alt="delivery">
                 </span>
                     <label for="shipping-cost">هزینه ارسال :</label>
                     @if(isset($freeShippingTwo) && !empty($freeShippingTwo))
@@ -62,7 +62,7 @@
                         <span> {{ \App\Utility\unit::unit(\App\Http\Controllers\Site\CheckoutController::shippingCost($totalPrice))  }} </span>
                         {{--                                                        <span>{{ \App\Utility\taxCalculate::taxCalculate($basket->totalPrice)}}</span>--}}
                     @endif
-                    <img class="wallet" width="100px" src="{{ url('site_themes/assets/img/wallet.png')  }}" alt="wallet">
+                    <img loading="lazy" class="wallet" width="100px" src="{{ url('site_themes/assets/img/wallet.png')  }}" alt="wallet">
                 </div>
             @else
                 <div class="col-md-12 text-center  pt-5">
@@ -103,7 +103,7 @@
 
                 </div>
                 <div class="col-12">
-                    <img class="img-responsive"
+                    <img loading="lazy" class="img-responsive"
                          src="https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcSwChUVvIM6ih8_m4ZNYUiF-mkOArMkb38r8A&usqp=CAU">
                 </div>
             @endif

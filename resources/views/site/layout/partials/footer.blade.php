@@ -75,7 +75,7 @@
             <div class="col-lg-4 col-md-6 col-12 p-0 d-none d-lg-block">
                 <div class="row text-center">
                     <div class="col-12 p-0 logo-footer">
-                        <img src="{{isset($setting_logo_footer) && !empty($setting_logo_footer->code5) ? $setting_logo_footer->code5 : null}}" alt="لوگو دفاع شخصی فردی" class="img-fluid">
+                        <img loading="lazy" src="{{isset($setting_logo_footer) && !empty($setting_logo_footer->code5) ? $setting_logo_footer->code5 : null}}" alt="لوگو دفاع شخصی فردی" class="img-fluid">
                     </div>
                     @if(isset($socialNetwork) && !empty($socialNetwork))
                         @php
@@ -167,7 +167,7 @@
                 <div class="row text-center">
                     <div class="col-12 p-0 logo-footer">
                         @if(isset($logoFooter) && !empty($logoFooter))
-                            <img src="{{ $logoFooter->code5 }}" width="164" height="149" class="img-fluid" alt="لگو آکادمی دفاع شخصی احسان دیبازر">
+                            <img loading="lazy" src="{{ $logoFooter->code5 }}" width="164" height="149" class="img-fluid" alt="لگو آکادمی دفاع شخصی احسان دیبازر">
                         @endif
                     </div>
                     @if(isset($socialNetwork) && !empty($socialNetwork))

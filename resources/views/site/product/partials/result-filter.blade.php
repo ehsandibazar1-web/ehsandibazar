@@ -8,7 +8,7 @@
                 <div class="result-item">
                     <div class="result-offered-image">
                         <a href="{{ $product->path() }}">
-                            <img src="{{ isset($product->image[0]) ? $product->image[0]->url : null }}">
+                            <img loading="lazy" src="{{ isset($product->image[0]) ? $product->image[0]->url : null }}">
                         </a>
                     </div>
                     <div class="result-offered-title">

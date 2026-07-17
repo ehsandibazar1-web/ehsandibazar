@@ -44,7 +44,7 @@
                                             <th class="th-mob">محصول</th>
                                             <td>
                                                 <figure class="media">
-                                                    <div class="img-wrap"><img src="{{$items['item']->image}}"
+                                                    <div class="img-wrap"><img loading="lazy" src="{{$items['item']->image}}"
                                                                                alt="{{$items['item']->title}}"
                                                                                class="img-thumbnail img-sm"></div>
                                                     <figcaption class="media-body">

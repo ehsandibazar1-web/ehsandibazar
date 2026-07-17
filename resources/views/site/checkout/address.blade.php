@@ -84,7 +84,7 @@
                                                             <div class="product-box-container">
                                                                 <div class="product-box product-box-compact">
                                                                     <a class="product-box-img" href="{{ $findVariation->product->path() }}">
-                                                                        <img src="{{ $items['item']->image }}" alt="{{ $items['item']->title }}">
+                                                                        <img loading="lazy" src="{{ $items['item']->image }}" alt="{{ $items['item']->title }}">
                                                                     </a>
                                                                     <div class="product-box-title">
                                                                         {{ $items['item']->title }}

@@ -29,7 +29,7 @@
                             </div>
                             <div class="checkout-paymethod-one-gateway">
                                 <div class="checkout-paymethod-one-gateway-img">
-                                    <!--<img class="img-fluid img-thumbnail"-->
+                                    <!--<img loading="lazy" class="img-fluid img-thumbnail"-->
                                     <!--     src="{{$shippingMethod->code5}}"-->
                                     <!--     alt="online-payment"-->
                                     <!--     id="shipping-method{{$key}}">-->

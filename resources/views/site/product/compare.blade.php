@@ -19,7 +19,7 @@
                                                 href="{{ $product->path() }}" target="_blank"
                                                 class="img swiper-container js-compare-product-images swiper-container-horizontal swiper-container-rtl">
                                                 <div>
-                                                    <img class="img-fluid" alt="{{ $product->title }}"
+                                                    <img loading="lazy" class="img-fluid" alt="{{ $product->title }}"
                                                          src="{{ $product->image[0]->url }}">
                                                 </div>
                                             </a><span class="title">{{ $product->title }}</span>
@@ -132,7 +132,7 @@
                                                     <label class="c-form-compare-selector__item js-compare-selector"
                                                            onclick="compare('{{$item->id}}',200)">
                                                         <figure class="img">
-                                                            <img class="js-compare-image"
+                                                            <img loading="lazy" class="js-compare-image"
                                                                  alt="{{ $item->title }}"
                                                                  src="{{ $item->image[0]->url }}">
                                                         </figure>

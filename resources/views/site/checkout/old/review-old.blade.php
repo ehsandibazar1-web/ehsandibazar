@@ -32,7 +32,7 @@
 
                             <div class="col-sm-6 col-xs-12">
                                 <div class="card card-review">
-                                    <img class="user-information" src="{{url('site_theme/assets/img/user-info.png')}}"
+                                    <img loading="lazy" class="user-information" src="{{url('site_theme/assets/img/user-info.png')}}"
                                          alt="user-information">
                                     <h2>@lang('cms.info-user')</h2>
                                     <table class="card-review-content" cellspacing="0">
@@ -72,7 +72,7 @@
                             </div>
                             <div class="col-sm-6 col-xs-12">
                                 <div class="card card-review">
-                                    <img class="address-location"
+                                    <img loading="lazy" class="address-location"
                                          src="{{url('site_theme/assets/img/address-location.png')}}" alt="address">
                                     <h2>@lang('cms.info-address')</h2>
                                     <table class="card-review-content" cellspacing="0">
@@ -117,7 +117,7 @@
                                                 <th class="th-mob">@lang('cms.product')</th>
                                                 <td>
                                                     <figure class="media">
-                                                        <div class="img-wrap"><img src="{{$items['item']->image}}"
+                                                        <div class="img-wrap"><img loading="lazy" src="{{$items['item']->image}}"
                                                                                    alt="{{$items['item']->title}}"
                                                                                    class="img-thumbnail img-sm"></div>
                                                         <figcaption class="media-body">

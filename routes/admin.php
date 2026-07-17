@@ -12,6 +12,38 @@ Route::group(['middleware' => ['auth:web'], 'prefix' => 'panel'], function () {
         Route::get('/', 'AdminController@dashboard')->name('panel.dashboard.index');
         //================================================== dashboard =============
 
+        // ============================== maintenance (admin-only) ==============
+        // Shell-less host: these let the admin run deploy-time artisan tasks
+        // safely from the browser after each "Update from Remote".
+        Route::get('maintenance/{action}', function ($action) {
+            $allowed = [
+                'cache-clear'  => ['cache:clear', 'config:clear', 'view:clear'],
+                'view-cache'   => ['view:clear', 'view:cache'],
+                'migrate'      => ['migrate', ['--force' => true]],
+                'optimize'     => ['config:clear', 'view:clear', 'view:cache', 'cache:clear'],
+            ];
+
+            if (! array_key_exists($action, $allowed)) {
+                abort(404);
+            }
+
+            $output = [];
+            $commands = $allowed[$action];
+            for ($i = 0; $i < count($commands); $i++) {
+                $cmd = $commands[$i];
+                $params = [];
+                if (isset($commands[$i + 1]) && is_array($commands[$i + 1])) {
+                    $params = $commands[$i + 1];
+                    $i++;
+                }
+                \Illuminate\Support\Facades\Artisan::call($cmd, $params);
+                $output[] = "$ artisan {$cmd}\n" . trim(\Illuminate\Support\Facades\Artisan::output());
+            }
+
+            return response('<pre dir="ltr">' . e(implode("\n\n", $output)) . '</pre>');
+        })->name('panel.maintenance');
+        // ============================== maintenance ===========================
+
         // ================================================= Start Of favorite =============
         Route::group(['prefix' => 'favorites'], function () {
             Route::get('/', 'FavriteController@index')->name('panel.favorite.index');

@@ -87,16 +87,6 @@
     @yield('site-js-header')
     @yield('site-json-ld')
 
-    <!--
-<script async src="https://www.googletagmanager.com/gtag/js?id=UA-229939247-2"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'UA-229939247-2');
-</script>
--->
 
     <!-- Global site tag (gtag.js) - Google Ads: AW-18235155408 -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=AW-18235155408"></script>

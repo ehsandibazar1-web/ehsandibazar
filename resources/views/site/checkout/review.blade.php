@@ -29,7 +29,7 @@
                                             @endphp
                                             <tr class="checkout-item">
                                                 <td>
-                                                    <img src="{{ $items['item']->image }}"
+                                                    <img loading="lazy" src="{{ $items['item']->image }}"
                                                          alt="{{ $items['item']->title }}">
                                                 </td>
                                                 <td>

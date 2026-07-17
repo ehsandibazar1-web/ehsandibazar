@@ -34,7 +34,7 @@
                                     <div class="home-product-box">
                                         @if(isset($product->image[0]) && !empty($product->image[0]))
                                             <a uk-toggle="target: #modal-id{{ $product->id }}" >
-                                                <img src="{{ $product->image[0]->url }}"
+                                                <img loading="lazy" src="{{ $product->image[0]->url }}"
                                                      alt="{{ $product->title }}">
                                             </a>
                                         @endif

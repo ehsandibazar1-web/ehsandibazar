@@ -48,9 +48,9 @@
                     <div class="reply-question-item">
                         <div class="reply-avatar-image">
                             @if(isset($comment->user->image[0]) && !empty($comment->user->image[0]))
-                                <img src="{{ Url($comment->user->image[0]->url) }}">
+                                <img loading="lazy" src="{{ Url($comment->user->image[0]->url) }}">
                             @else
-                                <img width="32" src="{{ url('admin_theme/img/noCustomer.svg')  }}" alt="">
+                                <img loading="lazy" width="32" src="{{ url('admin_theme/img/noCustomer.svg')  }}" alt="">
                             @endif                </div>
                         <div class="reply-main-detail">
                             <p>

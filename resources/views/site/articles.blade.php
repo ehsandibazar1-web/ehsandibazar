@@ -8,6 +8,11 @@
         <div class="">
             <div class="container site-blog__box">
                 <div class="row">
+                    <div class="col-12">
+                        <h1 style="font-size:1.6rem;margin:1rem 0;">مقالات آموزشی دفاع شخصی و ورزش‌های رزمی</h1>
+                    </div>
+                </div>
+                <div class="row">
                     <div class="col-12 col-md-4">
                         <div class="site-blog__sidebar">
                             @if(isset($categorys) && count($categorys) > 0)
@@ -49,7 +54,7 @@
                                                         <div class="col-4">
                                                             <div class="site-blog__sidebar__item__body__ads__list__item__image">
                                                                 <a href="{{ $itemArticle->path() }}">
-                                                                    <img src="{{ isset($itemArticle->image[0]) ? url($itemArticle->image[0]->url) : '#' }}"
+                                                                    <img loading="lazy" src="{{ isset($itemArticle->image[0]) ? url($itemArticle->image[0]->url) : '#' }}"
                                                                          alt="{{ $itemArticle->title }}" loading="lazy">
                                                                 </a>
                                                             </div>
@@ -91,7 +96,7 @@
                                                 <div class="site-blog__posts__item">
                                                     <div class="site-blog__posts__item__image">
                                                         <a href="{{ $article->path() }}">
-                                                                <img src="{{ isset($article->image[0]) ? url($article->image[0]->url) : null }}"
+                                                                <img loading="lazy" src="{{ isset($article->image[0]) ? url($article->image[0]->url) : null }}"
                                                                      alt="{{ $article->title }}" loading="lazy">
                                                         </a>
                                                         <div class="site-blog__posts__item__cat">

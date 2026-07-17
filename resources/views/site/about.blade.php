@@ -109,7 +109,7 @@ body{background:var(--dark) !important;}
 <!-- هیرو -->
 <header class="hero">
     <div class="glow"></div>
-    <div class="hero-photo-wrap"><img id="heroPhoto" class="hero-photo" src="https://ehsandibazar.com/public/storage/files/shares/ehsan-profile.jpg" alt="احسان دیبازر" fetchpriority="high" decoding="async"></div>
+    <div class="hero-photo-wrap"><img loading="lazy" id="heroPhoto" class="hero-photo" src="https://ehsandibazar.com/public/storage/files/shares/ehsan-profile.jpg" alt="احسان دیبازر" fetchpriority="high" decoding="async"></div>
     <h1>احسان دیبازر</h1>
     <div class="sub">مربی هنرهای رزمی و دفاع شخصی، کارشناس ارشد علوم ورزشی و توسعه‌دهنده مفهوم هوش رزمی</div>
     <div class="txt">همواره یکی از لذت بخش ترین کارها برای من آموزش ورزش های رزمی و بالا بردن توانمندی های دفاع شخصی در افراد است. کمک به قوی تر شدن انسان ها به زندگی من معنا می بخشد. مهم ترین دغدغه من این است که کیفیت تمرین و آموزش تو حوزه ورزش های رزمی و دفاع شخصی برای افراد به خصوص مبتدی بالا ببرم تا با لذت و پایداری بیش تری ادامه بدهند و نتایج و ثمرات مفیدی تو زندگی برایشان داشته باشد. ایمان دارم ورزش های رزمی اگر درست تمرین داده شود حال انسان ها را بهتر خواهد کرد.</div>
@@ -181,7 +181,7 @@ body{background:var(--dark) !important;}
 <div class="modal" id="modal" role="dialog" aria-modal="true" aria-label="نمایش بزرگ مدرک">
     <button class="modal-close" id="modalClose" aria-label="بستن">&times;</button>
     <div>
-        <img id="modalImg" src="" alt="">
+        <img loading="lazy" id="modalImg" src="" alt="">
         <div class="cap2" id="modalCap"></div>
     </div>
 </div>

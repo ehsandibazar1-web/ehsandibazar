@@ -101,7 +101,7 @@
 
                         @if(isset($page->image[0]))
                         <div class="site-blog-post__box__body__image">
-                            <img src="{{ url($page->image[0]->url) }}" alt="{{ $page->title }}" fetchpriority="high" decoding="async">
+                            <img loading="lazy" src="{{ url($page->image[0]->url) }}" alt="{{ $page->title }}" fetchpriority="high" decoding="async">
                         </div>
                         @endif
 
@@ -135,7 +135,7 @@
 
                         <div class="hoosh-box">
                             <div style="display:flex;align-items:center;gap:16px;margin-bottom:18px;">
-                                <img src="https://ehsandibazar.com/public/storage/files/shares/ehsan-profile.jpg" alt="احسان دیبازر" style="width:60px;height:60px;border-radius:50%;object-fit:cover;object-position:top;border:2px solid #d9bb75;flex-shrink:0;">
+                                <img loading="lazy" src="https://ehsandibazar.com/public/storage/files/shares/ehsan-profile.jpg" alt="احسان دیبازر" style="width:60px;height:60px;border-radius:50%;object-fit:cover;object-position:top;border:2px solid #d9bb75;flex-shrink:0;">
                                 <div>
                                     <div style="font-size:16px;font-weight:800;color:#fff;">سلام، من احسان دیبازر هستم</div>
                                     <div style="font-size:12px;color:#d9bb75;margin-top:3px;">مربی هنرهای رزمی و دفاع شخصی | کارشناس ارشد علوم ورزشی | توسعه‌دهنده مفهوم هوش رزمی</div>
@@ -168,7 +168,7 @@
                                         <div class="site-blog__posts__item">
                                             <div class="site-blog__posts__item__image">
                                                 <a href="{{ $itemArticle->path() }}">
-                                                    <img src="{{ isset($itemArticle->image[0]) ? url($itemArticle->image[0]->url) : null }}"
+                                                    <img loading="lazy" src="{{ isset($itemArticle->image[0]) ? url($itemArticle->image[0]->url) : null }}"
                                                          alt="{{ $itemArticle->title }}" loading="lazy">
                                                 </a>
                                                 @if($itemArticle->categories->count())
@@ -224,7 +224,7 @@
                                             <div class="col-4">
                                                 <div class="site-blog-post__last__item__image">
                                                     <a href="{{ $itemLastArticle->path() }}">
-                                                        <img src="{{ isset($itemLastArticle->image[0]) ? url($itemLastArticle->image[0]->url) : null }}"
+                                                        <img loading="lazy" src="{{ isset($itemLastArticle->image[0]) ? url($itemLastArticle->image[0]->url) : null }}"
                                                              alt="{{ $itemLastArticle->title }}" loading="lazy">
                                                     </a>
                                                 </div>

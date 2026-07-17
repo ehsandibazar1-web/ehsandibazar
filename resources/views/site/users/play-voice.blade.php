@@ -499,34 +499,34 @@
                                         <div class="glass-container">
                                             <div class="nodisplay">
                                                 <div class="imgs">
-                                                    <img class="img"
+                                                    <img loading="lazy" class="img"
                                                          src="https://images.pexels.com/photos/5412/water-blue-ocean.jpg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260"
                                                          alt="">
-                                                    <img class="img"
+                                                    <img loading="lazy" class="img"
                                                          src="https://images.pexels.com/photos/175773/pexels-photo-175773.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260"
                                                          alt="">
-                                                    <img class="img"
+                                                    <img loading="lazy" class="img"
                                                          src="https://images.pexels.com/photos/1546249/pexels-photo-1546249.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260"
                                                          alt="">
-                                                    <img class="img"
+                                                    <img loading="lazy" class="img"
                                                          src="https://images.pexels.com/photos/1591252/pexels-photo-1591252.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260"
                                                          alt="">
-                                                    <img class="img"
+                                                    <img loading="lazy" class="img"
                                                          src="https://images.pexels.com/photos/287229/pexels-photo-287229.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500"
                                                          alt="">
-                                                    <img class="img"
+                                                    <img loading="lazy" class="img"
                                                          src="https://images.pexels.com/photos/53135/hydrangea-blossom-bloom-flower-53135.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260"
                                                          alt="">
-                                                    <img class="img"
+                                                    <img loading="lazy" class="img"
                                                          src="https://images.pexels.com/photos/73873/star-clusters-rosette-nebula-star-galaxies-73873.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260"
                                                          alt="">
-                                                    <img class="img"
+                                                    <img loading="lazy" class="img"
                                                          src="https://images.pexels.com/photos/1819650/pexels-photo-1819650.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260"
                                                          alt="">
-                                                    <img class="img"
+                                                    <img loading="lazy" class="img"
                                                          src="https://images.pexels.com/photos/3029545/pexels-photo-3029545.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260"
                                                          alt="">
-                                                    <img class="img"
+                                                    <img loading="lazy" class="img"
                                                          src="https://images.pexels.com/photos/114979/pexels-photo-114979.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260"
                                                          alt="">
                                                 </div>
@@ -573,7 +573,7 @@
                                                 </div>
                                                 <div class="img-container">
                                                     @if(isset($voice->videoable->image[0]) && !empty($voice->videoable->image[0]))
-                                                        <img id="thumbnail" src="{{ $voice->videoable->image[0]->url }}"
+                                                        <img loading="lazy" id="thumbnail" src="{{ $voice->videoable->image[0]->url }}"
                                                              alt="">
                                                     @endif
                                                 </div>

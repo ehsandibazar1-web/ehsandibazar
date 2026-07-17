@@ -32,7 +32,7 @@
                                 </div>
                                 <div class="col-6">
                                     <div class="cart-item-pic">
-                                        <img src="{{$items['item']->image}}" alt="{{$items['item']->title}}">
+                                        <img loading="lazy" src="{{$items['item']->image}}" alt="{{$items['item']->title}}">
                                     </div>
                                 </div>
                             </div>
@@ -81,7 +81,7 @@
             @else
                 <div class="cart-main-cart-submit cart-empty">
 					<span class="text-info"> سبد خرید شما خالی می باشد
-					<img class="img-empty-basket" src="{{url('site_themes/assets/img/cart-empty.png')}}" alt="cart-empty">
+					<img loading="lazy" class="img-empty-basket" src="{{url('site_themes/assets/img/cart-empty.png')}}" alt="cart-empty">
 					</span>
                 </div>
             @endif

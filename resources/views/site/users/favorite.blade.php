@@ -15,7 +15,7 @@
                                     <div class="home-product-box">
                                         @if(isset($product->favoriteable->image[0]) && !empty($product->favoriteable->image[0]))
                                             <a href="{{ $product->favoriteable->path() }}" target="_blank">
-                                                <img src="{{ $product->favoriteable->image[0]->url }}"
+                                                <img loading="lazy" src="{{ $product->favoriteable->image[0]->url }}"
                                                      alt="{{ $product->favoriteable->title }}">
                                             </a>
                                         @endif

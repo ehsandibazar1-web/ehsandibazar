@@ -16,12 +16,9 @@ Route::get('/robots.txt', function () {
     return response($content, 200)->header('Content-Type', 'text/plain');
 });
 
-Route::get('/clear-cache-now', function () {
-    Artisan::call('config:clear');
-    Artisan::call('cache:clear');
-    Artisan::call('view:clear');
-    return 'done';
-});
+// NOTE: the old public /clear-cache-now route was removed for security.
+// Maintenance actions now live under the authenticated admin panel:
+// /panel/manager/maintenance/{action} (see routes/admin.php).
 /* ============================= user controller public ============================================ */
 Route::group(['namespace' => 'Site','middleware' => ['checkBlock']], function () {
     /* site index*/
@@ -263,6 +260,27 @@ Route::get('/sitemap.xml', function () {
         $content .= '<loc>https://ehsandibazar.com/article/' . $article->slug . '</loc>';
         $content .= '<lastmod>' . ($article->updated_at ? $article->updated_at->format('Y-m-d') : date('Y-m-d')) . '</lastmod>';
         $content .= '<priority>0.80</priority>';
+        $content .= '</url>';
+    }
+
+    // محصولات (صفحات فروش — مهم‌ترین صفحات تجاری سایت)
+    $products = \App\Model\Product::where('status', 1)
+        ->select('slug', 'updated_at')
+        ->get();
+
+    $content .= '<url><loc>https://ehsandibazar.com/products</loc><priority>0.90</priority></url>';
+
+    foreach ($products as $product) {
+        // Product::$updated_at may arrive as a plain string on this model,
+        // so avoid assuming a Carbon instance.
+        $lastmod = $product->updated_at instanceof \DateTimeInterface
+            ? $product->updated_at->format('Y-m-d')
+            : (is_string($product->updated_at) && $product->updated_at !== '' ? substr($product->updated_at, 0, 10) : date('Y-m-d'));
+
+        $content .= '<url>';
+        $content .= '<loc>https://ehsandibazar.com/products/' . rawurlencode($product->slug) . '</loc>';
+        $content .= '<lastmod>' . $lastmod . '</lastmod>';
+        $content .= '<priority>0.90</priority>';
         $content .= '</url>';
     }
 

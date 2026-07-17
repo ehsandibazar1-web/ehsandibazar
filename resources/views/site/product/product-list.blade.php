@@ -44,7 +44,7 @@
             <div class="carousel-inner">
                 @foreach($category->image as $key => $image)
                 <div class="carousel-item {{ $key == 1 ? 'active' : null }}">
-                    <img src="{{ $image->url }}" alt="{{ $category->title }}">
+                    <img loading="lazy" src="{{ $image->url }}" alt="{{ $category->title }}">
                 </div>
                 @endforeach
             </div>
@@ -65,12 +65,14 @@
     @endif
 
     <div class="container site-blog__box">
-        @if(isset($title))
         <div class="row search-result-header">
             <!--Search result text-->
-            <h4>{{ count($products) }} محصول برای {{ $title }} یافت شد</h4>
+            @if(isset($title))
+            <h1 style="font-size:1.5rem;">{{ count($products) }} محصول برای {{ $title }} یافت شد</h1>
+            @else
+            <h1 style="font-size:1.5rem;">فروشگاه آکادمی دفاع شخصی احسان دیبازر</h1>
+            @endif
         </div>
-        @endif
         <div class="row">
             <!--Search result slider-->
             <div class="serach-reslut-slider">
@@ -211,7 +213,7 @@
 
                                             <a href="{{ $product->path() }}" class="d-block">
 
-                                                <img src="{{ isset($product->image[0]) && !empty($product->image[0]) ? url($product->image[0]->url) : null }}"
+                                                <img loading="lazy" src="{{ isset($product->image[0]) && !empty($product->image[0]) ? url($product->image[0]->url) : null }}"
                                                     class="img-fluid" alt="{{ $product->title }}">
                                             </a>
                                         </div>

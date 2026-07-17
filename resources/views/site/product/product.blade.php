@@ -30,7 +30,7 @@
         document.addEventListener('contextmenu', event => event.preventDefault());
 
         function showImage(image) {
-            var img = $('<img />', {
+            var img = $('<img loading="lazy" />', {
                 src: image,
                 'class': 'fullImage'
             });
@@ -114,7 +114,7 @@
                                 <a data-fancybox="mygallery" class="thumbnail" big_image="{{ $image->url }}"
                                    href="{{ $image->url }}" title="{{ $product->title }}">
 
-                                    <img src="{{ $image->url }}" title="{{ $product->title }}" alt="{{$product->title}}"
+                                    <img loading="lazy" src="{{ $image->url }}" title="{{ $product->title }}" alt="{{$product->title}}"
                                          width="450" height="350"/>
                                 </a>
 
@@ -127,7 +127,7 @@
                             <div class="item" title="">
                                 <a data-fancybox="mygallery" class="thumbnail" big_image="{{ $image->url }}"
                                    href="{{ $image->url }}" title="{{ $product->title }}">
-                                    <img src="{{ $image->url }}" title="{{ $product->title }}" alt="{{$product->title}}"
+                                    <img loading="lazy" src="{{ $image->url }}" title="{{ $product->title }}" alt="{{$product->title}}"
                                          width="60" height="60"/>
                                 </a>
 
@@ -484,7 +484,7 @@
                                         @endif
                                     </div>
                                 @elseif(isset($product->video[0]) && !empty($product->video[0]))
-{{--                                    <img src="{{ asset('site_themes/loading.gif') }}" alt="loading" id="loading-image">--}}
+{{--                                    <img loading="lazy" src="{{ asset('site_themes/loading.gif') }}" alt="loading" id="loading-image">--}}
                                     <div>
                                               
                                         @if($product->video[0]->url && substr($product->video[0]->url,0,8) == '/storage')
@@ -638,21 +638,21 @@
                                         <li>
                                             <a target="_blank"
                                                href="tg://msg_url?url={{ urldecode(url()->current()) }}">
-                                                <img alt="telegram"
+                                                <img loading="lazy" alt="telegram"
                                                      src="{{asset('public/storage/files/1/icon/telegram_plane_icon.svg')}}">
                                             </a>
                                         </li>
                                         <li>
                                             <a target="_blank"
                                                href="https://www.facebook.com/sharer/sharer.php?u={{ urldecode(url()->current()) }}">
-                                                <img alt="telegram" width="30"
+                                                <img loading="lazy" alt="telegram" width="30"
                                                      src="https://image.similarpng.com/very-thumbnail/2020/11/Blue-facebook-icon-on-transparent-background-PNG.png">
                                             </a>
                                         </li>
                                         <li>
                                             <a target="_blank"
                                                href="http://twitter.com/home?status={{ urldecode(url()->current()) }}">
-                                                <img alt="telegram" width="30"
+                                                <img loading="lazy" alt="telegram" width="30"
                                                      src="https://toppng.com/uploads/preview/twitter-icon-transparent-11549680383mmzgiol88v.png">
                                             </a>
                                         </li>
@@ -660,7 +660,7 @@
                                             <a target="_blank"
                                                href="whatsapp://send?text={{ urldecode(url()->current()) }}"
                                                data-action="share/whatsapp/share">
-                                                <img alt="Aparat"
+                                                <img loading="lazy" alt="Aparat"
                                                      src="{{asset('public/storage/files/1/icon/whatsapp_icon.svg')}}">
                                             </a>
                                         </li>
@@ -1422,7 +1422,7 @@
             var selected = $(this);
 
             new_html = '<a onclick="return false;" class="thumbnail first_thumbnail" href="' + selected.attr('href') + '" title="آ">';
-            new_html += '<img id="zoom_01" class="img-fluid" src="' + selected.attr('href') + '" title=""  alt="" data-zoom-image="' + selected.attr('big_image') + '"/>';
+            new_html += '<img loading="lazy" id="zoom_01" class="img-fluid" src="' + selected.attr('href') + '" title=""  alt="" data-zoom-image="' + selected.attr('big_image') + '"/>';
             new_html += '</a>';
 
             $(".first_thumbnail").parent().html(new_html);

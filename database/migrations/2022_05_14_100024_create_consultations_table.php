@@ -13,6 +13,13 @@ class CreateConsultationsTable extends Migration
      */
     public function up()
     {
+        // The production database already contains this table (created
+        // manually, never recorded in the migrations table), so guard it
+        // to keep `php artisan migrate` runnable everywhere.
+        if (Schema::hasTable('consultations')) {
+            return;
+        }
+
         Schema::create('consultations', function (Blueprint $table) {
             $table->id();
             $table->string('name')->nullable();

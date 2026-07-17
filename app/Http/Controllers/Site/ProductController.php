@@ -39,11 +39,11 @@ class ProductController extends Controller
 
             $product = Product::with(['image','attributevalues', 'comments', 'variations', 'user'])->whereSlug($slug)->whereStatus(1)->firstOrFail();
  
-            if(!empty($seo)){
-                $seo=\App\Model\Seo::where([
+            $seo=\App\Model\Seo::where([
                 ['seoable_id',$product->id],
                 ['seoable_type','product'],
                 ])->first();
+            if(!empty($seo)){
                 SEOMeta::setTitle($seo->title);
                 SEOMeta::setDescription($seo->description);
                 SEOMeta::addKeyword($seo->keyword);

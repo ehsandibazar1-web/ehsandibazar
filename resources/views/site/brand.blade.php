@@ -41,7 +41,7 @@
                     @foreach($brand->image as $key => $image)
                         @if($key != 0)
                             <div class="carousel-item {{ $key == 1 ? 'active' : null }}">
-                                <img src="{{ url($image->url) }}" alt="{{ $brand->title }}">
+                                <img loading="lazy" src="{{ url($image->url) }}" alt="{{ $brand->title }}">
                             </div>
                         @endif
                     @endforeach
@@ -79,7 +79,7 @@
                                <div class="result-item">
                                    <div class="result-offered-image">
                                        <a href="{{ $product->path() }}">
-                                           <img src="{{ isset($product->image[0]) ? $product->image[0]->url : null }}">
+                                           <img loading="lazy" src="{{ isset($product->image[0]) ? $product->image[0]->url : null }}">
                                        </a>
                                    </div>
                                    <div class="result-offered-title">

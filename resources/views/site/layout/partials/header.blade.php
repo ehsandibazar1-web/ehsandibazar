@@ -7,7 +7,7 @@
                 @if(isset($logo))
                     <div class="logo">
                         <a href="{{ route('site.index') }}">
-                            <img src="{{$logo->code5}}" width="70" height="64" class="img-fluid" alt="{{$logo->name}}">
+                            <img loading="eager" src="{{$logo->code5}}" width="70" height="64" class="img-fluid" alt="{{$logo->name}}">
                         </a>
                     </div>
                 @endif
@@ -97,7 +97,7 @@
                         @if(isset($logo))
                             <li class="logo">
                                 <a href="{{route('site.index')}}" class="d-block">
-                                    <img src="{{$logo->code5}}" width="70" height="64" class="img-fluid" alt="{{$logo->name}}">
+                                    <img loading="eager" src="{{$logo->code5}}" width="70" height="64" class="img-fluid" alt="{{$logo->name}}">
                                 </a>
                             </li>
                         @endif
@@ -107,7 +107,7 @@
                     {{--
                      <span class="w-icon me-4">
                             <a href="https://api.whatsapp.com/send/?phone=989128936406&text&app_absent=0">
-                        <img src="{{ asset('site_themes/images/wh.svg') }}"width="31" height="31" class="img-fluid" alt="وب سایت دفاع شخصی">
+                        <img loading="lazy" src="{{ asset('site_themes/images/wh.svg') }}"width="31" height="31" class="img-fluid" alt="وب سایت دفاع شخصی">
                     </a>
                         </span>
                     --}}
@@ -126,7 +126,7 @@
                         <li class="lng  align-items-center">
                              <a href="https://trainwithehsan.com" aria-label="English">
                                 <span>
-                                    <img src="{{asset('site_themes/images/en.svg')}}" width="24" height="24" alt="English">
+                                    <img loading="lazy" src="{{asset('site_themes/images/en.svg')}}" width="24" height="24" alt="English">
                                 </span>
                            </a>
                         </li>
@@ -162,7 +162,7 @@
                                  <a href="https://trainwithehsan.com" aria-label="English">
                                 <span class="iconen"></span>
                                 <span>
-                                    <img alt="زبان انگلیسی آموزش دفاع شخصی دیبازر " src="{{asset('site_themes/images/en.svg')}}" width="24" height="24">
+                                    <img loading="lazy" alt="زبان انگلیسی آموزش دفاع شخصی دیبازر " src="{{asset('site_themes/images/en.svg')}}" width="24" height="24">
                                 </span>
                            </a>
                             </li>
@@ -221,7 +221,7 @@
                 <li>
                     <span class="fllow"> WhatsApp </span>
                     <span class="w-icon"><a href="https://api.whatsapp.com/send/?phone=989128936406&text&app_absent=0">
-                         <img src="{{ asset('site_themes/images/wh.svg') }}" class="img-fluid" alt="آیکون واتس اپ آکادمی دفاع شخصی دیبازر">
+                         <img loading="lazy" src="{{ asset('site_themes/images/wh.svg') }}" class="img-fluid" alt="آیکون واتس اپ آکادمی دفاع شخصی دیبازر">
                     </a></span>
                 </li>
                 --}}
