@@ -119,6 +119,23 @@
   1. تغییر کد (با Claude) → push به GitHub
   2. cPanel → Git → مخزن staging → Update from Remote → تست روی staging
   3. cPanel → Git → مخزن main-app → Update from Remote → لایو
+
+### بعد از هر «Update from Remote» (مهم)
+با اکانت ادمین وارد سایت شو و این آدرس را باز کن تا کش‌ها تازه و
+migrationهای جدید اجرا شوند (جایگزین امنِ مسیر حذف‌شده‌ی clear-cache-now):
+```
+/panel/manager/maintenance/optimize   ← کش‌ها (بعد از هر آپدیت)
+/panel/manager/maintenance/migrate    ← فقط وقتی migration جدید داریم
+```
+
+### کلیدهای .env که باید اضافه شوند (staging و production)
+```
+MELIPAYAMAK_USERNAME=شماره_پنل_پیامک
+MELIPAYAMAK_PASSWORD=رمز_پنل_پیامک
+```
+بعد از افزودن این‌ها، به Claude بگو fallback هاردکد را از
+`app/Utility/SendSms.php` حذف کند و رمز پنل ملی‌پیامک را هم عوض کن
+(رمز فعلی در تاریخچه‌ی گیت ثبت شده).
 - بعد از چند هفته‌ی پایدار، می‌توان فایل‌های سایت قدیمی داخل `public_html` را
   (به‌جز `main-app`، `staging-app`، پوشه‌های asset و فایل‌های سئویی) پاک‌سازی کرد —
   **عجله‌ای نیست.**
