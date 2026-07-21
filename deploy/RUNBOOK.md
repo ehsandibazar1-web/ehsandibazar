@@ -39,13 +39,17 @@
   ```
 - APP_KEY و اطلاعات دیتابیس و درگاه همان قبلی می‌مانند (نشست کاربران حفظ می‌شود).
 
-### ۱.۵ فایل‌های سئویی فیزیکی
-در `public_html` این فایل‌ها را پیدا کن و هر کدام بود به `/public_html/main-app/public` کپی کن:
-- `robots.txt`
-- `sitemap.xml` (اگر فایل فیزیکی بود — نسخه‌ی داینامیک هم در کد هست)
-- `google*.html` (فایل تأیید Search Console — **خیلی مهم**)
-- `ads.txt`
-- `favicon.ico` (اگر سفارشی بود)
+### ۱.۵ فایل‌های سئویی فیزیکی — فقط وجودشان را چک کن (کپی لازم نیست) ✅
+بلوک سوییچ (فاز ۲) این فایل‌ها را از **جای فعلی‌شان در `public_html`** سرو می‌کند،
+پس نیازی به کپی نیست — فقط مطمئن شو در `public_html` هستند:
+- `robots.txt` — **مهم**: با این نسخه‌ی بلوک، همین فایل فیزیکی سرو می‌شود تا قوانین
+  خزیدن دقیقاً مثل امروز بماند (Disallowهای signin/basket/checkout/filter/pagination).
+- `google*.html` (تأیید Search Console — **خیلی مهم**) — تأیید‌شده: سه فایل موجود است.
+- `BingSiteAuth.xml` (تأیید Bing) — موجود.
+- `favicon.ico` + آیکون‌ها (`android-icon*`, `apple-icon*`, `ms-icon*`, `favicon-*.png`)
+  و `manifest.json` و `browserconfig.xml`.
+- `ads.txt` (اگر گوگل ادسنس داری).
+- `sitemap.xml` **نه** — این یکی داینامیک از کد ساخته می‌شود (عمداً از بلوک مستثنا نشده).
 
 ### ۱.۶ تست خاموش (اختیاری ولی توصیه‌شده)
 - ساب‌دامنه‌ی `test.ehsandibazar.com` (که هاست ساخته) را موقتاً به
@@ -68,14 +72,19 @@
 
 ```apache
 # ---- NEW SITE (Laravel 12): route main-domain traffic into main-app/public ----
-# Asset folders are excluded and keep serving from their current locations
-# in public_html (no duplication needed).
+# Legacy asset folders AND root-level static / SEO / verification files keep
+# serving from their current location in public_html; everything else goes to the
+# new app. robots.txt is served from the EXISTING physical file so its crawl rules
+# stay byte-for-byte identical to today — zero SEO change, and no way for a
+# dynamic route to ever accidentally emit a whole-site Disallow.
+# (sitemap.xml is deliberately NOT excluded, so it routes to the new dynamic sitemap.)
 <IfModule mod_rewrite.c>
     RewriteEngine On
     RewriteCond %{HTTP_HOST} ^(www\.)?ehsandibazar\.com$ [NC]
     RewriteCond %{REQUEST_URI} !^/main-app/public/
     RewriteCond %{REQUEST_URI} !^/(site_themes|users_theme|admin|upload|storage|public|css|js|general|vendor|site_theme)/
-    RewriteCond %{REQUEST_URI} !^/(google[a-z0-9]*\.html|ads\.txt|favicon\.ico)$
+    RewriteCond %{REQUEST_URI} !^/(google[a-z0-9]*\.html|ads\.txt|favicon\.ico|robots\.txt|BingSiteAuth\.xml|manifest\.json|browserconfig\.xml)$ [NC]
+    RewriteCond %{REQUEST_URI} !^/(android-icon|apple-icon|ms-icon|favicon)[A-Za-z0-9._-]*\.png$ [NC]
     RewriteRule ^(.*)$ main-app/public/$1 [L]
 </IfModule>
 # ---- END NEW SITE ----
@@ -96,7 +105,7 @@
 |---|---|
 | `https://ehsandibazar.com` | صفحه‌ی اصلی کامل با قالب |
 | یک صفحه‌ی محصول | باز شود، قیمت درست |
-| `https://ehsandibazar.com/robots.txt` | **Disallow خالی** (یعنی باز) + خط Sitemap |
+| `https://ehsandibazar.com/robots.txt` | **همون قوانین فعلی** (Disallowهای signin/basket/checkout/filter/pagination + خط Sitemap) — بدون تغییر |
 | `https://ehsandibazar.com/sitemap.xml` | XML با لیست URLها |
 | ورود با اکانت واقعی | موفق |
 | افزودن به سبد + رفتن تا درگاه | صفحه‌ی درگاه زرین‌پال باز شود |
