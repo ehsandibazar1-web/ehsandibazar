@@ -16,6 +16,24 @@ Route::get('/robots.txt', function () {
     return response($content, 200)->header('Content-Type', 'text/plain');
 });
 
+/*
+ | English content lives on its own dedicated site (trainwithehsan.com), hosted
+ | outside Iran. To avoid duplicate-content / keyword-cannibalisation between the
+ | two domains — and to consolidate all English SEO authority onto the English
+ | site — the legacy /en English landing on this Persian domain is 301-redirected
+ | to trainwithehsan.com. Registered here, above every group/catch-all, so it
+ | always wins regardless of how /en used to resolve. The header language switcher
+ | already links straight to trainwithehsan.com; this redirect just catches any
+ | old inbound links / bookmarks / crawler memory of /en.
+ |
+ | NOTE: this is a one-way link FROM this Persian domain OUT to the English site.
+ | We deliberately do NOT add any reverse reference (no hreflang / link) on
+ | trainwithehsan.com back to this domain, so the English site stays fully
+ | independent of Iranian hosting (important for its Google AdSense eligibility).
+ */
+Route::redirect('/en', 'https://trainwithehsan.com', 301);
+Route::get('/en/{any}', fn () => redirect('https://trainwithehsan.com', 301))->where('any', '.*');
+
 // NOTE: the old public /clear-cache-now route was removed for security.
 // Maintenance actions now live under the authenticated admin panel:
 // /panel/manager/maintenance/{action} (see routes/admin.php).
