@@ -22,6 +22,10 @@
 - بعد از ساخت: **Manage** → Checked-Out Branch را به
   `claude/website-code-github-upload-xn3z2n` تغییر بده → **Update**
 - تأیید: HEAD Commit باید مربوط به Laravel 12 باشد.
+- ⚠️ **مجوز پوشه — خیلی مهم!** cPanel معمولاً پوشه‌ی کلون (`main-app`) را با مجوز `0700`
+  می‌سازد. با این مجوز، وب‌سرور نمی‌تواند وارد پوشه شود و **همه‌چیز ۴۰۴ می‌دهد**.
+  حتماً چک کن: File Manager → راست‌کلیک `main-app` → **Change Permissions** → باید `0755`
+  باشد (مثل `staging-app`). اگر `0700` بود، بکنش `0755` (اعداد: `7 5 5`) و **Save**.
 
 ### ۱.۳ ~~کپی پوشه‌های asset~~ — لازم نیست! ✅
 برای production هیچ کپی‌ای لازم نیست: بلوک سوییچ (فاز ۲) طوری نوشته شده که
@@ -35,8 +39,16 @@
   ```
   APP_ENV=production
   APP_DEBUG=false
-  APP_URL=https://ehsandibazar.com
+  APP_URL=https://ehsandibazar.com/public
   ```
+- ⚠️ **مهم — `/public` را نگه دار!** آدرس عکس‌ها و assetها از روی `APP_URL` ساخته می‌شوند
+  (`getCode5Attribute`/`Image::url` = `env('APP_URL') . مسیر`) و فایل‌های فیزیکی زیر
+  `.../public/storage` و `.../public/site_themes` و... هستند. اگر `/public` را برداری،
+  آدرس عکس‌ها بدون `/public` ساخته می‌شود و **همه‌ی عکس‌ها می‌شکنند**. با نگه‌داشتن `/public`
+  آدرس‌ها دقیقاً مثل سایت فعلی می‌مانند.
+  - سئو امن است: `canonical` از `request()->url()` و آدرس‌های `sitemap` دستی و ثابت
+    (`https://ehsandibazar.com/...`) ساخته می‌شوند — هیچ‌کدام از `APP_URL` استفاده نمی‌کنند،
+    پس `/public` در آن‌ها ظاهر نمی‌شود.
 - APP_KEY و اطلاعات دیتابیس و درگاه همان قبلی می‌مانند (نشست کاربران حفظ می‌شود).
 
 ### ۱.۵ فایل‌های سئویی فیزیکی — فقط وجودشان را چک کن (کپی لازم نیست) ✅
