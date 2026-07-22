@@ -21,7 +21,7 @@ Route::group(['middleware' => ['auth:web'], 'prefix' => 'panel'], function () {
         Route::get('maintenance/seo-check', function (\Illuminate\Http\Request $request, \App\Services\Seo\SeoRegressionChecker $checker) {
             $base = rtrim((string) $request->query('base', 'https://ehsandibazar.com'), '/');
             $candidate = rtrim((string) $request->query('candidate', $request->getSchemeAndHttpHost()), '/');
-            $limit = max(1, (int) $request->query('limit', 40));
+            $limit = max(1, (int) $request->query('limit', 15));
             $offset = max(0, (int) $request->query('offset', 0));
 
             @set_time_limit(0);

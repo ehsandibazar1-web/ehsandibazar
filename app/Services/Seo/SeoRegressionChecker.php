@@ -4,6 +4,8 @@ namespace App\Services\Seo;
 
 use DOMDocument;
 use DOMXPath;
+use Illuminate\Http\Client\Pool;
+use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
 
 /**
@@ -22,7 +24,8 @@ class SeoRegressionChecker
     public const WARNING = 'warning';     // 🟡 بازبینی دستی
 
     public function __construct(
-        private readonly int $timeout = 15,
+        private readonly int $timeout = 8,
+        private readonly int $connectTimeout = 5,
     ) {}
 
     /**
@@ -172,15 +175,24 @@ class SeoRegressionChecker
         $locs = $this->parseSitemapLocs($sitemap ?? '');
 
         $slice = array_slice($locs, $offset, $limit);
+        $paths = array_map(fn (string $loc): string => $this->pathOf($loc), $slice);
+
+        // همه‌ی URLها (مرجع + کاندیدا) را موازی واکشی می‌کنیم تا یک درخواستِ مرورگر به‌جای
+        // صدها واکشیِ پشت‌سرهم، در چند ثانیه تمام شود.
+        $urls = [];
+        foreach ($paths as $path) {
+            $urls[] = $baseUrl.$path;
+            $urls[] = $candidateUrl.$path;
+        }
+        $snaps = $this->fetchMany(array_values(array_unique($urls)));
 
         $rows = [];
         $critical = 0;
         $warning = 0;
 
-        foreach ($slice as $loc) {
-            $path = $this->pathOf($loc);
-            $baseSnap = $this->fetchSnapshot($baseUrl.$path);
-            $candSnap = $this->fetchSnapshot($candidateUrl.$path);
+        foreach ($paths as $path) {
+            $baseSnap = $snaps[$baseUrl.$path] ?? $this->extractFromHtml(null, 0);
+            $candSnap = $snaps[$candidateUrl.$path] ?? $this->extractFromHtml(null, 0);
             $issues = $this->compareSnapshots($baseSnap, $candSnap);
 
             $rowCritical = count(array_filter($issues, fn ($i) => $i['severity'] === self::CRITICAL));
@@ -205,6 +217,41 @@ class SeoRegressionChecker
             'warning' => $warning,
             'rows' => $rows,
         ];
+    }
+
+    /**
+     * چند URL را به‌صورت موازی (در دسته‌های ۱۰تایی) واکشی می‌کند.
+     *
+     * @param  list<string>  $urls
+     * @return array<string, array> نگاشتِ url → snapshot
+     */
+    private function fetchMany(array $urls): array
+    {
+        $out = [];
+
+        foreach (array_chunk($urls, 10) as $chunk) {
+            try {
+                $responses = Http::pool(fn (Pool $pool) => array_map(
+                    fn (string $u) => $pool->as($u)
+                        ->withHeaders(['User-Agent' => 'SeoRegressionChecker/1.0 (+red-line gate)'])
+                        ->connectTimeout($this->connectTimeout)
+                        ->timeout($this->timeout)
+                        ->get($u),
+                    $chunk,
+                ));
+            } catch (\Throwable $e) {
+                $responses = [];
+            }
+
+            foreach ($chunk as $u) {
+                $r = $responses[$u] ?? null;
+                $out[$u] = $r instanceof Response
+                    ? $this->extractFromHtml($r->body(), $r->status())
+                    : $this->extractFromHtml(null, 0);
+            }
+        }
+
+        return $out;
     }
 
     private function fetchBody(string $url): ?string
