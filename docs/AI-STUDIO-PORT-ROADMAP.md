@@ -42,8 +42,10 @@
       _(ستون‌های embedding از مهاجرت `add_embedding_columns_for_rag` که در گروه ۱ بخشی‌اش نگه داشته شد.)_
 - [ ] **گروه ۴ — Activity Log Viewer:** صفحه‌ی `ActivityLogPage` — فقط یک نمایشگر روی
       activitylog که **همین حالا نصب است**. تقریباً بدون کار جانبی.
-- [ ] **گروه ۵ — Media Library:** `Media`, `MediaFolder` + صفحه‌ی `MediaLibrary`.
-      جدول‌های جدید؛ با `File/Image/Video` فروشگاه تداخل ندارد (آن‌ها مخصوص محصول‌اند).
+- [x] **گروه ۵ — Media Library:** ✅ روی استگینگ کار می‌کند. `Media`, `MediaFolder`,
+      `MediaProcessor` (WebP/تامبنیل/ریسپانسیو با intervention/image v4)، `VideoMetadataService`،
+      `MediaUsageScanner` (فعلاً خنثی تا موج ۴)، صفحه + trait + blade. زیر گروه «AI Studio».
+      اکشنِ `storage-link` هم برای symlinkِ بدون‌شل اضافه شد. صفر تغییرِ vendor.
 
 ### موج ۴ — موتور تولید محتوا + نقطه‌ی همگرایی  🔧🆕
 اینجا اولین «ارتقا در جا» رخ می‌دهد: خروجی هوش مصنوعی باید در **مقاله‌ی فارسیِ موجود** بنشیند.
