@@ -184,6 +184,23 @@ class AiInternalLinking extends Page
         return $this->items()->count();
     }
 
+    /**
+     * محتوای یتیم (بدونِ لینکِ ورودی) همراه با لینکِ ویرایش/نمایش.
+     *
+     * @return array<int, array{title:string, type:string, url:string, edit_url:?string}>
+     */
+    public function getOrphansProperty(): array
+    {
+        return app(InternalLinkSuggester::class)->orphans()
+            ->map(fn (array $o): array => [
+                'title' => $o['title'],
+                'type' => $o['type'],
+                'url' => $o['url'],
+                'edit_url' => $this->editUrl($o['type'], $o['id']),
+            ])
+            ->all();
+    }
+
     private function editUrl(string $type, int $id): ?string
     {
         try {
