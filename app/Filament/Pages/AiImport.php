@@ -18,6 +18,9 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Throwable;
 use UnitEnum;
 
@@ -204,9 +207,10 @@ class AiImport extends Page implements HasForms
                 throw new \RuntimeException('ساختارِ JSON قابلِ خواندن نیست.');
             }
 
-            $decoded['locale'] ??= $state['locale'] ?? 'fa';
+            $normalized = $this->normalizeImportPayload($decoded);
+            $normalized['locale'] ??= $state['locale'] ?? 'fa';
 
-            return $decoded;
+            return $normalized;
         }
 
         // مسیرِ فیلدها.
@@ -226,6 +230,78 @@ class AiImport extends Page implements HasForms
         }
 
         return $payload;
+    }
+
+    /**
+     * فرمتِ غنیِ خروجیِ سایت انگلیسی (یا هر نامِ مستعارِ رایج) را به payloadِ هم‌شکلِ Contract نگاشت
+     * می‌کند: language→locale، content→body، publish_status→status، faq→faqs، seo/og تودرتو →
+     * ستون‌های تخت، featured_image (URL) → دانلود و image_path. کلیدهای ناشناخته (internal_links،
+     * external_links، keywords، provider، …) نادیده گرفته می‌شوند — ContentDraftFactory هم فقط
+     * ستون‌های واقعی را می‌نویسد. مقادیرِ خالی حذف می‌شوند تا چیزی را بازننویسند.
+     */
+    private function normalizeImportPayload(array $raw): array
+    {
+        $seo = is_array($raw['seo'] ?? null) ? $raw['seo'] : [];
+        $og = is_array($raw['og'] ?? null) ? $raw['og'] : [];
+
+        $image = $raw['image_path'] ?? $raw['featured_image'] ?? null;
+        if (filled($image) && Str::startsWith((string) $image, ['http://', 'https://'])) {
+            $image = $this->downloadImage((string) $image); // null در صورتِ شکست
+        }
+
+        $faqs = $raw['faqs'] ?? $raw['faq'] ?? null;
+        $tags = $raw['tags'] ?? null;
+
+        $payload = [
+            'locale' => $raw['locale'] ?? $raw['language'] ?? $raw['lang'] ?? null,
+            'title' => $raw['title'] ?? null,
+            'slug' => $raw['slug'] ?? null,
+            'excerpt' => $raw['excerpt'] ?? null,
+            'body' => $raw['body'] ?? $raw['content'] ?? null,
+            'status' => $raw['status'] ?? $raw['publish_status'] ?? 'draft',
+            'faqs' => is_array($faqs) ? $faqs : null,
+            'tags' => is_array($tags) ? $tags : null,
+            'seo_title' => $raw['seo_title'] ?? ($seo['title'] ?? null),
+            'meta_description' => $raw['meta_description'] ?? ($seo['meta_description'] ?? null),
+            'meta_keywords' => $raw['meta_keywords'] ?? null,
+            'canonical_url' => $raw['canonical_url'] ?? null,
+            'robots' => $raw['robots'] ?? null,
+            'og_title' => $raw['og_title'] ?? ($og['title'] ?? null),
+            'og_description' => $raw['og_description'] ?? ($og['description'] ?? null),
+            'image_path' => $image,
+            'image_alt' => $raw['image_alt'] ?? null,
+            'author_name' => $raw['author_name'] ?? null,
+            'reading_time' => $raw['reading_time'] ?? null,
+            'published_at' => $raw['published_at'] ?? ($raw['publish_date'] ?? null),
+            'translation_of' => filled($raw['translation_of'] ?? null) ? $raw['translation_of'] : null,
+        ];
+
+        // مقادیرِ null/'' حذف — تا کلیدِ خالی چیزی را بازننویسد و translation_of=''باعثِ خطای FK نشود.
+        return array_filter($payload, fn ($v) => $v !== null && $v !== '');
+    }
+
+    /**
+     * تصویرِ شاخصِ URL-دار را به دیسکِ public دانلود می‌کند و مسیرِ نسبی را برمی‌گرداند (یا null در
+     * صورتِ شکست، تا ایمپورت به‌خاطرِ تصویر متوقف نشود). تولیدِ WebP/ثبت در کتابخانه‌ی رسانه بعداً.
+     */
+    private function downloadImage(string $url): ?string
+    {
+        try {
+            $response = Http::timeout(20)->get($url);
+
+            if (! $response->successful() || blank($response->body())) {
+                return null;
+            }
+
+            $ext = pathinfo((string) parse_url($url, PHP_URL_PATH), PATHINFO_EXTENSION) ?: 'jpg';
+            $path = 'articles/imported/'.Str::random(16).'.'.strtolower($ext);
+
+            Storage::disk('public')->put($path, $response->body());
+
+            return $path;
+        } catch (Throwable $e) {
+            return null;
+        }
     }
 
     /** ۲۰ ایمپورتِ اخیر — برای جدولِ تاریخچه در ویو. */
