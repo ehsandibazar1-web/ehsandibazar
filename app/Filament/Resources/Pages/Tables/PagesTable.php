@@ -1,0 +1,61 @@
+<?php
+
+namespace App\Filament\Resources\Pages\Tables;
+
+use Filament\Actions\DeleteAction;
+use Filament\Actions\EditAction;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\ImageColumn;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
+use Filament\Tables\Table;
+
+class PagesTable
+{
+    public static function configure(Table $table): Table
+    {
+        return $table
+            ->columns([
+                ImageColumn::make('image_path')
+                    ->label('')
+                    ->disk('public')
+                    ->height(40)
+                    ->square(),
+
+                TextColumn::make('title')
+                    ->label('عنوان')
+                    ->searchable()
+                    ->limit(50)
+                    ->sortable(),
+
+                TextColumn::make('lang')
+                    ->label('زبان')
+                    ->badge()
+                    ->color('gray'),
+
+                IconColumn::make('status')
+                    ->label('منتشر شده')
+                    ->boolean(),
+
+                TextColumn::make('created_at')
+                    ->label('تاریخ'),
+            ])
+            ->filters([
+                TernaryFilter::make('status')
+                    ->label('وضعیت')
+                    ->placeholder('همه')
+                    ->trueLabel('منتشرشده')
+                    ->falseLabel('پیش‌نویس'),
+
+                SelectFilter::make('lang')
+                    ->label('زبان')
+                    ->options(['fa' => 'فارسی', 'en' => 'English', 'tr' => 'Türkçe']),
+            ])
+            ->recordActions([
+                EditAction::make(),
+                DeleteAction::make(),
+            ])
+            ->defaultSort('id', 'desc');
+    }
+}

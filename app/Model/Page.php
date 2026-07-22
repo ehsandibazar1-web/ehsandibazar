@@ -2,6 +2,8 @@
 
 namespace App\Model;
 
+use App\Cms\Contracts\Localizable;
+use App\Cms\Contracts\Publishable;
 use App\Traits\HasSeo;
 use App\User;
 use App\Traits\HasComment;
@@ -10,17 +12,59 @@ use App\Traits\HasSearch;
 use App\Traits\HasTag;
 use Cviebrock\EloquentSluggable\Services\SlugService;
 use Cviebrock\EloquentSluggable\Sluggable;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Searchable\Searchable;
 use App\Traits\Rateable;
 
-class Page extends Model
+/**
+ * موج ۴d: Page مثلِ Article قراردادِ Localizable/Publishable را با «پل» به ستون‌های legacyِ زنده
+ * (lang، statusِ بولین) پیاده می‌کند. storefront (`/page/{slug}` با where('status',1)) دست‌نخورده.
+ */
+class Page extends Model implements Localizable, Publishable
 {
     use SoftDeletes, HasImage, HasTag, HasComment,Rateable,HasSeo;
 
     protected $guarded = ['id'];
+
+    protected $casts = [
+        'faqs' => 'array',
+        'published_at' => 'datetime',
+    ];
+
+    public function getLocale(): string
+    {
+        return (string) ($this->lang ?? 'fa');
+    }
+
+    public function translation(): BelongsTo
+    {
+        return $this->belongsTo(self::class, 'translation_of');
+    }
+
+    public function translations(): HasMany
+    {
+        return $this->hasMany(self::class, 'translation_of');
+    }
+
+    public function isPublished(): bool
+    {
+        return (int) $this->status === 1;
+    }
+
+    public function getPublishedAt(): ?\DateTimeInterface
+    {
+        return $this->published_at;
+    }
+
+    public function scopePublished(Builder $query): Builder
+    {
+        return $query->where('status', 1);
+    }
 
     protected static function boot()
     {
