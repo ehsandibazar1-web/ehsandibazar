@@ -35,4 +35,12 @@ return [
         'secret' => env('STRIPE_SECRET'),
     ],
 
+    // ارائه‌دهنده‌ی پیش‌فرض هوش مصنوعی (fallback). کلید اختیاری است؛ اگر خالی باشد
+    // NullProvider استفاده می‌شود و کلیدها از پنل «AI Providers» (دیتابیس) خوانده می‌شوند.
+    'anthropic' => [
+        'key' => env('ANTHROPIC_API_KEY'),
+        'model' => env('ANTHROPIC_MODEL', 'claude-opus-4-8'),
+        'driver' => env('AI_ASSISTANT_DRIVER', 'anthropic'),
+    ],
+
 ];

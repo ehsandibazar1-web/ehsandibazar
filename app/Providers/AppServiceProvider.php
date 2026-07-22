@@ -27,6 +27,9 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\ServiceProvider;
 use App\User;
+use App\Services\AiAssistant\Contracts\AiProvider;
+use App\Services\AiAssistant\Providers\AnthropicProvider;
+use App\Services\AiAssistant\Providers\NullProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -157,6 +160,17 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+        // انتخاب ارائه‌دهنده‌ی پیش‌فرض هوش مصنوعی (fallback قدیمی که ProviderManager به آن نیاز دارد).
+        // اگر کلید Anthropic در .env نباشد، NullProvider برمی‌گردد؛ ارائه‌دهنده‌های دیگر کلیدشان را
+        // از دیتابیس (پنل «AI Providers») می‌خوانند، نه از این‌جا.
+        $this->app->bind(AiProvider::class, function () {
+            if (blank(config('services.anthropic.key'))) {
+                return new NullProvider;
+            }
+
+            return match (config('services.anthropic.driver', 'anthropic')) {
+                default => new AnthropicProvider,
+            };
+        });
     }
 }
