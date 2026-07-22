@@ -1,5 +1,0 @@
-.phpunit.result.cache
-coverage
-composer.lock
-composer.phar
-vendor
