@@ -4,10 +4,15 @@ namespace App\Filament\Pages;
 
 use App\Filament\Resources\Articles\ArticleResource;
 use App\Filament\Resources\Pages\PageResource;
+use App\Model\Article;
+use App\Model\Page as ContentPage;
+use App\Services\Seo\InternalLinkApplier;
 use App\Services\Seo\InternalLinkSuggester;
 use BackedEnum;
+use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Support\Icons\Heroicon;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use UnitEnum;
 
@@ -34,6 +39,111 @@ class AiInternalLinking extends Page
     private ?Collection $cached = null;
 
     /**
+     * پیشنهادِ در انتظارِ تأیید (پیش‌نمایشِ قبل/بعد). null یعنی هیچ پیش‌نمایشی باز نیست.
+     *
+     * @var array<string, mixed>|null
+     */
+    public ?array $pending = null;
+
+    /** @return Collection<int, array<string, mixed>> */
+    private function items(): Collection
+    {
+        return $this->cached ??= app(InternalLinkSuggester::class)->suggestions(300);
+    }
+
+    /**
+     * پیش‌نمایشِ اعمالِ یک پیشنهاد (بر اساسِ اندیسِ پایدار در فهرستِ مسطح). چیزی ذخیره نمی‌کند.
+     */
+    public function preview(int $index): void
+    {
+        $s = $this->items()->values()->get($index);
+
+        if (! $s) {
+            return;
+        }
+
+        $model = $this->resolveModel($s['source_type'], $s['source_id']);
+
+        if (! $model) {
+            Notification::make()->danger()->title('محتوای مبدأ پیدا نشد')->send();
+
+            return;
+        }
+
+        $plan = app(InternalLinkApplier::class)->plan((string) $model->body, $s['anchor'], $s['target_url']);
+
+        if (! $plan) {
+            Notification::make()->warning()
+                ->title('اعمالِ خودکار ممکن نیست')
+                ->body('عبارت به‌صورتِ متنِ سادهٔ یکپارچه در بدنه نیست (شاید داخلِ تگ/لینکِ دیگری است). لطفاً دستی اعمال کنید.')
+                ->send();
+
+            return;
+        }
+
+        $this->pending = [
+            'index' => $index,
+            'source_type' => $s['source_type'],
+            'source_id' => $s['source_id'],
+            'source_title' => $s['source_title'],
+            'anchor' => $s['anchor'],
+            'target_url' => $s['target_url'],
+            'preview_before' => $plan['preview_before'],
+            'preview_after' => $plan['preview_after'],
+        ];
+    }
+
+    public function cancelPreview(): void
+    {
+        $this->pending = null;
+    }
+
+    /**
+     * اعمالِ نهاییِ پیشنهادِ در انتظار: بدنه را با نسخهٔ لینک‌دار به‌روزرسانی می‌کند (از طریقِ Eloquent
+     * تا در صورتِ فعال‌بودنِ activitylog ثبت شود). فقط همان یک عبارت تغییر می‌کند.
+     */
+    public function confirmApply(): void
+    {
+        if (! $this->pending) {
+            return;
+        }
+
+        $p = $this->pending;
+        $model = $this->resolveModel($p['source_type'], $p['source_id']);
+
+        if (! $model) {
+            $this->pending = null;
+            Notification::make()->danger()->title('محتوای مبدأ پیدا نشد')->send();
+
+            return;
+        }
+
+        $newBody = app(InternalLinkApplier::class)->buildLinkedBody((string) $model->body, $p['anchor'], $p['target_url']);
+
+        if ($newBody === null) {
+            $this->pending = null;
+            Notification::make()->warning()->title('عبارت دیگر در بدنه پیدا نشد')->body('شاید بدنه بین پیش‌نمایش و تأیید تغییر کرده. دوباره تلاش کنید.')->send();
+
+            return;
+        }
+
+        $model->update(['body' => $newBody]);
+
+        Notification::make()->success()
+            ->title('لینکِ داخلی اضافه شد')
+            ->body('«'.$p['anchor'].'» در «'.$p['source_title'].'» لینک شد.')
+            ->send();
+
+        $this->pending = null;
+        $this->cached = null; // بازمحاسبهٔ پیشنهادها (این مورد دیگر نباید بیاید)
+    }
+
+    private function resolveModel(string $type, int $id): ?Model
+    {
+        return $type === 'article' ? Article::find($id) : ContentPage::find($id);
+    }
+
+    /**
      * پیشنهادها گروه‌بندی‌شده بر اساسِ محتوای مبدأ، همراه با لینکِ ویرایشِ همان محتوا.
      *
      * @return array<int, array{
@@ -43,9 +153,10 @@ class AiInternalLinking extends Page
      */
     public function getGroupedSuggestionsProperty(): array
     {
-        $this->cached ??= app(InternalLinkSuggester::class)->suggestions(300);
-
-        return $this->cached
+        return $this->items()
+            ->values()
+            // اندیسِ پایدارِ مسطح را نگه می‌داریم تا دکمهٔ «اعمال» بتواند دقیقاً همان پیشنهاد را بیابد.
+            ->map(fn (array $s, int $i): array => $s + ['index' => $i])
             ->groupBy(fn (array $s): string => $s['source_type'].':'.$s['source_id'])
             ->map(function (Collection $group): array {
                 $first = $group->first();
@@ -56,6 +167,7 @@ class AiInternalLinking extends Page
                     'edit_url' => $this->editUrl($first['source_type'], $first['source_id']),
                     'view_url' => $first['source_url'],
                     'links' => $group->map(fn (array $s): array => [
+                        'index' => $s['index'],
                         'anchor' => $s['anchor'],
                         'target_url' => $s['target_url'],
                         'link_html' => $s['link_html'],
@@ -69,9 +181,7 @@ class AiInternalLinking extends Page
 
     public function getTotalProperty(): int
     {
-        $this->cached ??= app(InternalLinkSuggester::class)->suggestions(300);
-
-        return $this->cached->count();
+        return $this->items()->count();
     }
 
     private function editUrl(string $type, int $id): ?string

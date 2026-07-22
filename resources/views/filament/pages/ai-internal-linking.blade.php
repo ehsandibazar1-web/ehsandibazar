@@ -1,10 +1,39 @@
 <x-filament-panels::page>
     <div class="mb-4 text-sm text-gray-500 dark:text-gray-400">
         فرصت‌های لینکِ داخلی: جاهایی که یک محتوا عنوانِ محتوای دیگری را ذکر کرده اما هنوز به آن لینک
-        نداده است. لینکِ آماده را کپی کنید و در ویرایشگرِ همان مقاله/صفحه، روی عبارتِ لنگر اعمال کنید.
-        <span class="font-semibold">هیچ محتوایی خودکار تغییر نمی‌کند.</span>
+        نداده است. با دکمهٔ «اعمال» پیش‌نمایشِ قبل/بعد را می‌بینید و پس از تأیید، لینک در بدنه گذاشته
+        می‌شود (فقط همان یک عبارت). یا لینکِ آمادهٔ کنارِ هر ردیف را کپی و دستی اعمال کنید.
         — مجموع: {{ $this->total }} پیشنهاد.
     </div>
+
+    {{-- پنلِ پیش‌نمایش/تأیید --}}
+    @if ($pending)
+        <x-filament::section class="mb-4 ring-2 ring-primary-500">
+            <x-slot name="heading">پیش‌نمایشِ افزودنِ لینک به «{{ $pending['source_title'] }}»</x-slot>
+
+            <div class="space-y-3 text-sm">
+                <div>
+                    <div class="mb-1 font-semibold text-gray-500 dark:text-gray-400">قبل:</div>
+                    <div class="rounded bg-gray-50 p-2 leading-7 dark:bg-white/5">{!! $pending['preview_before'] !!}</div>
+                </div>
+                <div>
+                    <div class="mb-1 font-semibold text-gray-500 dark:text-gray-400">بعد:</div>
+                    <div class="rounded bg-gray-50 p-2 leading-7 dark:bg-white/5">{!! $pending['preview_after'] !!}</div>
+                </div>
+            </div>
+
+            <x-slot name="footer">
+                <div class="flex items-center gap-2">
+                    <x-filament::button wire:click="confirmApply" icon="heroicon-o-check" color="success">
+                        تأیید و افزودنِ لینک
+                    </x-filament::button>
+                    <x-filament::button wire:click="cancelPreview" color="gray" outlined>
+                        انصراف
+                    </x-filament::button>
+                </div>
+            </x-slot>
+        </x-filament::section>
+    @endif
 
     @php $groups = $this->groupedSuggestions; @endphp
 
@@ -40,7 +69,7 @@
 
                     <ul class="divide-y divide-gray-100 dark:divide-white/10">
                         @foreach ($group['links'] as $link)
-                            <li class="flex flex-col gap-1 py-2 sm:flex-row sm:items-center sm:justify-between">
+                            <li class="flex flex-col gap-2 py-2 sm:flex-row sm:items-center sm:justify-between">
                                 <div class="text-sm">
                                     لینک به:
                                     <a href="{{ $link['target_url'] }}" target="_blank" class="font-semibold text-primary-600 hover:underline dark:text-primary-400">
@@ -48,11 +77,21 @@
                                     </a>
                                     <span class="text-xs text-gray-400">({{ $link['target_type'] === 'article' ? 'مقاله' : 'صفحه' }})</span>
                                 </div>
-                                <code
-                                    class="cursor-pointer select-all rounded bg-gray-100 px-2 py-1 text-xs text-gray-700 dark:bg-white/5 dark:text-gray-300"
-                                    dir="ltr"
-                                    title="برای انتخاب کلیک کنید"
-                                >{{ $link['link_html'] }}</code>
+                                <div class="flex items-center gap-2">
+                                    <x-filament::button
+                                        wire:click="preview({{ $link['index'] }})"
+                                        wire:loading.attr="disabled"
+                                        size="sm"
+                                        icon="heroicon-o-link"
+                                    >
+                                        اعمال
+                                    </x-filament::button>
+                                    <code
+                                        class="cursor-pointer select-all rounded bg-gray-100 px-2 py-1 text-xs text-gray-700 dark:bg-white/5 dark:text-gray-300"
+                                        dir="ltr"
+                                        title="برای انتخاب کلیک کنید"
+                                    >{{ $link['link_html'] }}</code>
+                                </div>
                             </li>
                         @endforeach
                     </ul>
