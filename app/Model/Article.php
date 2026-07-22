@@ -110,14 +110,15 @@ class Article extends Model implements Localizable, Publishable
 
     public function getCreatedAtAttribute($value)
     {
+        // بدونِ نوشتنِ دوباره در attributes: قبلاً مقدارِ فرمت‌شده را برمی‌گرداند «و» در
+        // $this->attributes می‌نوشت؛ این باعث می‌شد بارِ دومِ خواندن (مثلاً در رندرِ Filament)
+        // روی رشته‌ی از-قبل-فرمت‌شده اجرا شود و خطای پارس بدهد — و در صورتِ save پس از خواندن،
+        // مقدارِ شمسی را در DB می‌نوشت. حالا فقط return می‌کند (خروجی دقیقاً همان قبلی).
         if (self::$preventAttrSet) {
-            return $this->attributes['created_at'] = Carbon::createFromFormat('Y-m-d H:i:s', $value)->format('Y/m/d');
-        } else {
-            $v = verta($value);
-            return $this->attributes['created_at'] = $v->format('%Y/%m/%d');
-
+            return Carbon::createFromFormat('Y-m-d H:i:s', $value)->format('Y/m/d');
         }
 
+        return verta($value)->format('%Y/%m/%d');
     }
 
     protected static function boot()

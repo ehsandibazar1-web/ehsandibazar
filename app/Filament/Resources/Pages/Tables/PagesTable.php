@@ -38,8 +38,14 @@ class PagesTable
                     ->label('منتشر شده')
                     ->boolean(),
 
-                TextColumn::make('created_at')
-                    ->label('تاریخ'),
+                // accessorِ getCreatedAtAttributeِ legacy مقدار را به شمسی فرمت و attribute را
+                // بازنویسی می‌کند؛ خواندنِ دوباره‌اش در جدول خطا می‌دهد. با getRawOriginal مقدارِ
+                // خامِ دیتابیس را می‌گیریم تا accessor اصلاً فعال نشود.
+                TextColumn::make('created')
+                    ->label('تاریخ')
+                    ->state(fn ($record) => ($raw = $record->getRawOriginal('created_at'))
+                        ? \Illuminate\Support\Carbon::parse($raw)->format('Y-m-d')
+                        : '—'),
             ])
             ->filters([
                 TernaryFilter::make('status')

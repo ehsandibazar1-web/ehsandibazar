@@ -112,12 +112,13 @@ class Page extends Model implements Localizable, Publishable
 
     public function getCreatedAtAttribute($value)
     {
+        // بدونِ نوشتنِ دوباره در attributes (نگاه کنید به توضیحِ همین متد در Article) — خروجی همان قبلی.
         $v = verta($value);
         switch (app()->getLocale()) {
             case('fa');
-                return $this->attributes['created_at'] = $v->format('%d %B %Y');
+                return $v->format('%d %B %Y');
             case('en');
-                return $this->attributes['created_at'] = $v->formatGregorian('d m Y');
+                return $v->formatGregorian('d m Y');
         }
     }
     public function setSlugAttribute($value)
