@@ -12,46 +12,13 @@ Route::group(['middleware' => ['auth:web'], 'prefix' => 'panel'], function () {
         Route::get('/', 'AdminController@dashboard')->name('panel.dashboard.index');
         //================================================== dashboard =============
 
-        // ============================== maintenance (admin-only) ==============
-        // Shell-less host: these let the admin run deploy-time artisan tasks
-        // safely from the browser after each "Update from Remote".
-        Route::get('maintenance/{action}', function ($action) {
-            $allowed = [
-                'cache-clear'  => ['cache:clear', 'config:clear', 'view:clear'],
-                'view-cache'   => ['view:clear', 'view:cache'],
-                'migrate'      => ['migrate', ['--force' => true]],
-                // clear-compiled + package:discover regenerate the package manifest
-                // so newly pulled packages (e.g. Filament) are picked up on a
-                // shell-less host after each "Update from Remote".
-                'optimize'     => ['clear-compiled', 'package:discover', 'config:clear', 'view:clear', 'view:cache', 'cache:clear'],
-            ];
-
-            if (! array_key_exists($action, $allowed)) {
-                abort(404);
-            }
-
-            $output = [];
-            $commands = $allowed[$action];
-            for ($i = 0; $i < count($commands); $i++) {
-                $cmd = $commands[$i];
-                $params = [];
-                if (isset($commands[$i + 1]) && is_array($commands[$i + 1])) {
-                    $params = $commands[$i + 1];
-                    $i++;
-                }
-                \Illuminate\Support\Facades\Artisan::call($cmd, $params);
-                $output[] = "$ artisan {$cmd}\n" . trim(\Illuminate\Support\Facades\Artisan::output());
-            }
-
-            return response('<pre dir="ltr">' . e(implode("\n\n", $output)) . '</pre>');
-        })->name('panel.maintenance');
-        // ============================== maintenance ===========================
-
         // ============================== SEO red-line gate =====================
         // docs/SEO-RED-LINE.md — runs on THIS (staging) server (which can reach
         // production) and diffs every production sitemap URL against staging.
         // Batched via ?limit=&offset= so it never hits the request timeout.
-        Route::get('seo-check', function (\Illuminate\Http\Request $request, \App\Services\Seo\SeoRegressionChecker $checker) {
+        // MUST be registered BEFORE maintenance/{action} below, otherwise the
+        // catch-all matches "maintenance/seo-check" first and 404s.
+        Route::get('maintenance/seo-check', function (\Illuminate\Http\Request $request, \App\Services\Seo\SeoRegressionChecker $checker) {
             $base = rtrim((string) $request->query('base', 'https://ehsandibazar.com'), '/');
             $candidate = rtrim((string) $request->query('candidate', $request->getSchemeAndHttpHost()), '/');
             $limit = max(1, (int) $request->query('limit', 40));
@@ -105,6 +72,41 @@ Route::group(['middleware' => ['auth:web'], 'prefix' => 'panel'], function () {
             return response($html);
         })->name('panel.seo-check');
         // ============================== SEO red-line gate =====================
+
+        // ============================== maintenance (admin-only) ==============
+        // Shell-less host: these let the admin run deploy-time artisan tasks
+        // safely from the browser after each "Update from Remote".
+        Route::get('maintenance/{action}', function ($action) {
+            $allowed = [
+                'cache-clear'  => ['cache:clear', 'config:clear', 'view:clear'],
+                'view-cache'   => ['view:clear', 'view:cache'],
+                'migrate'      => ['migrate', ['--force' => true]],
+                // clear-compiled + package:discover regenerate the package manifest
+                // so newly pulled packages (e.g. Filament) are picked up on a
+                // shell-less host after each "Update from Remote".
+                'optimize'     => ['clear-compiled', 'package:discover', 'config:clear', 'view:clear', 'view:cache', 'cache:clear'],
+            ];
+
+            if (! array_key_exists($action, $allowed)) {
+                abort(404);
+            }
+
+            $output = [];
+            $commands = $allowed[$action];
+            for ($i = 0; $i < count($commands); $i++) {
+                $cmd = $commands[$i];
+                $params = [];
+                if (isset($commands[$i + 1]) && is_array($commands[$i + 1])) {
+                    $params = $commands[$i + 1];
+                    $i++;
+                }
+                \Illuminate\Support\Facades\Artisan::call($cmd, $params);
+                $output[] = "$ artisan {$cmd}\n" . trim(\Illuminate\Support\Facades\Artisan::output());
+            }
+
+            return response('<pre dir="ltr">' . e(implode("\n\n", $output)) . '</pre>');
+        })->name('panel.maintenance');
+        // ============================== maintenance ===========================
 
         // ================================================= Start Of favorite =============
         Route::group(['prefix' => 'favorites'], function () {
