@@ -126,6 +126,67 @@ class InternalLinkSuggester
             ->values();
     }
 
+    /**
+     * لینک‌های داخلیِ شکسته: hrefهایی در بدنه‌ی محتوای منتشرشده که به /article/{slug} یا /page/{slug}
+     * اشاره می‌کنند اما آن مقصد میانِ محتوای منتشرشده نیست (روی سایت ۴۰۴ می‌دهد چون storefront فقط
+     * status=1 را سِرو می‌کند). اسلاگ‌ها با rawurldecode نرمال می‌شوند تا encode/decode تفاوتی ندهد.
+     *
+     * @return Collection<int, array{
+     *     source_id:int, source_type:string, source_title:string, source_edit_type:string,
+     *     target_type:string, target_slug:string, href:string
+     * }>
+     */
+    public function brokenInternalLinks(): Collection
+    {
+        $items = $this->audit->collectContentItems();
+
+        $valid = [
+            'article' => $items->where('type', 'article')->mapWithKeys(fn (array $i) => [rawurldecode($i['slug']) => true])->all(),
+            'page' => $items->where('type', 'page')->mapWithKeys(fn (array $i) => [rawurldecode($i['slug']) => true])->all(),
+        ];
+
+        $broken = collect();
+
+        foreach ($items as $source) {
+            if (! preg_match_all('/href\s*=\s*("|\')(.*?)\1/i', $source['body'], $hrefs)) {
+                continue;
+            }
+
+            $seen = [];
+
+            foreach ($hrefs[2] as $href) {
+                if (! preg_match('~/(article|page)/([^/?#"\'\s]+)~u', $href, $m)) {
+                    continue; // لینکِ داخلیِ مقاله/صفحه نیست
+                }
+
+                $targetType = $m[1];
+                $slug = rawurldecode($m[2]);
+
+                if (isset($valid[$targetType][$slug])) {
+                    continue; // مقصدِ معتبرِ منتشرشده
+                }
+
+                $dedupKey = $targetType.'|'.$slug;
+                if (isset($seen[$dedupKey])) {
+                    continue;
+                }
+                $seen[$dedupKey] = true;
+
+                $broken->push([
+                    'source_id' => $source['id'],
+                    'source_type' => $source['type'],
+                    'source_title' => $source['title'],
+                    'source_edit_type' => $source['type'],
+                    'target_type' => $targetType,
+                    'target_slug' => $slug,
+                    'href' => $href,
+                ]);
+            }
+        }
+
+        return $broken->values();
+    }
+
     private function isLinkableTitle(string $title): bool
     {
         $title = trim($title);

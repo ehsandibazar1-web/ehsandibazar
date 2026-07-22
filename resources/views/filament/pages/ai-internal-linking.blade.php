@@ -35,6 +35,36 @@
         </x-filament::section>
     @endif
 
+    {{-- لینک‌های داخلیِ شکسته: به محتوای منتشرنشده/حذف‌شده --}}
+    @php $broken = $this->brokenLinks; @endphp
+    @if (! empty($broken))
+        <x-filament::section collapsible collapsed class="mb-4 ring-1 ring-danger-300 dark:ring-danger-500/40">
+            <x-slot name="heading">
+                <span class="text-danger-600 dark:text-danger-400">🔗 لینک‌های شکسته</span>
+                <span class="text-xs font-normal text-gray-400">({{ count($broken) }} مورد)</span>
+            </x-slot>
+            <x-slot name="description">
+                این لینک‌ها به مقاله/صفحه‌ای اشاره می‌کنند که منتشر نیست یا وجود ندارد — روی سایت ۴۰۴ می‌دهند و به سئو آسیب می‌زنند. مبدأ را ویرایش و لینک را اصلاح/حذف کنید.
+            </x-slot>
+
+            <ul class="divide-y divide-gray-100 dark:divide-white/10">
+                @foreach ($broken as $bl)
+                    <li class="flex flex-col gap-1 py-2 text-sm sm:flex-row sm:items-center sm:justify-between">
+                        <span>
+                            <span class="text-xs text-gray-400">{{ $bl['source_type'] === 'article' ? 'مقاله' : 'صفحه' }}</span>
+                            {{ $bl['source_title'] }}
+                            <span class="text-gray-400">→</span>
+                            <code dir="ltr" class="rounded bg-danger-50 px-1 text-xs text-danger-700 dark:bg-danger-500/10 dark:text-danger-300">/{{ $bl['target_type'] }}/{{ $bl['target_slug'] }}</code>
+                        </span>
+                        @if ($bl['edit_url'])
+                            <x-filament::link :href="$bl['edit_url']" size="sm" icon="heroicon-o-pencil-square">ویرایشِ مبدأ</x-filament::link>
+                        @endif
+                    </li>
+                @endforeach
+            </ul>
+        </x-filament::section>
+    @endif
+
     {{-- محتوای یتیم: بدونِ هیچ لینکِ داخلیِ ورودی --}}
     @php $orphans = $this->orphans; @endphp
     @if (! empty($orphans))

@@ -201,6 +201,24 @@ class AiInternalLinking extends Page
             ->all();
     }
 
+    /**
+     * لینک‌های داخلیِ شکسته همراه با لینکِ ویرایشِ محتوای مبدأ.
+     *
+     * @return array<int, array{source_title:string, source_type:string, target_type:string, target_slug:string, edit_url:?string}>
+     */
+    public function getBrokenLinksProperty(): array
+    {
+        return app(InternalLinkSuggester::class)->brokenInternalLinks()
+            ->map(fn (array $b): array => [
+                'source_title' => $b['source_title'],
+                'source_type' => $b['source_type'],
+                'target_type' => $b['target_type'],
+                'target_slug' => $b['target_slug'],
+                'edit_url' => $this->editUrl($b['source_type'], $b['source_id']),
+            ])
+            ->all();
+    }
+
     private function editUrl(string $type, int $id): ?string
     {
         try {
