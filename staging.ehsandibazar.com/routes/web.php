@@ -8,6 +8,23 @@ Route::get('/clear-cache-now', function () {
     Artisan::call('view:clear');
     return 'done';
 });
+
+/*
+ | English content lives on its own dedicated site (trainwithehsan.com), hosted
+ | outside Iran. To avoid duplicate-content / keyword-cannibalisation between the
+ | two domains — and to consolidate all English SEO authority onto the English
+ | site — the legacy /en English landing on this Persian domain is 301-redirected
+ | to trainwithehsan.com. Registered here, above every group/catch-all, so it
+ | always wins regardless of how /en used to resolve.
+ |
+ | NOTE: this is a one-way link FROM this Persian domain OUT to the English site.
+ | We deliberately do NOT add any reverse reference (no hreflang / link) on
+ | trainwithehsan.com back to this domain, so the English site stays fully
+ | independent of Iranian hosting (important for its Google AdSense eligibility).
+ */
+Route::redirect('/en', 'https://trainwithehsan.com', 301);
+Route::get('/en/{any}', fn () => redirect('https://trainwithehsan.com', 301))->where('any', '.*');
+
 /* ============================= user controller public ============================================ */
 Route::group(['namespace' => 'Site','middleware' => ['checkBlock']], function () {
     /* site index*/

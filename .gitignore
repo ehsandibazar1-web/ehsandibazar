@@ -5,6 +5,7 @@
 /.env
 /.env.backup
 *.log
+error_log
 .DS_Store
 Thumbs.db
 /public/hot
