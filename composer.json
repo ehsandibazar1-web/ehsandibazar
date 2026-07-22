@@ -26,6 +26,7 @@
         "spatie/laravel-activitylog": "^5.0",
         "spatie/laravel-image-optimizer": "*",
         "spatie/pdf-to-image": "*",
+        "symfony/html-sanitizer": "~7.4.0",
         "unisharp/laravel-filemanager": "*",
         "yadahan/laravel-authentication-log": "*",
         "yajra/laravel-datatables-oracle": "*"
