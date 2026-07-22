@@ -172,5 +172,12 @@ class AppServiceProvider extends ServiceProvider
                 default => new AnthropicProvider,
             };
         });
+
+        // موتورِ تولیدِ محتوا پشتِ Contractِ CMS Core (docs/CMS-CORE-CONTRACT.md، لایه ۵) —
+        // کدِ فیچرها می‌تواند به interface وابسته شود، نه کلاسِ خاص.
+        $this->app->bind(
+            \App\Cms\Contracts\ContentAssistant::class,
+            \App\Services\AiAssistant\ContentAssistantService::class,
+        );
     }
 }
