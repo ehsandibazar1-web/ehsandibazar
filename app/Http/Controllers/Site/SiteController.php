@@ -269,8 +269,11 @@ class SiteController extends Controller
                 SEOTools::setDescription($page->description ?? strip_tags(\Illuminate\Support\Str::limit($page->body, 160)));
             }
 
-            if (isset($page->image[0])) {
-                OpenGraph::addImage(url($page->image[0]->url));
+            $pageOgImage = isset($page->image[0])
+                ? $page->image[0]->url
+                : ($page->image_path ? asset('storage/'.ltrim($page->image_path, '/')) : null);
+            if ($pageOgImage) {
+                OpenGraph::addImage(url($pageOgImage));
             }
             OpenGraph::addProperty('type', 'website');
             SEO::opengraph()->setUrl($page->path());
@@ -360,7 +363,14 @@ class SiteController extends Controller
                     
                 createMetaSite($article);
                 SEO::opengraph()->setUrl(route('site.article', $article->slug));
-                OpenGraph::addImage(Url($article->image[0]->url));
+                // مقاله‌های همگرا (ایمپورت/فرم) تصویر را در ستونِ image_path دارند، نه رابطه‌ی
+                // قدیمیِ image؛ همان الگوی گاردِ خودِ ویو + fallback به image_path تا 500 ندهد.
+                $ogImageUrl = isset($article->image[0])
+                    ? $article->image[0]->url
+                    : ($article->image_path ? asset('storage/'.ltrim($article->image_path, '/')) : null);
+                if ($ogImageUrl) {
+                    OpenGraph::addImage(Url($ogImageUrl));
+                }
                 SEO::opengraph()->addProperty('type', 'article');
                
                 $similarArticles = Article::query()->whereHas('categories', function ($q) use ($article) {
