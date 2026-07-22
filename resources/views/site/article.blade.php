@@ -6762,10 +6762,21 @@ background-attachment: fixed;
 <!--<style>.h_iframe-aparat_embed_frame{position:relative;}.h_iframe-aparat_embed_frame .ratio{display:block;width:100%;height:auto;}.h_iframe-aparat_embed_frame iframe{position:absolute;top:0;left:0;width:100%;height:100%;}</style><div class="h_iframe-aparat_embed_frame"><span style="display: block;padding-top: 57%"></span><iframe src="https://www.aparat.com/video/video/embed/videohash/UqbKW/vt/frame"  allowFullScreen="true" webkitallowfullscreen="true" mozallowfullscreen="true"></iframe></div>-->
 
 
-			          @if($article->faq)
+			          @php
+                                        // موج ۴e: FAQ از ستونِ legacyِ faq یا ستونِ canonicalِ faqs (محتوای AI).
+                                        // کلیدها انعطاف‌پذیر خوانده می‌شوند و آیتم‌های ناقص حذف می‌شوند.
+                                        $faqList = collect($article->faq ?: $article->faqs ?: [])
+                                            ->map(fn ($f) => is_array($f) ? [
+                                                'question' => $f['question'] ?? $f['q'] ?? $f['title'] ?? null,
+                                                'answer' => $f['answer'] ?? $f['a'] ?? $f['content'] ?? null,
+                                            ] : ['question' => null, 'answer' => null])
+                                            ->filter(fn ($f) => filled($f['question']) && filled($f['answer']))
+                                            ->values();
+                                    @endphp
+			          @if($faqList->isNotEmpty())
                                         <div class="accordion my-5" id="accordionExample1">
                                             <h4 class="text-center text-secondary"><span class="fa fa-question-circle"></span> سوالات متداول</h4>
-                                            @foreach($article->faq as $f)
+                                            @foreach($faqList as $f)
                                                 <div class="accordion-item">
                                                     <h5 class="accordion-header" id="heading{{ $loop->iteration }}">
                                                         <button class="accordion-button"
@@ -6974,13 +6985,13 @@ background-attachment: fixed;
         ]
     }
     </script>
-    @if($article->faq)
+    @if(isset($faqList) && $faqList->isNotEmpty())
     <script type="application/ld+json">
     {
         "@@context": "https://schema.org",
         "@type": "FAQPage",
         "mainEntity": [
-            @foreach($article->faq as $f)
+            @foreach($faqList as $f)
             {"@type":"Question","name":"{{ addslashes($f['question']) }}","acceptedAnswer":{"@type":"Answer","text":"{{ addslashes($f['answer']) }}"}}{{ !$loop->last ? ',' : '' }}
             @endforeach
         ]
