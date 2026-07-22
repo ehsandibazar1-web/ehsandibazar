@@ -2,6 +2,8 @@
 
 namespace App\Model;
 
+use App\Cms\Contracts\Localizable;
+use App\Cms\Contracts\Publishable;
 use App\Http\Controllers\Admin\ArticleController;
 use App\Traits\HasCategory;
 use App\Traits\HasComment;
@@ -11,12 +13,21 @@ use App\Traits\HasTag;
 use App\User;
 use Cviebrock\EloquentSluggable\Services\SlugService;
 use Cviebrock\EloquentSluggable\Sluggable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Carbon\Carbon;
 use App\Traits\Rateable;
 
-class Article extends Model
+/**
+ * موج ۴: Article قراردادِ CMS Core را (به‌تدریج) پیاده می‌کند. Localizable و Publishable اینجا
+ * با «پل» به ستون‌های legacyِ زنده (lang و statusِ بولین) پیاده شده‌اند — نه با traitهای Core که
+ * ستونِ locale/statusِ رشته‌ای فرض می‌کنند. storefront دست‌نخورده می‌ماند (نگاه کنید به docs/WAVE-4-PLAN.md).
+ * Taggable/SeoOptimizable/CmsContentِ کامل در ۴c (همراه با همگراییِ tags و مدلِ Keyword) اضافه می‌شوند.
+ */
+class Article extends Model implements Localizable, Publishable
 {
     use SoftDeletes, HasImage, HasComment, HasTag, Rateable, HasCategory,HasSeo;
 
@@ -36,8 +47,41 @@ class Article extends Model
 
     protected $casts = [
         'faq' => 'array',
+        'faqs' => 'array',           // موج ۴: ستونِ canonicalِ FAQ (جدا از faqِ قدیمی)
+        'published_at' => 'datetime',
     ];
-	
+
+    // --- App\Cms\Contracts\Localizable (پل به ستونِ legacyِ lang) ---
+    public function getLocale(): string
+    {
+        return (string) ($this->lang ?? 'fa');
+    }
+
+    public function translation(): BelongsTo
+    {
+        return $this->belongsTo(self::class, 'translation_of');
+    }
+
+    public function translations(): HasMany
+    {
+        return $this->hasMany(self::class, 'translation_of');
+    }
+
+    // --- App\Cms\Contracts\Publishable (پل به ستونِ legacyِ statusِ بولین — storefront همان where('status',1)) ---
+    public function isPublished(): bool
+    {
+        return (int) $this->status === 1;
+    }
+
+    public function getPublishedAt(): ?\DateTimeInterface
+    {
+        return $this->published_at;
+    }
+
+    public function scopePublished(Builder $query): Builder
+    {
+        return $query->where('status', 1);
+    }
 
     public function path()
     {
