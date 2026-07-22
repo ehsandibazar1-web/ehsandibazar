@@ -26,7 +26,11 @@ class AdminPanelProvider extends PanelProvider
         return $panel
             ->default()
             ->id('admin')
-            ->path('admin')
+            // مسیر URL عمداً 'adminpanel' است نه 'admin': روی سرور یک پوشه‌ی
+            // فیزیکی asset به نام public_html/admin وجود دارد که Apache قبل از
+            // رسیدن درخواست به Laravel آن را سرو (و 403) می‌کند. 'adminpanel'
+            // با هیچ پوشه یا روت موجودی تداخل ندارد.
+            ->path('adminpanel')
             ->login()
             ->colors([
                 'primary' => Color::Amber,
