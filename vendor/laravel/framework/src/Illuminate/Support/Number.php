@@ -35,6 +35,13 @@ class Number
      */
     public static function format(int|float $number, ?int $precision = null, ?int $maxPrecision = null, ?string $locale = null)
     {
+        // TEMP (ehsandibazar): fall back to plain PHP formatting when the intl
+        // extension is unavailable on the host, so Filament number/currency
+        // columns don't 500. Remove this branch once ext-intl is enabled.
+        if (! extension_loaded('intl')) {
+            return number_format((float) $number, $precision ?? $maxPrecision ?? 0);
+        }
+
         static::ensureIntlExtensionIsInstalled();
 
         $formatter = new NumberFormatter($locale ?? static::$locale, NumberFormatter::DECIMAL);
@@ -160,6 +167,11 @@ class Number
      */
     public static function percentage(int|float $number, int $precision = 0, ?int $maxPrecision = null, ?string $locale = null)
     {
+        // TEMP (ehsandibazar): plain fallback when ext-intl is missing.
+        if (! extension_loaded('intl')) {
+            return number_format((float) $number, $maxPrecision ?? $precision) . '%';
+        }
+
         static::ensureIntlExtensionIsInstalled();
 
         $formatter = new NumberFormatter($locale ?? static::$locale, NumberFormatter::PERCENT);
@@ -184,6 +196,11 @@ class Number
      */
     public static function currency(int|float $number, string $in = '', ?string $locale = null, ?int $precision = null)
     {
+        // TEMP (ehsandibazar): plain fallback when ext-intl is missing.
+        if (! extension_loaded('intl')) {
+            return ($in !== '' ? $in : static::$currency) . ' ' . number_format((float) $number, $precision ?? 2);
+        }
+
         static::ensureIntlExtensionIsInstalled();
 
         $formatter = new NumberFormatter($locale ?? static::$locale, NumberFormatter::CURRENCY);
