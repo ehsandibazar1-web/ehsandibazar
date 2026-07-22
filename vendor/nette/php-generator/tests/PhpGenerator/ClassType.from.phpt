@@ -1,0 +1,36 @@
+<?php declare(strict_types=1);
+
+/**
+ * Test: Nette\PhpGenerator generator.
+ */
+
+use Nette\PhpGenerator\ClassType;
+use Nette\PhpGenerator\Factory;
+use Nette\PhpGenerator\InterfaceType;
+use Tester\Assert;
+
+require __DIR__ . '/../bootstrap.php';
+require __DIR__ . '/fixtures/classes.php';
+
+$res[] = InterfaceType::from(Abc\Interface1::class);
+$res[] = InterfaceType::from(Abc\Interface2::class);
+$res[] = InterfaceType::from(Abc\Interface3::class);
+$res[] = InterfaceType::from(Abc\Interface4::class);
+$res[] = ClassType::from(Abc\Class1::class);
+$res[] = ClassType::from(new Abc\Class2);
+$obj = new Abc\Class3;
+@$obj->prop2 = 1; // dynamic property
+$res[] = (new Factory)->fromClassReflection(new ReflectionObject($obj));
+$res[] = ClassType::from(Abc\Class4::class);
+$res[] = ClassType::from(Abc\Class5::class);
+$res[] = ClassType::from(Abc\Class6::class);
+$res[] = ClassType::from(Abc\Class7::class);
+$res[] = ClassType::from(Abc\Class8::class);
+$res[] = ClassType::from(Abc\Class9::class);
+$res[] = ClassType::from(Abc\Class10::class);
+
+sameFile(__DIR__ . '/expected/ClassType.from.expect', implode("\n", $res));
+
+// class is in namespace
+$c = ClassType::from(Abc\Class10::class);
+Assert::same($c, $c->getNamespace()->getClass('Class10'));

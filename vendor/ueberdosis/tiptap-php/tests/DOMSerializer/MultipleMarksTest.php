@@ -1,0 +1,257 @@
+<?php
+
+namespace Tiptap\Tests\HTMLOutput\Mix;
+
+use Tiptap\Editor;
+use Tiptap\Extensions\StarterKit;
+use Tiptap\Marks\TextStyle;
+
+test('multiple marks get rendered correctly', function () {
+    $document = [
+        'type' => 'doc',
+        'content' => [
+            [
+                'type' => 'paragraph',
+                'content' => [
+                    [
+                        'type' => 'text',
+                        'text' => 'Example Text',
+                        'marks' => [
+                            [
+                                'type' => 'bold',
+                            ],
+                            [
+                                'type' => 'italic',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ],
+    ];
+
+    $result = (new Editor)->setContent($document)->getHTML();
+    expect($result)->toEqual('<p><strong><em>Example Text</em></strong></p>');
+});
+
+
+test('multiple marks get rendered correctly, with additional mark at the first node', function () {
+    $document = [
+        'type' => 'doc',
+        'content' => [
+            [
+                'type' => 'text',
+                'marks' => [
+                    [
+                        'type' => 'italic',
+                    ],
+                    [
+                        'type' => 'bold',
+                    ],
+                ],
+                'text' => 'lorem ',
+            ],
+            [
+                'type' => 'text',
+                'marks' => [
+                    [
+                        'type' => 'bold',
+                    ],
+                ],
+                'text' => 'ipsum',
+            ],
+        ],
+    ];
+    $result = (new Editor)->setContent($document)->getHTML();
+
+    expect($result)->toEqual('<em><strong>lorem </strong></em><strong>ipsum</strong>');
+});
+
+
+test('multiple marks get rendered correctly, with additional mark at the last node', function () {
+    $document = [
+        'type' => 'doc',
+        'content' => [
+            [
+                'type' => 'text',
+                'marks' => [
+                    [
+                        'type' => 'italic',
+                    ],
+                ],
+                'text' => 'lorem ',
+            ],
+            [
+                'type' => 'text',
+                'marks' => [
+                    [
+                        'type' => 'italic',
+                    ],
+                    [
+                        'type' => 'bold',
+                    ],
+                ],
+                'text' => 'ipsum',
+            ],
+        ],
+    ];
+    $result = (new Editor)->setContent($document)->getHTML();
+
+    expect($result)->toEqual('<em>lorem <strong>ipsum</strong></em>');
+});
+
+
+test('multiple marks get rendered correctly, when overlapping marks exist', function () {
+    $document = [
+        "type" => "doc",
+        "content" => [
+            [
+                "type" => "paragraph",
+                "content" => [
+                    [
+                        "type" => "text",
+                        "marks" => [
+                            [
+                                "type" => "bold",
+                            ],
+                        ],
+                        "text" => "lorem ",
+                    ],
+                    [
+                        "type" => "text",
+                        "marks" => [
+                            [
+                                "type" => "bold",
+                            ],
+                            [
+                                "type" => "italic",
+                            ],
+                        ],
+                        "text" => "ipsum",
+                    ],
+                    [
+                        "type" => "text",
+                        "marks" => [
+                            [
+                                "type" => "italic",
+                            ],
+                        ],
+                        "text" => " dolor",
+                    ],
+                    [
+                        "type" => "text",
+                        "text" => " sit",
+                    ],
+                ],
+            ],
+        ],
+    ];
+
+    $result = (new Editor)
+        ->setContent($document)
+        ->getHTML();
+
+    expect($result)->toEqual('<p><strong>lorem <em>ipsum</em></strong><em> dolor</em> sit</p>');
+});
+
+
+test('multiple marks get rendered correctly, when overlapping passage with multiple marks exist', function () {
+    $document = [
+        "type" => "doc",
+        "content" => [
+            [
+                "type" => "paragraph",
+                "content" => [
+                    [
+                        "type" => "text",
+                        "marks" => [
+                            [
+                                "type" => "bold",
+                            ],
+                            [
+                                "type" => "strike",
+                            ],
+                        ],
+                        "text" => "lorem ",
+                    ],
+                    [
+                        "type" => "text",
+                        "marks" => [
+                            [
+                                "type" => "italic",
+                            ],
+                            [
+                                "type" => "bold",
+                            ],
+                            [
+                                "type" => "strike",
+                            ],
+                        ],
+                        "text" => "ipsum",
+                    ],
+                    [
+                        "type" => "text",
+                        "marks" => [
+                            [
+                                "type" => "strike",
+                            ],
+                            [
+                                "type" => "italic",
+                            ],
+                        ],
+                        "text" => " dolor",
+                    ],
+                ],
+            ],
+        ],
+    ];
+
+    $result = (new Editor)
+        ->setContent($document)
+        ->getHTML();
+
+    expect($result)->toEqual('<p><strong><s>lorem <em>ipsum</em></s></strong><s><em> dolor</em></s></p>');
+});
+
+test('renders duplicate mark types as nested elements', function () {
+    $document = [
+        'type' => 'doc',
+        'content' => [
+            [
+                'type' => 'paragraph',
+                'content' => [
+                    [
+                        'type' => 'text',
+                        'text' => 'Example',
+                        'marks' => [
+                            [
+                                'type' => 'bold',
+                            ],
+                            [
+                                'type' => 'textStyle',
+                            ],
+                            [
+                                'type' => 'textStyle',
+                            ],
+                        ],
+                    ],
+                    [
+                        'type' => 'text',
+                        'text' => ' Text',
+                    ],
+                ],
+            ],
+        ],
+    ];
+
+    $result = (new Editor([
+        'extensions' => [
+            new StarterKit,
+            new TextStyle,
+        ],
+    ]))
+        ->setContent($document)
+        ->getHTML();
+
+    expect($result)->toEqual('<p><strong><span><span>Example</span></span></strong> Text</p>');
+});

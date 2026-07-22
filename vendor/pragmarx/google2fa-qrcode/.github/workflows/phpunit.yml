@@ -1,0 +1,99 @@
+name: PHPUnit
+
+on:
+  push:
+    branches: [master, main, '*.x']
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    name: PHP ${{ matrix.php }} / PHPUnit ${{ matrix.phpunit }} / google2fa ${{ matrix.google2fa }} / bacon ${{ matrix.bacon || 'absent' }} / chillerlan ${{ matrix.chillerlan || 'absent' }}${{ matrix.coverage && ' / coverage' || '' }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # PHP 8.1 — PHPUnit 9–10, chillerlan v5 only (v6 needs PHP 8.2+)
+          - { php: '8.1', phpunit: '^9.0',  google2fa: '^8.0', bacon: '^2.0', chillerlan: '^5.0' }
+          - { php: '8.1', phpunit: '^10.0', google2fa: '^8.0', bacon: '^3.0', chillerlan: '^5.0' }
+
+          # PHP 8.2 — PHPUnit 10–11, both chillerlan & both bacon
+          - { php: '8.2', phpunit: '^10.0', google2fa: '^8.0', bacon: '^2.0', chillerlan: '^5.0' }
+          - { php: '8.2', phpunit: '^11.0', google2fa: '^9.0', bacon: '^3.0', chillerlan: '^6.0' }
+
+          # PHP 8.3 — PHPUnit 11–12, both chillerlan & both bacon
+          - { php: '8.3', phpunit: '^11.0', google2fa: '^9.0', bacon: '^2.0', chillerlan: '^5.0' }
+          - { php: '8.3', phpunit: '^12.0', google2fa: '^9.0', bacon: '^3.0', chillerlan: '^6.0' }
+
+          # PHP 8.4 — PHPUnit 12–13, both chillerlan & both bacon
+          # The PHPUnit 13 row also computes coverage for Codecov.
+          - { php: '8.4', phpunit: '^12.0', google2fa: '^9.0', bacon: '^2.0', chillerlan: '^5.0' }
+          - { php: '8.4', phpunit: '^13.0', google2fa: '^9.0', bacon: '^3.0', chillerlan: '^6.0', coverage: 'pcov' }
+
+          # PHP 8.5 — PHPUnit 12–13, both chillerlan & both bacon
+          - { php: '8.5', phpunit: '^12.0', google2fa: '^9.0', bacon: '^2.0', chillerlan: '^5.0' }
+          - { php: '8.5', phpunit: '^13.0', google2fa: '^9.0', bacon: '^3.0', chillerlan: '^6.0' }
+
+          # bacon-only — no chillerlan; verifies bacon path stands alone
+          - { php: '8.4', phpunit: '^13.0', google2fa: '^9.0', bacon: '^3.0', chillerlan: '' }
+
+          # chillerlan-only — no bacon; verifies factory fallback to Chillerlan
+          - { php: '8.4', phpunit: '^13.0', google2fa: '^9.0', bacon: '', chillerlan: '^6.0' }
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Set up PHP ${{ matrix.php }}
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: mbstring, intl, imagick
+          coverage: ${{ matrix.coverage || 'none' }}
+          tools: composer:v2
+
+      - name: Pin PHPUnit, google2fa, bacon, and chillerlan
+        run: |
+          composer require --dev --no-update "phpunit/phpunit:${{ matrix.phpunit }}"
+          composer require --no-update "pragmarx/google2fa:${{ matrix.google2fa }}"
+          if [ -n "${{ matrix.bacon }}" ]; then
+            composer require --dev --no-update "bacon/bacon-qr-code:${{ matrix.bacon }}"
+          else
+            composer remove --dev --no-update bacon/bacon-qr-code
+          fi
+          if [ -n "${{ matrix.chillerlan }}" ]; then
+            composer require --dev --no-update "chillerlan/php-qrcode:${{ matrix.chillerlan }}"
+          else
+            composer remove --dev --no-update chillerlan/php-qrcode
+          fi
+
+      - name: Install dependencies
+        run: composer update --no-interaction --prefer-dist --ignore-platform-req=php+
+
+      - name: Verify imagick is loaded
+        run: php -m | grep -qi imagick
+
+      - name: Run tests
+        run: |
+          flags="--fail-on-skipped"
+          if [ -z "${{ matrix.bacon }}" ]; then
+            flags="$flags --exclude-group=bacon"
+          elif [ -z "${{ matrix.chillerlan }}" ]; then
+            flags="$flags --exclude-group=chillerlan --exclude-group=bacon-absent"
+          else
+            flags="$flags --exclude-group=bacon-absent"
+          fi
+          if [ -n "${{ matrix.coverage }}" ]; then
+            flags="$flags --coverage-clover=coverage.xml --coverage-filter=src"
+          fi
+          vendor/bin/phpunit $flags
+
+      - name: Upload coverage to Codecov
+        if: matrix.coverage == 'pcov'
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage.xml
+          fail_ci_if_error: true
+          verbose: true

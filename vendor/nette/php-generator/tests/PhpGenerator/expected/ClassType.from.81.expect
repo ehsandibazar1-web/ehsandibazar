@@ -1,0 +1,34 @@
+#[Attr(new \Abc\Attr(/* unknown */))]
+class Class11
+{
+	final public const FOO = 10;
+
+	public Foo&Bar $foo;
+	public readonly array $ro;
+
+
+	public function foo(Foo&Bar $c): Foo&Bar
+	{
+	}
+
+
+	public function bar($c = new \stdClass(/* unknown */))
+	{
+	}
+}
+
+#[\Attribute]
+class Attr
+{
+}
+
+class Class12
+{
+	private readonly string $bar;
+
+
+	public function __construct(
+		private readonly string $foo,
+	) {
+	}
+}

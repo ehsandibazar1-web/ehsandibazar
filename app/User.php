@@ -30,9 +30,19 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use App\Notifications\ResetPassword as ResetPasswordNotification;
 use App\Model\Rating;
 use Yadahan\AuthenticationLog\AuthenticationLogable;
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Panel;
 
-class User extends Authenticatable
+class User extends Authenticatable implements FilamentUser
 {
+    /**
+     * فقط ادمین و سوپرادمین اجازه‌ی ورود به پنل مدیریت Filament (/admin) را دارند.
+     */
+    public function canAccessPanel(Panel $panel): bool
+    {
+        return $this->isSuperAdminOrAdmin();
+    }
+
     use Notifiable, SoftDeletes, HasImage, HasComment, HasDiscount, AuthenticationLogable;
 
     public static $preventAttrSet = false;
