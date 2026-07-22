@@ -80,26 +80,34 @@ Route::group(['middleware' => ['auth:web'], 'prefix' => 'panel'], function () {
             @set_time_limit(0);
             $limit = max(1, (int) $request->query('limit', 200));
             $offset = max(0, (int) $request->query('offset', 0));
-            // source=legacy → مدلِ Image (تصاویرِ محصول/مقاله)؛ source=disk → فایل‌منیجر (photos/files).
-            $source = $request->query('source', 'legacy') === 'disk' ? 'disk' : 'legacy';
+            // source: legacy=تصاویرِ Image · video=ویدیوهای Video · disk=فایل‌منیجر (photos/files)
+            $source = in_array($request->query('source'), ['disk', 'video'], true) ? $request->query('source') : 'legacy';
 
-            $r = $source === 'disk'
-                ? $svc->backfillFromPublicDisk($limit, $offset)
-                : $svc->backfillFromLegacyImages($limit, $offset);
+            $r = match ($source) {
+                'video' => $svc->backfillFromLegacyVideos($limit, $offset),
+                'disk' => $svc->backfillFromPublicDisk($limit, $offset),
+                default => $svc->backfillFromLegacyImages($limit, $offset),
+            };
+
+            $labels = [
+                'legacy' => 'تصاویرِ محصول/مقاله (Image)',
+                'video' => 'ویدیوها (Video)',
+                'disk' => 'File Manager (photos/files)',
+            ];
 
             $base = '?source='.$source.'&limit='.$limit;
             $next = $r['done']
                 ? '<b>پایانِ این منبع.</b>'
                 : '<a href="'.$base.'&offset='.$r['next_offset'].'">▶ batch بعدی (از '.$r['next_offset'].')</a>';
 
-            $other = $source === 'legacy'
-                ? '<a href="?source=disk">▶ حالا عکس‌های File Manager را هم ثبت کن (photos/files)</a>'
-                : '<a href="?source=legacy">▶ منبعِ تصاویرِ محصول/مقاله (Image)</a>';
+            $other = '<a href="?source=legacy">عکس‌های محصول/مقاله</a> · '
+                .'<a href="?source=video">ویدیوها</a> · '
+                .'<a href="?source=disk">File Manager</a>';
 
             $html = '<!doctype html><meta charset="utf-8"><title>Media Backfill</title>'
                 .'<div style="font-family:Tahoma,sans-serif;max-width:720px;margin:2rem auto;direction:rtl">'
-                .'<h2>ثبتِ عکس‌های سایت در Media Library</h2>'
-                .'<p>منبع: <b>'.($source === 'disk' ? 'File Manager (photos/files)' : 'تصاویرِ محصول/مقاله (Image)').'</b></p>'
+                .'<h2>ثبتِ رسانه‌های سایت در Media Library</h2>'
+                .'<p>منبع: <b>'.$labels[$source].'</b></p>'
                 .'<p>این batch: بررسی‌شده <b>'.$r['scanned'].'</b> · ثبت‌شده‌ی جدید <b style="color:#16a34a">'.$r['registered'].'</b> · قبلاً بود <b>'.$r['skipped'].'</b></p>'
                 .'<p>کلِ این منبع: <b>'.$r['total'].'</b> (تا offset '.$r['next_offset'].' بررسی شد)</p>'
                 .'<p style="margin-top:1rem">'.$next.'</p>'

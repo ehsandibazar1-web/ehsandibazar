@@ -3,8 +3,10 @@
 namespace App\Services\Media;
 
 use App\Model\Image as LegacyImage;
+use App\Model\Video as LegacyVideo;
 use App\Models\Media;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 /**
  * عکس‌های موجودِ سایت (مدلِ قدیمیِ App\Model\Image — تصاویرِ محصولات/مقاله‌ها/…) را در جدولِ
@@ -73,7 +75,67 @@ class MediaBackfillService
         ];
     }
 
-    // پوشه‌هایی از دیسکِ public که File Manager عکس‌ها را در آن‌ها می‌گذارد (نگاه کنید به config/lfm.php).
+    /**
+     * ویدیوهای موجودِ سایت (مدلِ App\Model\Video) را در جدولِ media با type=video ثبت می‌کند.
+     * url اگر کامل (http) باشد همان، وگرنه با APP_URL کامل می‌شود. هیچ فایلی تغییر نمی‌کند.
+     *
+     * @return array{registered:int, skipped:int, scanned:int, total:int, done:bool, next_offset:int}
+     */
+    public function backfillFromLegacyVideos(int $limit = 200, int $offset = 0): array
+    {
+        $total = LegacyVideo::query()->count();
+
+        $videos = LegacyVideo::query()->orderBy('id')->offset($offset)->limit($limit)->get();
+
+        $registered = 0;
+        $skipped = 0;
+
+        foreach ($videos as $vid) {
+            $raw = trim((string) $vid->getRawOriginal('url'));
+
+            if ($raw === '') {
+                $skipped++;
+
+                continue;
+            }
+
+            $fullUrl = Str::startsWith($raw, ['http://', 'https://'])
+                ? $raw
+                : rtrim((string) config('app.url'), '/').'/'.ltrim($raw, '/');
+            $diskPath = ltrim($raw, '/');
+
+            if (Media::query()->where('url', $fullUrl)->orWhere('disk_path', $diskPath)->exists()) {
+                $skipped++;
+
+                continue;
+            }
+
+            Media::create([
+                'original_name' => basename($diskPath) ?: (string) ($vid->title ?? 'video'),
+                'disk' => 'public',
+                'disk_path' => $diskPath,
+                'url' => $fullUrl,
+                'type' => 'video',
+                'mime_type' => null,
+                'size' => null,
+            ]);
+
+            $registered++;
+        }
+
+        $nextOffset = $offset + $videos->count();
+
+        return [
+            'registered' => $registered,
+            'skipped' => $skipped,
+            'scanned' => $videos->count(),
+            'total' => $total,
+            'done' => $nextOffset >= $total,
+            'next_offset' => $nextOffset,
+        ];
+    }
+
+    // پوشه‌هایی از دیسکِ public که File Manager عکس/ویدیو را در آن‌ها می‌گذارد (نگاه کنید به config/lfm.php).
     private const DISK_SCAN_DIRS = ['photos', 'files', 'shares'];
 
     /**
@@ -94,7 +156,7 @@ class MediaBackfillService
                 if (preg_match('#(^|/)thumbs/#', $path)) {
                     continue;
                 }
-                if (! preg_match('/\.(jpe?g|png|webp|gif|bmp)$/i', $path)) {
+                if (! preg_match('/\.(jpe?g|png|webp|gif|bmp|mp4|webm|mov|m4v)$/i', $path)) {
                     continue;
                 }
                 $all[] = $path;
@@ -128,7 +190,7 @@ class MediaBackfillService
                 'disk' => 'public',
                 'disk_path' => $path,
                 'url' => $disk->url($path),
-                'type' => 'image',
+                'type' => preg_match('/\.(mp4|webm|mov|m4v)$/i', $path) ? 'video' : 'image',
                 'mime_type' => $mime,
                 'size' => $size,
             ]);
