@@ -81,6 +81,9 @@ Route::group(['middleware' => ['auth:web'], 'prefix' => 'panel'], function () {
                 'cache-clear'  => ['cache:clear', 'config:clear', 'view:clear'],
                 'view-cache'   => ['view:clear', 'view:cache'],
                 'migrate'      => ['migrate', ['--force' => true]],
+                // symlinkِ public/storage → storage/app/public تا فایل‌های آپلودشده‌ی
+                // Media Library از طریق /storage/... عمومی سرو شوند (روی هاستِ بدون‌شل).
+                'storage-link' => ['storage:link'],
                 // clear-compiled + package:discover regenerate the package manifest
                 // so newly pulled packages (e.g. Filament) are picked up on a
                 // shell-less host after each "Update from Remote".
