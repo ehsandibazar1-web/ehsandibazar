@@ -4,9 +4,12 @@ namespace App\Livewire;
 
 use App\Filament\Resources\Articles\ArticleResource;
 use App\Filament\Resources\Pages\PageResource;
+use App\Jobs\ProcessAiChatMessage;
 use App\Jobs\RunAiContentGeneration;
+use App\Jobs\TranslateArticleDraft;
 use App\Model\Article;
 use App\Model\Page as PageModel;
+use App\Models\AiChatMessage;
 use App\Models\AiGeneration;
 use App\Models\Media;
 use App\Services\AiAssistant\ActionRegistry;
@@ -26,10 +29,12 @@ use Livewire\Component;
  * دو جا mount می‌شود: (۱) درون سایدبار تعبیه‌شده در صفحه‌ی ویرایش (EditArticle/EditPage،
  * standalone=false)، (۲) درون صفحه‌ی مستقل App\Filament\Pages\AiContentAssistant (standalone=true).
  *
- * موقتاً: چت (ProcessAiChatMessage/AiChatMessage)، تصویرِ hero (GenerateHeroImage/AiImageGeneration)
- * و ترجمه (TranslateArticleDraft) هنوز منتقل نشده‌اند — دکمه‌هایشان حفظ شده ولی handler فقط یک
- * نوتیفیکیشن «در گروه بعد فعال می‌شود» نشان می‌دهد، بدون dispatch/کلاسِ گمشده. تولیدِ محتوا
- * (generate/apply/restore از مسیر RunAiContentGeneration) کامل کار می‌کند.
+ * چت (ProcessAiChatMessage/AiChatMessage) و ترجمه (TranslateArticleDraft) اکنون فعال‌اند و هر دو
+ * از طریقِ App\Services\Content\ContentDraftFactory محتوا می‌سازند. تولیدِ محتوا (generate/apply/
+ * restore از مسیرِ RunAiContentGeneration) کامل کار می‌کند.
+ *
+ * موقتاً: فقط تصویرِ hero (GenerateHeroImage/AiImageGeneration) هنوز منتقل نشده — دکمه‌اش حفظ شده
+ * ولی handler فقط یک نوتیفیکیشنِ «در گروه بعد فعال می‌شود» نشان می‌دهد، بدونِ dispatch/کلاسِ گمشده.
  */
 class AiAssistantPanel extends Component
 {
@@ -156,25 +161,42 @@ class AiAssistantPanel extends Component
             ->exists();
     }
 
-    // ============ AI Chat (موقتاً stub — ProcessAiChatMessage/AiChatMessage در گروه بعد) ============
+    // ============ AI Chat (ProcessAiChatMessage/AiChatMessage) ============
 
-    // بدونِ مدلِ AiChatMessage یک مجموعه‌ی خالی برمی‌گردانیم تا @forelse در بلید حالت خالی را نشان
-    // دهد و هیچ ارجاعی به کلاسِ گمشده رخ ندهد
     public function getChatMessagesProperty(): Collection
     {
-        return collect();
+        return AiChatMessage::forRecord($this->recordType, $this->record->id)
+            ->with('relatedGeneration')
+            ->orderBy('created_at')
+            ->get();
     }
 
+    // وقتی آخرین پیام از کاربر است و هنوز پاسخِ assistant نیامده، یعنی ProcessAiChatMessage هنوز در
+    // صف/در‌حال‌اجراست — سایدبار در این حالت هم باید poll کند (جدا از isPolling که فقط AiGeneration
+    // را می‌بیند، نه پیام‌های چت).
     public function getIsChatPendingProperty(): bool
     {
-        return false;
+        return $this->chatMessages->last()?->role === 'user';
     }
 
     public function sendChatMessage(): void
     {
+        $message = trim($this->chatInput);
+
+        if ($message === '') {
+            return;
+        }
+
+        $userMessage = AiChatMessage::create([
+            'content_type' => $this->recordType,
+            'content_id' => $this->record->id,
+            'role' => 'user',
+            'message' => $message,
+        ]);
+
         $this->chatInput = '';
 
-        $this->notifyComingSoon();
+        ProcessAiChatMessage::dispatch($this->recordType, $this->record->id, $userMessage->id);
     }
 
     public function generateField(string $field, string $mode): void
@@ -248,11 +270,22 @@ class AiAssistantPanel extends Component
         return max(0, $recentTotal - $pending).' از '.$recentTotal.' انجام شد';
     }
 
-    // ============ Translate (موقتاً stub — TranslateArticleDraft در گروه بعد) ============
+    // ============ Translate (پیش‌نویسِ کامل، نه یک پیشنهادِ متنی — نگاه کنید به App\Jobs\TranslateArticleDraft) ============
 
     public function translate(string $targetLocale): void
     {
-        $this->notifyComingSoon();
+        $generation = AiGeneration::create([
+            'content_type' => $this->recordType,
+            'content_id' => $this->record->id,
+            'field' => 'translate',
+            'mode' => $targetLocale,
+            'provider' => config('services.anthropic.driver', 'anthropic'),
+            'status' => 'queued',
+        ]);
+
+        TranslateArticleDraft::dispatch($this->recordType, $this->record->id, $targetLocale, $generation->id);
+
+        $this->notifyQueued('ترجمه به '.strtoupper($targetLocale));
     }
 
     public function getTranslationsProperty(): Collection
