@@ -4,6 +4,7 @@ namespace App\Services\Media;
 
 use App\Model\Image as LegacyImage;
 use App\Models\Media;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * عکس‌های موجودِ سایت (مدلِ قدیمیِ App\Model\Image — تصاویرِ محصولات/مقاله‌ها/…) را در جدولِ
@@ -66,6 +67,81 @@ class MediaBackfillService
             'registered' => $registered,
             'skipped' => $skipped,
             'scanned' => $images->count(),
+            'total' => $total,
+            'done' => $nextOffset >= $total,
+            'next_offset' => $nextOffset,
+        ];
+    }
+
+    // پوشه‌هایی از دیسکِ public که File Manager عکس‌ها را در آن‌ها می‌گذارد (نگاه کنید به config/lfm.php).
+    private const DISK_SCAN_DIRS = ['photos', 'files', 'shares'];
+
+    /**
+     * فایل‌های تصویریِ File Manager (روی دیسکِ public) را که به مدلِ Image وصل نیستند ثبت می‌کند.
+     * پوشه‌ی thumbs (تامبنیل‌های خودِ فایل‌منیجر) و فایل‌های از-قبل-ثبت‌شده رد می‌شوند. هیچ فایلی
+     * تغییر نمی‌کند.
+     *
+     * @return array{registered:int, skipped:int, scanned:int, total:int, done:bool, next_offset:int}
+     */
+    public function backfillFromPublicDisk(int $limit = 200, int $offset = 0): array
+    {
+        $disk = Storage::disk('public');
+
+        // همه‌ی مسیرهای تصویری در پوشه‌های فایل‌منیجر (به‌جز thumbs).
+        $all = [];
+        foreach (self::DISK_SCAN_DIRS as $dir) {
+            foreach ($disk->allFiles($dir) as $path) {
+                if (preg_match('#(^|/)thumbs/#', $path)) {
+                    continue;
+                }
+                if (! preg_match('/\.(jpe?g|png|webp|gif|bmp)$/i', $path)) {
+                    continue;
+                }
+                $all[] = $path;
+            }
+        }
+
+        $total = count($all);
+        $slice = array_slice($all, $offset, $limit);
+
+        $registered = 0;
+        $skipped = 0;
+
+        foreach ($slice as $path) {
+            if (Media::query()->where('disk_path', $path)->exists()) {
+                $skipped++;
+
+                continue;
+            }
+
+            $mime = null;
+            $size = null;
+            try {
+                $mime = $disk->mimeType($path) ?: null;
+                $size = $disk->size($path);
+            } catch (\Throwable $e) {
+                // بی‌خیالِ متادیتا؛ ثبت خودِ ردیف مهم‌تر است.
+            }
+
+            Media::create([
+                'original_name' => basename($path),
+                'disk' => 'public',
+                'disk_path' => $path,
+                'url' => $disk->url($path),
+                'type' => 'image',
+                'mime_type' => $mime,
+                'size' => $size,
+            ]);
+
+            $registered++;
+        }
+
+        $nextOffset = $offset + count($slice);
+
+        return [
+            'registered' => $registered,
+            'skipped' => $skipped,
+            'scanned' => count($slice),
             'total' => $total,
             'done' => $nextOffset >= $total,
             'next_offset' => $nextOffset,
