@@ -74,7 +74,8 @@
                 <span class="text-xs font-normal text-gray-400">({{ count($orphans) }} مورد بدونِ لینکِ ورودی)</span>
             </x-slot>
             <x-slot name="description">
-                این صفحات از هیچ محتوای دیگری لینکِ داخلی نمی‌گیرند — برای سئو بهتر است از مقاله‌های مرتبط به آن‌ها لینک بدهید.
+                این صفحات از <span class="font-semibold">بدنه‌ی</span> هیچ مقاله/صفحه‌ی دیگری لینکِ داخلی نمی‌گیرند — بهتر است از محتوای مرتبط به آن‌ها لینک بدهید.
+                <span class="text-warning-600 dark:text-warning-400">توجه:</span> لینک‌های قالب (دسته‌بندی، مقالاتِ اخیر، سایدبار) شمرده نمی‌شوند و روی دیتابیسِ کاملِ سایتِ اصلی دقیق‌تر است تا استگینگِ ناقص.
             </x-slot>
 
             <ul class="divide-y divide-gray-100 dark:divide-white/10">
