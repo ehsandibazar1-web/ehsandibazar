@@ -40,8 +40,9 @@
 - [ ] **گروه ۳ — Knowledge Base (+ RAG):** `KnowledgeEntry`, `KnowledgeChunk`,
       `KnowledgeEntryAttachment` + Resource `KnowledgeEntries`. پایه‌ی کیفیت تولید محتوا.
       _(ستون‌های embedding از مهاجرت `add_embedding_columns_for_rag` که در گروه ۱ بخشی‌اش نگه داشته شد.)_
-- [ ] **گروه ۴ — Activity Log Viewer:** صفحه‌ی `ActivityLogPage` — فقط یک نمایشگر روی
-      activitylog که **همین حالا نصب است**. تقریباً بدون کار جانبی.
+- [x] **گروه ۴ — Activity Log Viewer:** ✅ روی استگینگ کار می‌کند. صفحه‌ی `ActivityLogPage`
+      روی activitylog. ستون‌ها generic شدند (User/Type/Subject/Action/When) تا با هر مدلِ ثبت‌شده
+      کار کند. بدون جدول/وابستگیِ جدید. زیر گروه «AI Studio».
 - [x] **گروه ۵ — Media Library:** ✅ روی استگینگ کار می‌کند. `Media`, `MediaFolder`,
       `MediaProcessor` (WebP/تامبنیل/ریسپانسیو با intervention/image v4)، `VideoMetadataService`،
       `MediaUsageScanner` (فعلاً خنثی تا موج ۴)، صفحه + trait + blade. زیر گروه «AI Studio».
