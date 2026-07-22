@@ -56,6 +56,21 @@ class ArticleForm
                     ->nullable()
                     ->helperText('اختیاری — اگر این نسخه‌ی زبانِ دیگرِ یک مقاله‌ی موجود است، آن را اینجا انتخاب کنید.'),
 
+                // فیلدِ برچسب — به رابطه‌ی موجودِ tags() (morphToMany روی taggables) وصل است، نه به
+                // کلاسِ خاص. وقتی در موج ۵ MorphMap فعال و جدولِ tags همگرا شود، این کد بدونِ بازنویسی
+                // کار می‌کند (حداکثر 'title' به 'name' تغییر می‌کند). صفر تغییرِ جدول/URL الان.
+                Select::make('tags')
+                    ->label('برچسب‌ها')
+                    ->relationship('tags', 'title')
+                    ->multiple()
+                    ->preload()
+                    ->searchable()
+                    ->helperText('برای سازمان‌دهی و صفحه‌ی /article/tag. از برچسب‌های موجود انتخاب کنید یا جدید بسازید.')
+                    ->createOptionForm([
+                        TextInput::make('title')->label('نامِ برچسب')->required(),
+                        Toggle::make('status')->label('فعال')->default(true),
+                    ]),
+
                 Textarea::make('excerpt')
                     ->label('خلاصه')
                     ->rows(3)

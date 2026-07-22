@@ -52,6 +52,18 @@ class PageForm
                     ->searchable()
                     ->nullable(),
 
+                // برچسب — روی رابطه‌ی موجودِ tags() (polymorphic). سازگار با MorphMapِ آینده بدونِ بازنویسی.
+                Select::make('tags')
+                    ->label('برچسب‌ها')
+                    ->relationship('tags', 'title')
+                    ->multiple()
+                    ->preload()
+                    ->searchable()
+                    ->createOptionForm([
+                        TextInput::make('title')->label('نامِ برچسب')->required(),
+                        Toggle::make('status')->label('فعال')->default(true),
+                    ]),
+
                 RichEditor::make('body')
                     ->label('متنِ صفحه')
                     ->required()
