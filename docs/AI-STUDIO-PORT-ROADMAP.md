@@ -32,6 +32,18 @@
 
 ---
 
+## وضعیتِ کلی (به‌روز)
+
+✅ **انجام‌شده روی استگینگ:** موج ۱ (زیرساخت AI)، موج ۲ (Brand Memory + Workflow)،
+موج ۳ (Media Library + Activity Log)، CMS Core (app/Cms)، موج ۴ (Article/Page/Tags پنل +
+ستون‌های canonical + پل‌های lang/status)، موج ۵a (موتور)، موج ۵b (دستیارِ تولیدِ محتوا)،
+زنجیره‌ی محتوا (AI Import + Translation + Chat از طریقِ ContentDraftFactory)، رفعِ html-sanitizer
+(v7.4 برای PHP 8.3)، و تکه‌ی اولِ همگراییِ storefront (fallbackِ image_path برای رندرِ مقاله‌ی همگرا).
+
+⏭️ **باقی‌مانده:** تولیدِ تصویرِ AI (نیاز به API تصویر)، Content Planner (۵c، نیاز به Tag همگرا)،
+Internal Linking (۵e)، همگراییِ کاملِ Tags + MorphMap (۵f)، و همگراییِ کاملِ storefront (۴e —
+متا/سئو از ستون‌های جدید، تصاویرِ داخلِ متن). موج ۵f و ۴e حساس به SEO‌اند و با نقشه + دروازه انجام می‌شوند.
+
 ## موج‌های پیش‌رو (به ترتیب اجرا: کم‌ریسک → پرریسک)
 
 ### موج ۳ — افزودنی‌های خالص، بدون تداخل، بدون URL عمومی  🆕
