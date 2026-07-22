@@ -1,0 +1,54 @@
+<?php
+
+namespace App\Filament\Resources\Tags;
+
+use App\Filament\Resources\Tags\Pages\CreateTag;
+use App\Filament\Resources\Tags\Pages\EditTag;
+use App\Filament\Resources\Tags\Pages\ListTags;
+use App\Filament\Resources\Tags\Schemas\TagForm;
+use App\Filament\Resources\Tags\Tables\TagsTable;
+use App\Model\Tag;
+use BackedEnum;
+use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
+use Filament\Tables\Table;
+use UnitEnum;
+
+/**
+ * مدیریتِ تگ‌ها — پورتِ آیتمِ «Tags» سایتِ انگلیسی (زیرِ Content Planner). CRUDِ سبک روی مدلِ زنده‌ی
+ * App\Model\Tag (title/slug/lang/status). storefront دست‌نخورده؛ فقط ابزارِ مدیریتِ ادمین.
+ */
+class TagResource extends Resource
+{
+    protected static ?string $model = Tag::class;
+
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedTag;
+
+    protected static string|UnitEnum|null $navigationGroup = 'Content Planner';
+
+    protected static ?int $navigationSort = 3;
+
+    protected static ?string $navigationLabel = 'Tags';
+
+    protected static ?string $recordTitleAttribute = 'title';
+
+    public static function form(Schema $schema): Schema
+    {
+        return TagForm::configure($schema);
+    }
+
+    public static function table(Table $table): Table
+    {
+        return TagsTable::configure($table);
+    }
+
+    public static function getPages(): array
+    {
+        return [
+            'index' => ListTags::route('/'),
+            'create' => CreateTag::route('/create'),
+            'edit' => EditTag::route('/{record}/edit'),
+        ];
+    }
+}
