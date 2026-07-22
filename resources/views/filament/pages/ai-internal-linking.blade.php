@@ -65,37 +65,6 @@
         </x-filament::section>
     @endif
 
-    {{-- محتوای یتیم: بدونِ هیچ لینکِ داخلیِ ورودی --}}
-    @php $orphans = $this->orphans; @endphp
-    @if (! empty($orphans))
-        <x-filament::section collapsible collapsed class="mb-4">
-            <x-slot name="heading">
-                <span class="text-warning-600 dark:text-warning-400">⚠️ محتوای یتیم</span>
-                <span class="text-xs font-normal text-gray-400">({{ count($orphans) }} مورد بدونِ لینکِ ورودی)</span>
-            </x-slot>
-            <x-slot name="description">
-                این صفحات از هیچ محتوای دیگری لینکِ داخلی نمی‌گیرند — برای سئو بهتر است از مقاله‌های مرتبط به آن‌ها لینک بدهید.
-            </x-slot>
-
-            <ul class="divide-y divide-gray-100 dark:divide-white/10">
-                @foreach ($orphans as $orphan)
-                    <li class="flex items-center justify-between py-2 text-sm">
-                        <span>
-                            <span class="text-xs text-gray-400">{{ $orphan['type'] === 'article' ? 'مقاله' : 'صفحه' }}</span>
-                            {{ $orphan['title'] }}
-                        </span>
-                        <span class="flex items-center gap-2">
-                            @if ($orphan['edit_url'])
-                                <x-filament::link :href="$orphan['edit_url']" size="sm" icon="heroicon-o-pencil-square">ویرایش</x-filament::link>
-                            @endif
-                            <x-filament::link :href="$orphan['url']" target="_blank" size="sm" icon="heroicon-o-eye" color="gray">نمایش</x-filament::link>
-                        </span>
-                    </li>
-                @endforeach
-            </ul>
-        </x-filament::section>
-    @endif
-
     @php $groups = $this->groupedSuggestions; @endphp
 
     @if (empty($groups))
