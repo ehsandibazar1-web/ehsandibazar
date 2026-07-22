@@ -16,3 +16,5 @@ staging.ehsandibazar.com/public/storage
 *.mkv
 
 /bootstrap/cache/*.php
+
+/.phpunit.result.cache
