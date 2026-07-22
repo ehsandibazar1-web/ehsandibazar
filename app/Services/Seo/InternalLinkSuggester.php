@@ -93,6 +93,40 @@ class InternalLinkSuggester
     }
 
     /**
+     * محتوای «یتیم»: مقاله/صفحه‌های منتشرشده‌ای که هیچ محتوای دیگری در بدنه‌اش به آن‌ها لینک نداده.
+     * تشخیصِ لینکِ ورودی بر اساسِ حضورِ مسیرِ یکتای مقصد (/article/slug یا /page/slug) در بدنه‌ی مبدأ
+     * است — این مسیر عملاً فقط داخلِ href ظاهر می‌شود، پس سیگنالِ دقیقی از لینکِ واقعی است. محافظه‌کار:
+     * اگر شک باشد، یتیم علامت نمی‌زند (کم‌گزارش، نه پرگزارش).
+     *
+     * @return Collection<int, array{id:int, type:string, title:string, url:string}>
+     */
+    public function orphans(): Collection
+    {
+        $items = $this->audit->collectContentItems();
+
+        return $items
+            ->reject(function (array $target) use ($items): bool {
+                foreach ($items as $source) {
+                    if ($source['id'] === $target['id'] && $source['type'] === $target['type']) {
+                        continue; // خودارجاعی لینکِ ورودی حساب نمی‌شود
+                    }
+                    if (mb_stripos($source['body'], $target['url']) !== false) {
+                        return true; // لینکِ ورودی دارد → یتیم نیست
+                    }
+                }
+
+                return false;
+            })
+            ->map(fn (array $it): array => [
+                'id' => $it['id'],
+                'type' => $it['type'],
+                'title' => $it['title'],
+                'url' => $it['url'],
+            ])
+            ->values();
+    }
+
+    /**
      * لینک‌های داخلیِ شکسته: hrefهایی در بدنه‌ی محتوای منتشرشده که به /article/{slug} یا /page/{slug}
      * اشاره می‌کنند اما آن مقصد میانِ محتوای منتشرشده نیست (روی سایت ۴۰۴ می‌دهد چون storefront فقط
      * status=1 را سِرو می‌کند). اسلاگ‌ها با rawurldecode نرمال می‌شوند تا encode/decode تفاوتی ندهد.
