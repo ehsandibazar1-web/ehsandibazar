@@ -427,7 +427,9 @@ class SiteController extends Controller
         if (isset($slug) && !empty($slug)) {
             $tag = Tag::whereSlug($slug)->whereStatus(1)->firstOrFail();
             SEO::setTitle($tag->title);
-            $articles = $tag->article;
+            // پیش‌تر $tag->article (رابطه‌ی تعریف‌نشده) بود → null و سپس $articles->links() در ویو
+            // خطای ۵۰۰ می‌داد. رابطه‌ی درست articles() است؛ فقط مقاله‌های منتشرشده و صفحه‌بندی‌شده.
+            $articles = $tag->articles()->where('articles.status', 1)->latest()->paginate(8);
             $categorys = Category::query()->whereType(Article::class)->whereStatus(1)->orderBy('sorting', 'ASC')->get();
             $articleViewCount = Article::where('status', 1)->orderBy('viewCount', 'desc')->take(7)->get();
             return view('site.articles', compact('articles', 'categorys', 'articleViewCount'));
@@ -442,8 +444,9 @@ class SiteController extends Controller
         if (isset($slug) && !empty($slug)) {
             $tag = Tag::whereSlug($slug)->whereStatus(1)->firstOrFail();
             SEO::setTitle($tag->title);
-//            $products = $tag->product;
-            $products = $this->CustomPaginate($tag->product, $request, 12);
+            // پیش‌تر $tag->product (رابطه‌ی تعریف‌نشده) بود → null. رابطه‌ی درست products() است؛
+            // فقط محصولاتِ منتشرشده. CustomPaginate خودش collection را صفحه‌بندی می‌کند.
+            $products = $this->CustomPaginate($tag->products()->where('products.status', 1)->get(), $request, 12);
 
 
             $similarProducts = Product::where('status', 1)->limit(10)->orderBy('viewCount', 'desc')->get();
