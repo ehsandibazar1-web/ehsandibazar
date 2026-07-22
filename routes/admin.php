@@ -104,6 +104,14 @@ Route::group(['middleware' => ['auth:web'], 'prefix' => 'panel'], function () {
                 $output[] = "$ artisan {$cmd}\n" . trim(\Illuminate\Support\Facades\Artisan::output());
             }
 
+            // On a shell-less host with opcache.validate_timestamps=0, edits to
+            // *existing* PHP files (e.g. routes/admin.php) stay cached until
+            // opcache is reset. Do it here so "optimize" fully picks up a pull.
+            if (in_array($action, ['optimize', 'cache-clear'], true) && function_exists('opcache_reset')) {
+                $ok = @opcache_reset();
+                $output[] = '$ opcache_reset()  → ' . ($ok ? 'OK' : 'unavailable');
+            }
+
             return response('<pre dir="ltr">' . e(implode("\n\n", $output)) . '</pre>');
         })->name('panel.maintenance');
         // ============================== maintenance ===========================
