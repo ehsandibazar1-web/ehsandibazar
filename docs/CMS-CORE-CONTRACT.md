@@ -231,6 +231,27 @@ interface را می‌بیند ⇒ همان فیچر بدون تغییر روی 
 
 ---
 
+## وضعیت پیاده‌سازی (اسکلتِ کد)
+
+اسکلتِ Core در `app/Cms/` ساخته شد (همه پیوریِ کد، صفر ریسکِ DB، با ۷ تستِ قرارداد در
+`tests/Unit/CmsCoreContractTest.php`):
+
+- `app/Cms/Enums/` → `ContentStatus`, `Locale`
+- `app/Cms/Contracts/` → `Sluggable`, `Localizable`, `Publishable`, `Taggable`, `SeoOptimizable`,
+  `HasFeaturedMedia`, `CmsContent` (ترکیب) + سرویس‌ها: `MediaLibrary`, `SeoService`, `ContentAssistant`
+- `app/Cms/Concerns/` → `HasSlug`, `HasLocale`, `HasPublishing`, `HasContentTags`, `HasSeoMeta`,
+  `ProvidesFeaturedMedia`, `LogsContentActivity`
+- `app/Cms/MorphMap.php` → منبعِ حقیقتِ aliasها
+
+> نگاشتِ interface↔trait: Sluggable↔HasSlug · Localizable↔HasLocale · Publishable↔HasPublishing ·
+> Taggable↔HasContentTags · SeoOptimizable↔HasSeoMeta · HasFeaturedMedia↔ProvidesFeaturedMedia.
+
+⚠️ **MorphMap هنوز register نشده.** فعال‌سازیِ `Relation::morphMap` روی دادهٔ زنده‌ی موجود بدونِ
+backfill، لوکاپ‌های چندریختیِ فعلی را می‌شکند (taggables قدیمیِ فروشگاه + activity_log). فعال‌سازی
+در موج ۴ همراه با یک مهاجرتِ backfill انجام می‌شود. تا آن زمان `MorphMap::map()` فقط مرجع است.
+
 ## Changelog
 - **v1 (تعریف اولیه):** Article, Page, Tag, Keyword(SEO), Media/MediaFolder, SiteSetting +
   ۷ trait مشترک + نقشه‌ی morph ثابت + ۴ service contract.
+- **v1.1 (اسکلتِ کد):** `app/Cms/` ساخته شد (Enums + Contracts + Concerns + MorphMap) + تستِ قرارداد.
+  فعال‌سازیِ MorphMap به موج ۴ (بعد از backfill) موکول شد.
