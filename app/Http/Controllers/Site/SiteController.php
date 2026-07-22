@@ -271,8 +271,12 @@ class SiteController extends Controller
             if (filled($page->meta_keywords)) {
                 SEOMeta::addKeyword($page->meta_keywords);
             }
-            OpenGraph::setTitle($seoTitle);
-            OpenGraph::setDescription($seoDescription);
+            // OpenGraph: اگر ستون‌های اختصاصیِ og_* پر باشند override می‌کنند، وگرنه = متای سئو
+            // (برای صفحه‌های موجود og_* خالی‌اند → دقیقاً رفتارِ قبلی). Twitter بدون تغییر.
+            $ogTitle = filled($page->og_title) ? $page->og_title : $seoTitle;
+            $ogDescription = filled($page->og_description) ? $page->og_description : $seoDescription;
+            OpenGraph::setTitle($ogTitle);
+            OpenGraph::setDescription($ogDescription);
             Twitter::setTitle($seoTitle);
             Twitter::setDescription($seoDescription);
 
@@ -359,11 +363,15 @@ class SiteController extends Controller
             if (! empty($seo->keyword)) {
                 SEOMeta::addKeyword($seo->keyword);
             }
-            OpenGraph::setTitle($seoTitle);
-            OpenGraph::setDescription($seoDescription);
+            // OpenGraph: اگر ستون‌های اختصاصیِ og_* پر باشند override می‌کنند، وگرنه = متای سئو
+            // (برای مقاله‌های موجود og_* خالی‌اند → دقیقاً رفتارِ قبلی). Twitter بدون تغییر.
+            $ogTitle = filled($article->og_title) ? $article->og_title : $seoTitle;
+            $ogDescription = filled($article->og_description) ? $article->og_description : $seoDescription;
+            OpenGraph::setTitle($ogTitle);
+            OpenGraph::setDescription($ogDescription);
             Twitter::setTitle($seoTitle);
             Twitter::setDescription($seoDescription);
-       
+
             if ($article) {
                
                 $comments = $article->comments()->where('status', 1)->where('parent_id', 0)->latest()->paginate(5);
