@@ -2,14 +2,16 @@
 
 namespace App\Services\Seo;
 
+use App\Model\Article;
+use App\Model\Page;
 use Illuminate\Support\Collection;
 
 /**
- * Stubِ موقتِ موتور بررسی سئو — همان امضاهای عمومیِ نسخه‌ی کاملِ سایت انگلیسی را دارد ولی خروجیِ
- * خنثی/خالی می‌دهد. نسخه‌ی کامل به زنجیره‌ی سنگینی (HtmlContentScanner / InternalLinkResolver /
- * SiteSetting / منابع محتوا) وابسته است که در موجِ سئو منتقل می‌شود. تنها متدی که دستیار محتوا
- * فعلاً واقعاً صدا می‌زند checkUrls() است (برای تأییدِ لینک‌های خارجیِ پیشنهادی) — این stub هیچ
- * URLی را «خراب» علامت نمی‌زند تا رفتار پنل شکسته نشود. forward-compatible: با نسخه‌ی کامل جایگزین می‌شود.
+ * موتور بررسیِ سئو — بخشی از زنجیره‌ی موج ۵e. collectContentItems() اکنون واقعی است و محتوای
+ * منتشرشده (مقاله/صفحه) را به یک شکلِ یکسان نرمال می‌کند تا InternalLinkSuggester رویش کار کند.
+ * checkUrls() برای تأییدِ لینک‌های خارجیِ پیشنهادیِ دستیار به‌کار می‌رود و هیچ URLی را بدونِ تماسِ
+ * واقعی «خراب» علامت نمی‌زند. متدهای externalLinkTargets/checkExternalLinks/allLinkSources هنوز
+ * خنثی‌اند (بررسیِ لینکِ خارجی جداگانه منتقل می‌شود). هیچ‌کدام محتوای زنده را تغییر نمی‌دهند.
  */
 class SeoAuditService
 {
@@ -62,13 +64,39 @@ class SeoAuditService
     }
 
     /**
-     * نرمال‌سازیِ مقاله/صفحه به یک شکل یکسان — فعلاً خالی.
+     * محتوای منتشرشده (مقاله + صفحه) را به یک شکلِ یکسان نرمال می‌کند. فقط-خواندنی؛ هیچ چیزی را
+     * ذخیره/تغییر نمی‌دهد. url به‌صورتِ نسبی (/article/... , /page/...) تولید می‌شود تا مستقل از
+     * دامنه (staging/production) باشد.
      *
-     * @return Collection<int, array<string, mixed>>
+     * @return Collection<int, array{id:int, type:string, title:string, slug:string, url:string, body:string}>
      */
     public function collectContentItems(): Collection
     {
-        return collect();
+        $articles = Article::query()
+            ->where('status', 1)
+            ->get(['id', 'title', 'slug', 'body'])
+            ->map(fn (Article $a): array => [
+                'id' => (int) $a->id,
+                'type' => 'article',
+                'title' => (string) $a->title,
+                'slug' => (string) $a->slug,
+                'url' => '/article/'.$a->slug,
+                'body' => (string) $a->body,
+            ]);
+
+        $pages = Page::query()
+            ->where('status', 1)
+            ->get(['id', 'title', 'slug', 'body'])
+            ->map(fn (Page $p): array => [
+                'id' => (int) $p->id,
+                'type' => 'page',
+                'title' => (string) $p->title,
+                'slug' => (string) $p->slug,
+                'url' => '/page/'.$p->slug,
+                'body' => (string) $p->body,
+            ]);
+
+        return $articles->concat($pages)->values();
     }
 
     /**
