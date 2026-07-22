@@ -23,7 +23,7 @@ class AiProfileResource extends Resource
 
     protected static string|UnitEnum|null $navigationGroup = 'AI Studio';
 
-    protected static ?int $navigationSort = 6;
+    protected static ?int $navigationSort = 7;
 
     protected static ?string $navigationLabel = 'AI Profiles';
 

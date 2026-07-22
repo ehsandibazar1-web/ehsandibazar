@@ -22,7 +22,7 @@ class ApiTokenResource extends Resource
 
     protected static string|UnitEnum|null $navigationGroup = 'AI Studio';
 
-    protected static ?int $navigationSort = 7;
+    protected static ?int $navigationSort = 9;
 
     protected static ?string $navigationLabel = 'API Tokens';
 

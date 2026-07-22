@@ -21,6 +21,10 @@ class AiContentAssistant extends Page
 
     protected static string|UnitEnum|null $navigationGroup = 'AI Studio';
 
+    // صفحه‌ی زمینه‌ای است (با ?article= یا ?page= باز می‌شود و بدونِ رکورد 404 می‌دهد)،
+    // پس نباید در منو ظاهر شود — از ویرایشِ مقاله/صفحه باز می‌شود.
+    protected static bool $shouldRegisterNavigation = false;
+
     protected static ?string $title = 'AI Content Assistant';
 
     protected string $view = 'filament.pages.ai-content-assistant';

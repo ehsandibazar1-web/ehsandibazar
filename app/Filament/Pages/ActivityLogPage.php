@@ -24,9 +24,9 @@ class ActivityLogPage extends Page implements HasTable
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedClipboardDocumentList;
 
-    protected static string|UnitEnum|null $navigationGroup = 'AI Studio';
+    protected static string|UnitEnum|null $navigationGroup = null;
 
-    protected static ?int $navigationSort = 30;
+    protected static ?int $navigationSort = 3;
 
     protected static ?string $navigationLabel = 'Activity Log';
 

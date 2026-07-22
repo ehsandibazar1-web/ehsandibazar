@@ -24,9 +24,9 @@ class MediaLibrary extends Page implements HasForms
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedPhoto;
 
-    protected static string|UnitEnum|null $navigationGroup = 'AI Studio';
+    protected static string|UnitEnum|null $navigationGroup = null;
 
-    protected static ?int $navigationSort = 20;
+    protected static ?int $navigationSort = 7;
 
     protected static ?string $navigationLabel = 'Media Library';
 

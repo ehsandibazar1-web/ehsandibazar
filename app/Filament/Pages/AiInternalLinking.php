@@ -25,9 +25,9 @@ class AiInternalLinking extends Page
 {
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedLink;
 
-    protected static string|UnitEnum|null $navigationGroup = 'AI Studio';
+    protected static string|UnitEnum|null $navigationGroup = null;
 
-    protected static ?int $navigationSort = 5;
+    protected static ?int $navigationSort = 6;
 
     protected static ?string $navigationLabel = 'Internal Linking';
 

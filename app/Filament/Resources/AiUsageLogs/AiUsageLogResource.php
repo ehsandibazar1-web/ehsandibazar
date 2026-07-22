@@ -22,7 +22,7 @@ class AiUsageLogResource extends Resource
 
     protected static string|UnitEnum|null $navigationGroup = 'AI Studio';
 
-    protected static ?int $navigationSort = 9;
+    protected static ?int $navigationSort = 11;
 
     protected static ?string $navigationLabel = 'AI Usage Logs';
 

@@ -37,7 +37,7 @@ class AiActionRouting extends Page implements HasForms
 
     protected static string|UnitEnum|null $navigationGroup = 'AI Studio';
 
-    protected static ?int $navigationSort = 8;
+    protected static ?int $navigationSort = 10;
 
     protected static ?string $navigationLabel = 'AI Routing';
 
