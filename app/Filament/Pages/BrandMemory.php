@@ -237,15 +237,10 @@ class BrandMemory extends Page implements HasForms
                         ->required(),
                 ])
                 ->action(function (array $data): void {
-                    // موقتاً غیرفعال: previewSystemPrompt به ContentAssistantService
-                    // (موتور تولید محتوا) وابسته است که در گروه بعدی منتقل می‌شود.
-                    // تا آن زمان فقط یک پیام نشان می‌دهیم؛ ذخیره‌ی حافظه‌ی برند کامل کار می‌کند.
-                    $this->previewPromptResult = null;
-                    \Filament\Notifications\Notification::make()
-                        ->title('پیش‌نمایش پرامپت به‌زودی')
-                        ->body('این قابلیت پس از انتقال موتور تولید محتوا (گروه بعدی) فعال می‌شود.')
-                        ->info()
-                        ->send();
+                    // system prompt واقعی را از موتور تولید محتوا می‌گیرد (previewSystemPrompt
+                    // خودِ سازنده‌های خصوصی پرامپت را دوباره استفاده می‌کند — بدون منطق تکراری اینجا)
+                    $this->previewPromptResult = app(\App\Cms\Contracts\ContentAssistant::class)
+                        ->previewSystemPrompt($data['field'], $data['mode'], $data['locale'] ?? 'en');
                 }),
 
             Action::make('addSection')
