@@ -99,22 +99,38 @@ class MediaBackfillService
                 continue;
             }
 
-            $fullUrl = Str::startsWith($raw, ['http://', 'https://'])
-                ? $raw
-                : rtrim((string) config('app.url'), '/').'/'.ltrim($raw, '/');
-            $diskPath = ltrim($raw, '/');
+            // ویدیوهای سایت اغلب کدِ کاملِ <iframe> (پخش‌کننده‌ی ArvanCloud) در فیلدِ url دارند، نه
+            // یک فایلِ ساده. آدرسِ پخش‌کننده را از داخلِ iframe درمی‌آوریم؛ اگر خودش یک URLِ ساده بود
+            // همان. disk_path را کوتاه و یکتا نگه می‌داریم (نه HTMLِ طولانی که ستون را بترکاند).
+            if (preg_match('/<iframe[^>]+src=(["\'])(.*?)\1/i', $raw, $m)) {
+                $url = html_entity_decode($m[2], ENT_QUOTES | ENT_HTML5);
+            } elseif (Str::startsWith($raw, ['http://', 'https://'])) {
+                $url = $raw;
+            } else {
+                $url = rtrim((string) config('app.url'), '/').'/'.ltrim($raw, '/');
+            }
+            $url = mb_substr($url, 0, 255);
 
-            if (Media::query()->where('url', $fullUrl)->orWhere('disk_path', $diskPath)->exists()) {
+            // نامِ نمایشی: اگر در embed اسمِ فایل (name="VID_....mp4") بود همان، وگرنه عنوان/شناسه.
+            $name = preg_match('/name=(["\'])(.*?\.[a-z0-9]{2,4})\1/i', $raw, $nm)
+                ? $nm[2]
+                : ((string) ($vid->title ?: '') ?: 'video-'.$vid->id);
+            $name = mb_substr($name, 0, 255);
+
+            // disk_path کوتاه و یکتا (این ویدیوها فایلِ روی دیسک نیستند، embed‌اند).
+            $diskPath = 'video/legacy-'.$vid->id;
+
+            if (Media::query()->where('disk_path', $diskPath)->exists()) {
                 $skipped++;
 
                 continue;
             }
 
             Media::create([
-                'original_name' => basename($diskPath) ?: (string) ($vid->title ?? 'video'),
+                'original_name' => $name,
                 'disk' => 'public',
                 'disk_path' => $diskPath,
-                'url' => $fullUrl,
+                'url' => $url,
                 'type' => 'video',
                 'mime_type' => null,
                 'size' => null,
