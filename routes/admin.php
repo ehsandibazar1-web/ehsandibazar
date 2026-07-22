@@ -47,6 +47,65 @@ Route::group(['middleware' => ['auth:web'], 'prefix' => 'panel'], function () {
         })->name('panel.maintenance');
         // ============================== maintenance ===========================
 
+        // ============================== SEO red-line gate =====================
+        // docs/SEO-RED-LINE.md — runs on THIS (staging) server (which can reach
+        // production) and diffs every production sitemap URL against staging.
+        // Batched via ?limit=&offset= so it never hits the request timeout.
+        Route::get('seo-check', function (\Illuminate\Http\Request $request, \App\Services\Seo\SeoRegressionChecker $checker) {
+            $base = rtrim((string) $request->query('base', 'https://ehsandibazar.com'), '/');
+            $candidate = rtrim((string) $request->query('candidate', $request->getSchemeAndHttpHost()), '/');
+            $limit = max(1, (int) $request->query('limit', 40));
+            $offset = max(0, (int) $request->query('offset', 0));
+
+            @set_time_limit(0);
+            $report = $checker->run($base, $candidate, $limit, $offset);
+
+            $badge = [
+                'ok' => ['🟢 سبز', '#16a34a'],
+                \App\Services\Seo\SeoRegressionChecker::WARNING => ['🟡 زرد — بازبینی دستی', '#ca8a04'],
+                \App\Services\Seo\SeoRegressionChecker::CRITICAL => ['🔴 قرمز — عبور به production ممنوع', '#dc2626'],
+            ][$report['verdict']];
+
+            $rows = '';
+            foreach ($report['rows'] as $row) {
+                if (empty($row['issues'])) {
+                    continue;
+                }
+                $items = '';
+                foreach ($row['issues'] as $i) {
+                    $mark = $i['severity'] === \App\Services\Seo\SeoRegressionChecker::CRITICAL ? '🔴' : '🟡';
+                    $items .= '<div>'.$mark.' <b>'.e($i['field']).'</b>: ['
+                        .e($i['base'] ?? '∅').'] → ['.e($i['candidate'] ?? '∅').']</div>';
+                }
+                $rows .= '<tr><td dir="ltr">'.e($row['path']).'</td><td>'.$row['base_status']
+                    .' → '.$row['candidate_status'].'</td><td dir="ltr">'.$items.'</td></tr>';
+            }
+            if ($rows === '') {
+                $rows = '<tr><td colspan="3">هیچ رگرسیونی در این batch پیدا نشد.</td></tr>';
+            }
+
+            $end = $offset + $report['checked'];
+            $next = $end < $report['total_urls']
+                ? '<a href="?base='.urlencode($base).'&candidate='.urlencode($candidate)
+                    .'&limit='.$limit.'&offset='.$end.'">▶ batch بعدی ('.$end.'..'.min($end + $limit, $report['total_urls']).')</a>'
+                : '<b>پایانِ فهرست.</b>';
+
+            $html = '<!doctype html><meta charset="utf-8"><title>SEO Red-Line Gate</title>'
+                .'<div style="font-family:Tahoma,sans-serif;max-width:1000px;margin:2rem auto;direction:rtl">'
+                .'<h2>دروازه‌ی خط قرمز SEO</h2>'
+                .'<div style="padding:.6rem 1rem;border-radius:8px;color:#fff;display:inline-block;background:'.$badge[1].'">'.$badge[0].'</div>'
+                .'<p>مرجع: <code dir="ltr">'.e($base).'</code> · کاندیدا: <code dir="ltr">'.e($candidate).'</code></p>'
+                .'<p>بررسی‌شده: '.$report['checked'].' از '.$report['total_urls'].' (offset '.$offset.') · '
+                .'🔴 '.$report['critical'].' · 🟡 '.$report['warning'].'</p>'
+                .'<table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%">'
+                .'<tr style="background:#f3f4f6"><th>URL</th><th>status</th><th>مشکل‌ها</th></tr>'.$rows.'</table>'
+                .'<p style="margin-top:1rem">'.$next.'</p>'
+                .'</div>';
+
+            return response($html);
+        })->name('panel.seo-check');
+        // ============================== SEO red-line gate =====================
+
         // ================================================= Start Of favorite =============
         Route::group(['prefix' => 'favorites'], function () {
             Route::get('/', 'FavriteController@index')->name('panel.favorite.index');
