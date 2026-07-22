@@ -23,6 +23,7 @@
         "realrashid/sweet-alert": "*",
         "shetabit/payment": "*",
         "simplesoftwareio/simple-qrcode": "*",
+        "spatie/laravel-activitylog": "^5.0",
         "spatie/laravel-image-optimizer": "*",
         "spatie/pdf-to-image": "*",
         "unisharp/laravel-filemanager": "*",
