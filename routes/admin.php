@@ -73,6 +73,33 @@ Route::group(['middleware' => ['auth:web'], 'prefix' => 'panel'], function () {
         })->name('panel.seo-check');
         // ============================== SEO red-line gate =====================
 
+        // ============================== Media Library backfill ================
+        // عکس‌های موجودِ سایت (App\Model\Image) را در جدولِ media ثبت می‌کند تا در Media Library
+        // دیده شوند. batch به batch با ?limit=&offset=. هیچ فایلی تغییر نمی‌کند (صفر ریسکِ SEO).
+        Route::get('maintenance/media-backfill', function (\Illuminate\Http\Request $request, \App\Services\Media\MediaBackfillService $svc) {
+            @set_time_limit(0);
+            $limit = max(1, (int) $request->query('limit', 200));
+            $offset = max(0, (int) $request->query('offset', 0));
+
+            $r = $svc->backfillFromLegacyImages($limit, $offset);
+
+            $next = $r['done']
+                ? '<b>پایان — همه‌ی عکس‌ها بررسی شدند.</b>'
+                : '<a href="?limit='.$limit.'&offset='.$r['next_offset'].'">▶ batch بعدی (از '.$r['next_offset'].')</a>';
+
+            $html = '<!doctype html><meta charset="utf-8"><title>Media Backfill</title>'
+                .'<div style="font-family:Tahoma,sans-serif;max-width:700px;margin:2rem auto;direction:rtl">'
+                .'<h2>ثبتِ عکس‌های سایت در Media Library</h2>'
+                .'<p>این batch: بررسی‌شده <b>'.$r['scanned'].'</b> · ثبت‌شده‌ی جدید <b style="color:#16a34a">'.$r['registered'].'</b> · قبلاً بود <b>'.$r['skipped'].'</b></p>'
+                .'<p>کلِ عکس‌های سایت: <b>'.$r['total'].'</b> (تا offset '.$r['next_offset'].' بررسی شد)</p>'
+                .'<p style="margin-top:1rem">'.$next.'</p>'
+                .'<p style="color:#888">بعد از پایان، به Media Library برو — عکس‌ها آنجا دیده می‌شوند. WebP را می‌توانی per-image از دکمه‌ی «بازتولید» بسازی.</p>'
+                .'</div>';
+
+            return response($html);
+        })->name('panel.media-backfill');
+        // ============================== Media Library backfill ================
+
         // ============================== maintenance (admin-only) ==============
         // Shell-less host: these let the admin run deploy-time artisan tasks
         // safely from the browser after each "Update from Remote".
