@@ -256,18 +256,25 @@ class SiteController extends Controller
                 ['seoable_type', 'page'],
             ])->first();
 
-            if ($seo) {
-                SEOMeta::setTitle($seo->title);
-                SEOMeta::setDescription($seo->description);
+            // همگراییِ سئو (موج ۴e): اولویت با ستون‌های canonicalِ جدید، بعد Seoِ legacy، بعد
+            // عنوان/چکیده‌ی body. صفحه‌های قدیمی رفتارِ قبلی؛ صفحه‌های همگرا متا/سئوی درست.
+            $seoTitle = filled($page->seo_title) ? $page->seo_title : ($seo->title ?? $page->title);
+            $seoDescription = filled($page->meta_description)
+                ? $page->meta_description
+                : ($seo->description ?? strip_tags(\Illuminate\Support\Str::limit($page->body, 160)));
+
+            SEOMeta::setTitle($seoTitle);
+            SEOMeta::setDescription($seoDescription);
+            if (! empty($seo->keyword)) {
                 SEOMeta::addKeyword($seo->keyword);
-                OpenGraph::setTitle($seo->title);
-                OpenGraph::setDescription($seo->description);
-                Twitter::setTitle($seo->title);
-                Twitter::setDescription($seo->description);
-            } else {
-                SEOTools::setTitle($page->title);
-                SEOTools::setDescription($page->description ?? strip_tags(\Illuminate\Support\Str::limit($page->body, 160)));
             }
+            if (filled($page->meta_keywords)) {
+                SEOMeta::addKeyword($page->meta_keywords);
+            }
+            OpenGraph::setTitle($seoTitle);
+            OpenGraph::setDescription($seoDescription);
+            Twitter::setTitle($seoTitle);
+            Twitter::setDescription($seoDescription);
 
             $pageOgImage = isset($page->image[0])
                 ? $page->image[0]->url
@@ -338,20 +345,24 @@ class SiteController extends Controller
             ['seoable_id',$article->id],
             ['seoable_type','article'],
             ])->first();
-            if($seo){
-                SEOMeta::setTitle($seo->title);
-                SEOMeta::setDescription($seo->description);
+
+            // همگراییِ سئو (موج ۴e): اولویت با ستون‌های canonicalِ جدید (seo_title/meta_description)،
+            // بعد رابطه‌ی legacyِ Seo، بعد عنوان. مقاله‌های قدیمی seo_title خالی دارند، پس دقیقاً همان
+            // رفتارِ قبلی؛ مقاله‌های تولیدشده با AI حالا متا/سئوی درست می‌گیرند.
+            $seoTitle = filled($article->seo_title) ? $article->seo_title : ($seo->title ?? $article->title);
+            // fallbackِ نهایی $article->description (ستون وجود ندارد → null) تا برای مقاله‌های موجود
+            // دقیقاً همان رفتارِ قبلی (بدونِ description) حفظ شود؛ نه رشته‌ی خالی.
+            $seoDescription = filled($article->meta_description) ? $article->meta_description : ($seo->description ?? $article->description);
+
+            SEOMeta::setTitle($seoTitle);
+            SEOMeta::setDescription($seoDescription);
+            if (! empty($seo->keyword)) {
                 SEOMeta::addKeyword($seo->keyword);
-                OpenGraph::setTitle($seo->title);
-                OpenGraph::setDescription($seo->description);
-                Twitter::setTitle($seo->title);
-                Twitter::setDescription($seo->description);
-            }else{
-                SEOTools::setTitle($article->title);
-                SEOTools::setDescription($article->description);
-                OpenGraph::setTitle($article->title);
-                OpenGraph::setDescription($article->description);
             }
+            OpenGraph::setTitle($seoTitle);
+            OpenGraph::setDescription($seoDescription);
+            Twitter::setTitle($seoTitle);
+            Twitter::setDescription($seoDescription);
        
             if ($article) {
                
