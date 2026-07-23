@@ -45,9 +45,17 @@
                     این آدرس را به یک سرویسِ رایگانِ زمان‌بند (مثلِ cron-job.org) بدهید تا هر ۵ دقیقه یک‌بار بازش کند:
                 </p>
                 <code dir="ltr" class="block select-all overflow-x-auto rounded bg-white px-2 py-1 text-[11px] text-gray-800 dark:bg-black/30 dark:text-gray-200">{{ $this->pingerUrl() }}</code>
+
+                <div class="mt-3 mb-1 font-semibold text-primary-700 dark:text-primary-300">— یا — اگر cPanel شما Cron Job دارد (روشِ بهتر)</div>
+                <p class="mb-2 text-gray-600 dark:text-gray-400">
+                    در cPanel وارد بخشِ <b>Cron Jobs</b> شوید، بازه را روی <b>هر دقیقه</b> بگذارید
+                    (در فیلدهای دستی: <code dir="ltr" class="text-[11px]">* * * * *</code>) و این دستور را دقیقاً کپی کنید:
+                </p>
+                <code dir="ltr" class="block select-all overflow-x-auto rounded bg-white px-2 py-1 text-[11px] text-gray-800 dark:bg-black/30 dark:text-gray-200">{{ $this->cronCommand() }}</code>
                 <p class="mt-2 text-gray-500 dark:text-gray-500">
-                    این آدرس با یک توکنِ مخفی محافظت می‌شود. اگر cPanel شما Cron Job دارد، به‌جای این می‌توانید
-                    <code dir="ltr" class="text-[11px]">php artisan schedule:run</code> را هر دقیقه اجرا کنید.
+                    نکته: اگر cPanel نسخه‌ی PHP را انتخاب می‌کند، ممکن است لازم باشد کلمه‌ی ابتداییِ
+                    <code dir="ltr" class="text-[11px]">php</code> را با مسیرِ کاملِ باینریِ PHP جایگزین کنید
+                    (مثلاً <code dir="ltr" class="text-[11px]">/usr/local/bin/ea-php83</code>). همین یک Cron Job هم انتشارِ خودکارِ مقاله‌ها و هم پشتیبان‌گیریِ روزانه‌ی دیتابیس را اجرا می‌کند.
                 </p>
             </div>
 

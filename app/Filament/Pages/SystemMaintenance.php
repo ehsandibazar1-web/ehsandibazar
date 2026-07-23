@@ -94,6 +94,12 @@ class SystemMaintenance extends Page
         return url('/cron/publish-due').'?token='.$token;
     }
 
+    /** دستورِ آماده‌ی cPanel Cron Job (با مسیرِ واقعیِ artisanِ همین سرور). */
+    public function cronCommand(): string
+    {
+        return 'php '.base_path('artisan').' schedule:run >> /dev/null 2>&1';
+    }
+
     private function run(string $action): void
     {
         $map = $this->commandMap();
