@@ -15,6 +15,16 @@ class EditArticle extends EditRecord
 
     protected string $view = 'filament.resources.articles.pages.edit-article';
 
+    protected function mutateFormDataBeforeFill(array $data): array
+    {
+        return ArticleResource::derivePublishState($data);
+    }
+
+    protected function mutateFormDataBeforeSave(array $data): array
+    {
+        return ArticleResource::applyPublishState($data);
+    }
+
     protected function getHeaderActions(): array
     {
         return [

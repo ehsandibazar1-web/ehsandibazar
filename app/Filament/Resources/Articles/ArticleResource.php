@@ -47,4 +47,39 @@ class ArticleResource extends Resource
             'edit' => EditArticle::route('/{record}/edit'),
         ];
     }
+
+    /**
+     * ترجمه‌ی فیلدِ مجازیِ فرم (publish_state) به ستون‌های واقعی هنگامِ ذخیره. به موتورِ
+     * زمان‌بندیِ خودکار (articles:publish-due) وصل است: زمان‌بندی‌شده = status=0 + is_scheduled=1.
+     */
+    public static function applyPublishState(array $data): array
+    {
+        $state = $data['publish_state'] ?? null;
+        unset($data['publish_state']);
+
+        if ($state === 'published') {
+            $data['status'] = 1;
+            $data['is_scheduled'] = false;
+            $data['published_at'] = $data['published_at'] ?? now();
+        } elseif ($state === 'scheduled') {
+            $data['status'] = 0;
+            $data['is_scheduled'] = true;
+            // published_at از خودِ فرم (تاریخِ آینده) می‌آید.
+        } elseif ($state === 'draft') {
+            $data['status'] = 0;
+            $data['is_scheduled'] = false;
+        }
+
+        return $data;
+    }
+
+    /** مشتق‌کردنِ publish_state از رکورد هنگامِ پرکردنِ فرمِ ویرایش. */
+    public static function derivePublishState(array $data): array
+    {
+        $data['publish_state'] = ((int) ($data['status'] ?? 0) === 1)
+            ? 'published'
+            : (! empty($data['is_scheduled']) ? 'scheduled' : 'draft');
+
+        return $data;
+    }
 }

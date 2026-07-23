@@ -11,6 +11,7 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Str;
 
@@ -161,17 +162,27 @@ class ArticleForm
                         Textarea::make('social_image_prompt')->label('پرامپتِ تصویرِ اجتماعی')->rows(2)->nullable(),
                     ]),
 
-                // پلِ انتشار: Toggleِ status (بولینِ زنده). روشن = 1 = روی سایت دیده می‌شود (همان
-                // where('status',1)ی storefront/sitemap). خاموش = 0 = پیش‌نویس.
-                Toggle::make('status')
-                    ->label('منتشر شده')
-                    ->helperText('روشن: روی سایت نمایش داده می‌شود. خاموش: پیش‌نویس.')
-                    ->default(false),
+                // وضعیتِ انتشار — فیلدِ مجازیِ publish_state (نه ستونِ DB) که در صفحاتِ Create/Edit به
+                // status(بولین)/is_scheduled/published_at ترجمه می‌شود و به موتورِ زمان‌بندیِ خودکار
+                // (articles:publish-due) وصل است.
+                Select::make('publish_state')
+                    ->label('وضعیتِ انتشار')
+                    ->options([
+                        'draft' => 'پیش‌نویس (نمایش داده نمی‌شود)',
+                        'scheduled' => 'زمان‌بندی‌شده (در تاریخِ انتشار خودکار منتشر می‌شود)',
+                        'published' => 'منتشرشده (همین حالا روی سایت)',
+                    ])
+                    ->default('draft')
+                    ->live()
+                    ->required(),
 
                 DateTimePicker::make('published_at')
                     ->label('تاریخِ انتشار')
-                    ->nullable()
-                    ->helperText('اختیاری — فعلاً فقط ذخیره/نمایش می‌شود.'),
+                    ->seconds(false)
+                    ->visible(fn (Get $get): bool => in_array($get('publish_state'), ['scheduled', 'published'], true))
+                    ->required(fn (Get $get): bool => $get('publish_state') === 'scheduled')
+                    ->minDate(fn (Get $get) => $get('publish_state') === 'scheduled' ? now() : null)
+                    ->helperText('برای «زمان‌بندی‌شده» یک تاریخِ آینده بگذارید — سیستم در همان لحظه خودکار منتشر می‌کند.'),
             ]);
     }
 }

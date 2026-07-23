@@ -17,6 +17,6 @@ class CreateArticle extends CreateRecord
     {
         $data['user_id'] ??= auth()->id();
 
-        return $data;
+        return ArticleResource::applyPublishState($data);
     }
 }
