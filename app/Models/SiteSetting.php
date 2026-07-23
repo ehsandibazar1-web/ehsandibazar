@@ -28,9 +28,13 @@ class SiteSetting extends Model
         return is_array($decoded) ? $decoded : $default;
     }
 
-    // نوشتن/به‌روزرسانی مقدار
+    // نوشتن/به‌روزرسانی مقدار (آرایه/آبجکت خودکار به JSON تبدیل می‌شود — متقارن با getJson)
     public static function set(string $key, $value, ?string $group = null): void
     {
+        if (is_array($value)) {
+            $value = json_encode($value, JSON_UNESCAPED_UNICODE);
+        }
+
         self::updateOrCreate(['key' => $key], ['value' => $value, 'group' => $group]);
     }
 }
