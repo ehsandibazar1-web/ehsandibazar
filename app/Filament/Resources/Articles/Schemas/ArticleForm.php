@@ -107,6 +107,22 @@ class ArticleForm
                     ->onlyImages()
                     ->uploadDirectory('articles')
                     ->nullable()
+                    // مقاله‌های قدیمی تصویرِ شاخص را در رابطه‌ی image() (مسیرِ public/uploads) دارند نه در
+                    // ستونِ image_path؛ این فقط برای «نمایشِ» همان تصویرِ فعلی در فرم است — چیزی ذخیره
+                    // یا در storefront تغییر داده نمی‌شود (storefront همیشه اول رابطه‌ی image را می‌خواند).
+                    ->fallbackPreviewUrl(function (?Article $record): ?string {
+                        if (! $record) {
+                            return null;
+                        }
+                        $img = $record->image->first();
+                        if (! $img) {
+                            return null;
+                        }
+                        $raw = (string) $img->getRawOriginal('url');
+                        $rel = ltrim($raw, '/');
+
+                        return ($rel !== '' && is_file(public_path($rel))) ? url($raw) : null;
+                    })
                     ->helperText('از کتابخانه‌ی رسانه انتخاب کنید یا یک تصویرِ تازه آپلود کنید — WebP، تامبنیل و اندازه‌های ریسپانسیو خودکار ساخته می‌شوند.'),
 
                 TextInput::make('image_alt')

@@ -31,6 +31,11 @@ class MediaPickerInput extends Field
     // نوعِ پیش‌فرضی که پیکر با آن باز می‌شود — یک نمای اولیه، نه یک قفل. برای فیلدهای فقط-تصویر بی‌اثر است.
     protected string|Closure|null $initialType = null;
 
+    // نشانیِ پیش‌نمایشِ جایگزین وقتی مقدارِ فیلد (image_path) خالی است — فقط برای نمایش، نه ذخیره.
+    // کاربرد: مقاله‌های قدیمی تصویرِ شاخص را در رابطه‌ی image() (مسیرِ /uploads) دارند نه در ستونِ
+    // image_path؛ این اجازه می‌دهد همان تصویرِ فعلی در فرم دیده شود بدونِ هیچ تغییری در داده یا storefront.
+    protected string|Closure|null $fallbackPreviewUrl = null;
+
     public function onlyImages(bool|Closure $condition = true): static
     {
         $this->onlyImages = $condition;
@@ -55,6 +60,20 @@ class MediaPickerInput extends Field
     public function getInitialType(): ?string
     {
         return $this->evaluate($this->initialType);
+    }
+
+    public function fallbackPreviewUrl(string|Closure|null $url): static
+    {
+        $this->fallbackPreviewUrl = $url;
+
+        return $this;
+    }
+
+    public function getFallbackPreviewUrl(): ?string
+    {
+        $url = $this->evaluate($this->fallbackPreviewUrl);
+
+        return filled($url) ? (string) $url : null;
     }
 
     public function isOnlyImages(): bool
