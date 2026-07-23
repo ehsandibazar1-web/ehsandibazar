@@ -195,6 +195,81 @@ Route::group(['middleware' => ['auth:web'], 'prefix' => 'panel'], function () {
         })->name('panel.storage-fix');
         // ============================== storage symlink fix ==================
 
+        // ============================== heal image paths =====================
+        // بعضی عکس‌های قدیمیِ رابطه‌ی image() نامِ فایل/پوشه‌ی مشکل‌دار دارند (پرانتز، فاصله، حروفِ فارسی
+        // مثل پوشه‌ی «احسان») — فایل روی دیسک هست ولی سرور آن URL را سرو نمی‌کند، پس هیرو نمایش داده
+        // نمی‌شود. این ابزار فایلِ مشکل‌دار را با نامِ تمیزِ ASCII کپی می‌کند و رکوردِ Image را به آن به‌روز
+        // می‌کند. غیرمخرب (فایلِ اصلی می‌ماند). پیش‌فرض dry-run؛ با ?apply=1 اجرا می‌شود. idempotent
+        // (بعد از تمیزشدن، مسیرِ کاراکترِ مشکل‌دار ندارد و دفعه‌ی بعد رد می‌شود).
+        Route::get('maintenance/heal-image-paths', function (\Illuminate\Http\Request $request) {
+            @set_time_limit(0);
+            $apply = $request->query('apply') === '1';
+            $shared = dirname(base_path()).'/storage/app/public';
+
+            $scanned = 0;
+            $fixed = 0;
+            $missing = 0;
+            $samples = [];
+
+            \App\Model\Image::query()->orderBy('id')->chunkById(500, function ($imgs) use (&$scanned, &$fixed, &$missing, &$samples, $shared, $apply) {
+                foreach ($imgs as $img) {
+                    $raw = (string) $img->getRawOriginal('url');
+                    $p = ltrim($raw, '/');
+                    if (! str_starts_with($p, 'storage/')) {
+                        continue;
+                    }
+                    // فقط مسیرهایی که کاراکترِ مشکل‌دار دارند: پرانتز، فاصله، یا هر کاراکترِ غیر-ASCII
+                    if (! preg_match('/[()\s]|[^\x20-\x7E]/u', $p)) {
+                        continue;
+                    }
+                    $scanned++;
+                    $rel = substr($p, strlen('storage/'));   // photos/5/احسان/IMG_...(...).jpg
+                    $src = $shared.'/'.$rel;
+                    if (! is_file($src)) {
+                        $missing++;
+
+                        continue;
+                    }
+                    $ext = strtolower(pathinfo($src, PATHINFO_EXTENSION)) ?: 'jpg';
+                    $clean = 'photos/healed/'.$img->id.'.'.$ext;
+                    $dst = $shared.'/'.$clean;
+
+                    if ($apply) {
+                        if (! is_dir(dirname($dst))) {
+                            @mkdir(dirname($dst), 0775, true);
+                        }
+                        if (@copy($src, $dst)) {
+                            $img->url = '/storage/'.$clean;  // setter مسیرِ خام را ذخیره می‌کند
+                            $img->save();
+                            $fixed++;
+                        }
+                    } else {
+                        $fixed++;
+                    }
+
+                    if (count($samples) < 10) {
+                        $samples[] = $rel.'  →  '.$clean;
+                    }
+                }
+            });
+
+            $out = [];
+            $out[] = ($apply ? '=== APPLIED ===' : '=== DRY RUN (چیزی تغییر نکرد) ===');
+            $out[] = 'مشکل‌دار (پرانتز/فاصله/فارسی): '.$scanned;
+            $out[] = ($apply ? 'تعمیرشده: ' : 'قابلِ‌تعمیر: ').$fixed;
+            $out[] = 'فایلش پیدا نشد (باید دوباره آپلود شود): '.$missing;
+            $out[] = '';
+            $out = array_merge($out, $samples);
+            if (! $apply && $fixed > 0) {
+                $out[] = '';
+                $out[] = 'برای اجرای واقعی، همین آدرس را با ?apply=1 باز کن:';
+                $out[] = '/panel/manager/maintenance/heal-image-paths?apply=1';
+            }
+
+            return response('<pre dir="ltr" style="font:14px/1.7 monospace;padding:1rem">'.e(implode("\n", $out)).'</pre>');
+        })->name('panel.heal-image-paths');
+        // ============================== heal image paths =====================
+
         // ============================== maintenance (admin-only) ==============
         // Shell-less host: these let the admin run deploy-time artisan tasks
         // safely from the browser after each "Update from Remote".
