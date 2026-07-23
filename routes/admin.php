@@ -137,6 +137,8 @@ Route::group(['middleware' => ['auth:web'], 'prefix' => 'panel'], function () {
                 // انتشارِ خودکارِ مقاله‌های زمان‌بندی‌شده‌ای که زمانشان رسیده (روی هاستِ بدون‌شل جایگزینِ cron).
                 // یک سرویسِ uptime-pinger می‌تواند این URL را هر چند دقیقه یک‌بار بزند.
                 'publish-due'  => ['articles:publish-due'],
+                // پشتیبان‌گیریِ خودکارِ دیتابیس (uptime-pinger روزانه) — جایگزینِ cron روی هاستِ بدون‌شل.
+                'db-backup'    => ['db:backup'],
             ];
 
             if (! array_key_exists($action, $allowed)) {
