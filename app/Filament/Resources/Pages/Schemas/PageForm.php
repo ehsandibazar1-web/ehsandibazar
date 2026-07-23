@@ -77,7 +77,14 @@ class PageForm
                     ->label('تصویرِ شاخص')
                     ->onlyImages()
                     ->uploadDirectory('pages')
-                    ->nullable(),
+                    ->nullable()
+                    // صفحه‌های قدیمی تصویرِ شاخص را در رابطه‌ی image() دارند نه در ستونِ image_path؛
+                    // همان آدرسِ storefront (url($image->url)) را برای پیش‌نمایش نشان بده — فقط نمایشی.
+                    ->fallbackPreviewUrl(function ($record): ?string {
+                        $img = $record?->image?->first();
+
+                        return $img ? url($img->url) : null;
+                    }),
 
                 TextInput::make('image_alt')
                     ->label('متنِ جایگزینِ تصویر (ALT)')

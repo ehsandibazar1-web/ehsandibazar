@@ -111,17 +111,13 @@ class ArticleForm
                     // ستونِ image_path؛ این فقط برای «نمایشِ» همان تصویرِ فعلی در فرم است — چیزی ذخیره
                     // یا در storefront تغییر داده نمی‌شود (storefront همیشه اول رابطه‌ی image را می‌خواند).
                     ->fallbackPreviewUrl(function (?Article $record): ?string {
-                        if (! $record) {
-                            return null;
-                        }
-                        $img = $record->image->first();
-                        if (! $img) {
-                            return null;
-                        }
-                        $raw = (string) $img->getRawOriginal('url');
-                        $rel = ltrim($raw, '/');
+                        // دقیقاً همان آدرسی که storefront برای هیرو می‌سازد: url($image->url) —
+                        // اکسسورِ Image::url خودش APP_URL (شاملِ /public روی production) را جلو می‌گذارد،
+                        // پس پیش‌نمایشِ فرم هم مثلِ سایت درست باز می‌شود. (قبلاً از مسیرِ خام url($raw)
+                        // استفاده می‌شد که روی ساختارِ /public + storage/app/public تولید نمی‌شد.)
+                        $img = $record?->image->first();
 
-                        return ($rel !== '' && is_file(public_path($rel))) ? url($raw) : null;
+                        return $img ? url($img->url) : null;
                     })
                     ->helperText('از کتابخانه‌ی رسانه انتخاب کنید یا یک تصویرِ تازه آپلود کنید — WebP، تامبنیل و اندازه‌های ریسپانسیو خودکار ساخته می‌شوند.'),
 
