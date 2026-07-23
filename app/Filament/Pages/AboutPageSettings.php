@@ -27,6 +27,18 @@ class AboutPageSettings extends Page implements HasForms
 {
     use InteractsWithForms;
 
+    // صفحه‌ی «درباره» از دادهٔ واقعیِ فروشگاه (Systeminfmanage) می‌آید؛ این صفحه به آن وصل نیست.
+    // تا زمانِ اتصالِ واقعی، از منو و دسترسی مخفی می‌ماند (کد و جدول دست‌نخورده).
+    public static function shouldRegisterNavigation(): bool
+    {
+        return false;
+    }
+
+    public static function canAccess(): bool
+    {
+        return false;
+    }
+
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedIdentification;
 
     protected static string|UnitEnum|null $navigationGroup = null;

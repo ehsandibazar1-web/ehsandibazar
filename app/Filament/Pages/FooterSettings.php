@@ -26,6 +26,18 @@ class FooterSettings extends Page implements HasForms
 {
     use InteractsWithForms;
 
+    // فوتر از دادهٔ واقعیِ فروشگاه (Systeminfmanage) رندر می‌شود؛ این صفحه به آن وصل نیست.
+    // تا زمانِ اتصالِ واقعی، از منو و دسترسی مخفی می‌ماند (کد و جدول دست‌نخورده).
+    public static function shouldRegisterNavigation(): bool
+    {
+        return false;
+    }
+
+    public static function canAccess(): bool
+    {
+        return false;
+    }
+
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedViewColumns;
 
     protected static string|UnitEnum|null $navigationGroup = null;

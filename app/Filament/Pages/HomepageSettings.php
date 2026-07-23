@@ -27,6 +27,18 @@ class HomepageSettings extends Page implements HasForms
 {
     use InteractsWithForms;
 
+    // این صفحه به دادهٔ واقعیِ فروشگاه (Systeminf) وصل نیست؛ فروشگاه صفحه‌ی خانه را با پنلِ قدیمی
+    // مدیریت می‌کند. تا زمانِ اتصالِ واقعی، از منو و دسترسی مخفی می‌ماند (کد و جدول دست‌نخورده).
+    public static function shouldRegisterNavigation(): bool
+    {
+        return false;
+    }
+
+    public static function canAccess(): bool
+    {
+        return false;
+    }
+
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedHome;
 
     protected static string|UnitEnum|null $navigationGroup = null;
