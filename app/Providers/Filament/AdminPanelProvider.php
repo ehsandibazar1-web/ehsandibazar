@@ -10,6 +10,8 @@ use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
+use Filament\View\PanelsRenderHook;
+use Illuminate\Support\Facades\Blade;
 use Filament\Widgets\AccountWidget;
 use Filament\Widgets\FilamentInfoWidget;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
@@ -58,6 +60,13 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
-            ]);
+            ])
+            // پنجره‌ی انتخابِ رسانه — یک‌بار در انتهای body هر صفحه‌ی پنل رندر می‌شود تا هر
+            // فیلدِ MediaPickerInput بتواند همان یک پنجره را باز کند. تا وقتی باز نشده تقریباً
+            // هیچ هزینه‌ای ندارد (فقط یک div و یک شنونده‌ی رویداد) — نگاه کنید به App\Livewire\MediaPicker.
+            ->renderHook(
+                PanelsRenderHook::BODY_END,
+                fn (): string => Blade::render('@livewire(\'media-picker\')'),
+            );
     }
 }

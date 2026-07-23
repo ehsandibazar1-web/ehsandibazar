@@ -4,7 +4,6 @@ namespace App\Filament\Resources\Pages\Schemas;
 
 use App\Model\Page;
 use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
@@ -71,11 +70,12 @@ class PageForm
                     ->fileAttachmentsDirectory('pages/inline')
                     ->columnSpanFull(),
 
-                FileUpload::make('image_path')
+                // انتخابگرِ رسانه — به‌جای آپلودِ ساده، تصویر را از کتابخانه‌ی رسانه انتخاب می‌کند.
+                // مقدارِ ذخیره‌شده همان رشته‌ی disk_path است — سازگارِ کاملِ عقب‌رو با ردیف‌های موجود.
+                \App\Filament\Forms\Components\MediaPickerInput::make('image_path')
                     ->label('تصویرِ شاخص')
-                    ->image()
-                    ->disk('public')
-                    ->directory('pages')
+                    ->onlyImages()
+                    ->uploadDirectory('pages')
                     ->nullable(),
 
                 TextInput::make('image_alt')

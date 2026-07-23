@@ -4,7 +4,6 @@ namespace App\Filament\Resources\Articles\Schemas;
 
 use App\Model\Article;
 use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
@@ -98,13 +97,15 @@ class ArticleForm
                     ->fileAttachmentsDirectory('articles/inline')
                     ->columnSpanFull(),
 
-                FileUpload::make('image_path')
+                // انتخابگرِ رسانه — به‌جای آپلودِ ساده، تصویر را از کتابخانه‌ی رسانه انتخاب می‌کند
+                // (یا همان‌جا آپلود می‌کند). مقدارِ ذخیره‌شده همان رشته‌ی disk_path است — عیناً همان
+                // چیزی که FileUpload ذخیره می‌کرد — پس هر ردیفِ موجود و storefront بدونِ تغییر کار می‌کند.
+                \App\Filament\Forms\Components\MediaPickerInput::make('image_path')
                     ->label('تصویرِ شاخص')
-                    ->image()
-                    ->disk('public')
-                    ->directory('articles')
+                    ->onlyImages()
+                    ->uploadDirectory('articles')
                     ->nullable()
-                    ->helperText('تصویرِ اصلیِ مقاله. (اتصالِ کاملِ کتابخانه‌ی رسانه و تولیدِ WebP در گروه بعد.)'),
+                    ->helperText('از کتابخانه‌ی رسانه انتخاب کنید یا یک تصویرِ تازه آپلود کنید — WebP، تامبنیل و اندازه‌های ریسپانسیو خودکار ساخته می‌شوند.'),
 
                 TextInput::make('image_alt')
                     ->label('متنِ جایگزینِ تصویر (ALT)')
