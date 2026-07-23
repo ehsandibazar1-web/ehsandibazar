@@ -134,6 +134,9 @@ Route::group(['middleware' => ['auth:web'], 'prefix' => 'panel'], function () {
                 // so newly pulled packages (e.g. Filament) are picked up on a
                 // shell-less host after each "Update from Remote".
                 'optimize'     => ['clear-compiled', 'package:discover', 'config:clear', 'view:clear', 'view:cache', 'cache:clear'],
+                // انتشارِ خودکارِ مقاله‌های زمان‌بندی‌شده‌ای که زمانشان رسیده (روی هاستِ بدون‌شل جایگزینِ cron).
+                // یک سرویسِ uptime-pinger می‌تواند این URL را هر چند دقیقه یک‌بار بزند.
+                'publish-due'  => ['articles:publish-due'],
             ];
 
             if (! array_key_exists($action, $allowed)) {

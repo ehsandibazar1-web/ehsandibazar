@@ -49,6 +49,7 @@ class Article extends Model implements Localizable, Publishable
         'faq' => 'array',
         'faqs' => 'array',           // موج ۴: ستونِ canonicalِ FAQ (جدا از faqِ قدیمی)
         'published_at' => 'datetime',
+        'is_scheduled' => 'boolean',  // نشانگرِ انتشارِ زمان‌بندی‌شده (articles:publish-due)
     ];
 
     // --- App\Cms\Contracts\Localizable (پل به ستونِ legacyِ lang) ---

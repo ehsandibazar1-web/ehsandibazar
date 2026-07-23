@@ -339,7 +339,16 @@ class SiteController extends Controller
     public function article($slug = null)
     {
         if (!empty($slug)) {
-            $article = Article::with('image')->where('slug', $slug)->where('status', 1)->first();
+            // پیش‌نمایشِ امنِ ادمین: فقط اگر درخواست ?preview=1 با «امضای معتبر» باشد، فیلترِ status=1
+            // برداشته می‌شود تا پیش‌نویس/زمان‌بندی‌شده هم دیده شود. درخواستِ عمومی (بدونِ امضا) دقیقاً
+            // مثلِ قبل فقط مقاله‌ی منتشرشده را می‌بیند — رفتارِ storefront بایت‌به‌بایت دست‌نخورده.
+            $isSignedPreview = request()->boolean('preview') && request()->hasValidSignature();
+
+            $query = Article::with('image')->where('slug', $slug);
+            if (! $isSignedPreview) {
+                $query->where('status', 1);
+            }
+            $article = $query->first();
 
             if (!$article) {
                 abort(404);

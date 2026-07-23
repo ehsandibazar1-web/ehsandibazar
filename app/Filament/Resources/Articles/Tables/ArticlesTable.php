@@ -4,18 +4,26 @@ namespace App\Filament\Resources\Articles\Tables;
 
 use App\Model\Article;
 use Filament\Actions\Action;
+use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Forms\Components\CheckboxList;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\TimePicker;
 use Filament\Notifications\Notification;
-use Filament\Tables\Columns\IconColumn;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
 
 class ArticlesTable
@@ -41,9 +49,15 @@ class ArticlesTable
                     ->badge()
                     ->color('gray'),
 
-                IconColumn::make('status')
-                    ->label('منتشر شده')
-                    ->boolean(),
+                TextColumn::make('status')
+                    ->label('وضعیت')
+                    ->badge()
+                    ->state(fn (Article $record): string => (int) $record->status === 1
+                        ? 'منتشرشده'
+                        : ($record->is_scheduled ? 'زمان‌بندی‌شده' : 'پیش‌نویس'))
+                    ->color(fn (Article $record): string => (int) $record->status === 1
+                        ? 'success'
+                        : ($record->is_scheduled ? 'warning' : 'gray')),
 
                 TextColumn::make('published_at')
                     ->label('انتشار')
@@ -91,20 +105,25 @@ class ArticlesTable
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
+                    self::scheduleBulkAction(),
+                    self::cancelScheduleBulkAction(),
                     DeleteBulkAction::make(),
                 ]),
             ])
             ->defaultSort('id', 'desc');
     }
 
-    // نمایش روی سایت (برای مقاله‌های منتشرشده؛ پیش‌نویس روی storefront ۴۰۴ می‌دهد).
+    // نمایش/پیش‌نمایش روی سایت — با «لینکِ امضاشده‌ی موقت» تا پیش‌نویس/زمان‌بندی‌شده هم (که روی
+    // storefront عادی ۴۰۴ می‌دهند) قابلِ دیدن باشند. لینک ۳۰ دقیقه معتبر است.
     private static function previewAction(): Action
     {
         return Action::make('preview')
             ->label('نمایش')
             ->icon('heroicon-o-eye')
             ->color('gray')
-            ->url(fn (Article $record): string => url('article/'.$record->slug))
+            ->url(fn (Article $record): string => (int) $record->status === 1
+                ? url('article/'.$record->slug)
+                : URL::temporarySignedRoute('site.article', now()->addMinutes(30), ['slug' => $record->slug, 'preview' => 1]))
             ->openUrlInNewTab();
     }
 
@@ -167,5 +186,141 @@ class ArticlesTable
 
                 Notification::make()->success()->title('به‌عنوانِ پیش‌نویسِ '.strtoupper($newLang).' کلون شد — یادتان باشد متن را ترجمه کنید')->send();
             });
+    }
+
+    // زمان‌بندیِ گروهی — به هر مقاله‌ی انتخاب‌شده یک تاریخِ انتشارِ آینده می‌دهد و is_scheduled=true
+    // می‌کند (status=0 می‌ماند تا دستورِ articles:publish-due در زمانِ مقرر منتشرش کند).
+    private static function scheduleBulkAction(): BulkAction
+    {
+        return BulkAction::make('bulkSchedule')
+            ->label('زمان‌بندیِ انتشار')
+            ->icon('heroicon-o-calendar-days')
+            ->color('warning')
+            ->schema([
+                Select::make('pattern')
+                    ->label('الگو')
+                    ->options([
+                        'daily' => 'روزی یک مقاله',
+                        'every_n_days' => 'هر چند روز یک مقاله',
+                        'weekly' => 'هفته‌ای یک مقاله',
+                        'specific_days' => 'فقط روزهای مشخصِ هفته',
+                    ])
+                    ->default('daily')
+                    ->live()
+                    ->required(),
+
+                TextInput::make('interval_days')
+                    ->label('هر چند روز؟')
+                    ->numeric()
+                    ->minValue(1)
+                    ->default(2)
+                    ->visible(fn (Get $get) => $get('pattern') === 'every_n_days')
+                    ->required(fn (Get $get) => $get('pattern') === 'every_n_days'),
+
+                CheckboxList::make('weekdays')
+                    ->label('کدام روزها؟')
+                    ->options([
+                        6 => 'شنبه', 0 => 'یکشنبه', 1 => 'دوشنبه', 2 => 'سه‌شنبه',
+                        3 => 'چهارشنبه', 4 => 'پنجشنبه', 5 => 'جمعه',
+                    ])
+                    ->columns(4)
+                    ->visible(fn (Get $get) => $get('pattern') === 'specific_days')
+                    ->required(fn (Get $get) => $get('pattern') === 'specific_days'),
+
+                DatePicker::make('start_date')
+                    ->label('تاریخِ شروع')
+                    ->default(now()->addDay()->toDateString())
+                    ->minDate(now()->toDateString())
+                    ->required(),
+
+                TimePicker::make('time')
+                    ->label('ساعتِ انتشار')
+                    ->seconds(false)
+                    ->default('09:00')
+                    ->required(),
+            ])
+            ->action(function (Collection $records, array $data): void {
+                $dates = self::buildScheduleDates(
+                    count: $records->count(),
+                    pattern: $data['pattern'],
+                    intervalDays: (int) ($data['interval_days'] ?? 1),
+                    weekdays: $data['weekdays'] ?? [],
+                    startDate: $data['start_date'],
+                    time: $data['time'],
+                );
+
+                $records->values()->each(function (Article $article, int $i) use ($dates): void {
+                    $article->update([
+                        'status' => 0,
+                        'is_scheduled' => true,
+                        'published_at' => $dates[$i],
+                    ]);
+                });
+
+                Notification::make()->success()
+                    ->title('زمان‌بندی روی '.$records->count().' مقاله اعمال شد')
+                    ->send();
+            })
+            ->deselectRecordsAfterCompletion();
+    }
+
+    // لغوِ زمان‌بندی — مقاله را به پیش‌نویسِ عادی برمی‌گرداند (is_scheduled=false, published_at=null).
+    private static function cancelScheduleBulkAction(): BulkAction
+    {
+        return BulkAction::make('cancelSchedule')
+            ->label('لغوِ زمان‌بندی (→ پیش‌نویس)')
+            ->icon('heroicon-o-x-circle')
+            ->color('gray')
+            ->requiresConfirmation()
+            ->action(function (Collection $records): void {
+                $count = 0;
+                foreach ($records as $article) {
+                    if ($article->is_scheduled) {
+                        $article->update(['is_scheduled' => false, 'published_at' => null]);
+                        $count++;
+                    }
+                }
+
+                Notification::make()->success()->title($count.' مقاله به پیش‌نویس برگشت')->send();
+            })
+            ->deselectRecordsAfterCompletion();
+    }
+
+    // محاسبه‌ی تاریخ‌های انتشار بر اساسِ الگو (روزانه/هر N روز/هفتگی/روزهای مشخص).
+    private static function buildScheduleDates(int $count, string $pattern, int $intervalDays, array $weekdays, string $startDate, string $time): array
+    {
+        $dates = [];
+        $cursor = Carbon::parse($startDate);
+
+        if ($pattern === 'specific_days') {
+            $weekdays = array_map('intval', $weekdays);
+            while (count($dates) < $count) {
+                if (in_array((int) $cursor->dayOfWeek, $weekdays, true)) {
+                    $dates[] = self::combine($cursor, $time);
+                }
+                $cursor = $cursor->copy()->addDay();
+            }
+
+            return $dates;
+        }
+
+        $step = match ($pattern) {
+            'weekly' => 7,
+            'every_n_days' => max(1, $intervalDays),
+            default => 1,
+        };
+
+        for ($i = 0; $i < $count; $i++) {
+            $dates[] = self::combine($cursor->copy()->addDays($i * $step), $time);
+        }
+
+        return $dates;
+    }
+
+    private static function combine(Carbon $date, string $time): Carbon
+    {
+        [$hour, $minute] = array_pad(explode(':', $time), 2, '0');
+
+        return $date->copy()->setTime((int) $hour, (int) $minute);
     }
 }
