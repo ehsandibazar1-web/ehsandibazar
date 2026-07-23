@@ -80,7 +80,7 @@ class PagesTable
 
                 SelectFilter::make('lang')
                     ->label('زبان')
-                    ->options(['fa' => 'فارسی', 'en' => 'English', 'tr' => 'Türkçe']),
+                    ->options(['fa' => 'فارسی', 'en' => 'English']),
             ])
             ->recordActions([
                 self::previewAction(),

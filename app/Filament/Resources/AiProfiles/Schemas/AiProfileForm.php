@@ -25,7 +25,7 @@ class AiProfileForm
 
                 Select::make('default_language')
                     ->label('Default language')
-                    ->options(['en' => 'English', 'tr' => 'Türkçe'])
+                    ->options(['fa' => 'فارسی', 'en' => 'English'])
                     ->nullable()
                     ->helperText('Used only when the pasted content does not specify a language itself.'),
 

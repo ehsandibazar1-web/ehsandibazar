@@ -49,7 +49,7 @@ class BrandMemory extends Page implements HasForms
 
     // زبان‌های مقدارِ حافظه‌ی برند — جدا از زبان‌های واقعی سایت (en/tr در Article/Page)؛ fa اینجا
     // فقط برای محتوای مرجع/دانش برند مجاز است، نه یک لوکیل واقعی صفحات عمومی (نگاه کنید به CLAUDE.md)
-    public const LOCALES = ['en' => 'English', 'tr' => 'Turkish', 'fa' => 'Persian'];
+    public const LOCALES = ['fa' => 'Persian', 'en' => 'English'];
 
     public ?array $data = [];
 
@@ -231,9 +231,9 @@ class BrandMemory extends Page implements HasForms
                         ->visible(fn (Get $get) => filled($get('field'))),
                     Select::make('locale')
                         ->label('Content locale')
-                        ->options(['en' => 'English', 'tr' => 'Turkish'])
+                        ->options(['fa' => 'Persian', 'en' => 'English'])
                         ->native(false)
-                        ->default('en')
+                        ->default('fa')
                         ->required(),
                 ])
                 ->action(function (array $data): void {

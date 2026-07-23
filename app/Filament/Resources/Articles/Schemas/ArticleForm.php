@@ -28,7 +28,7 @@ class ArticleForm
             ->components([
                 Select::make('lang')
                     ->label('زبان')
-                    ->options(['fa' => 'فارسی', 'en' => 'English', 'tr' => 'Türkçe'])
+                    ->options(['fa' => 'فارسی', 'en' => 'English'])
                     ->default('fa')
                     ->required(),
 

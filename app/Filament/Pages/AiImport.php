@@ -80,7 +80,6 @@ class AiImport extends Page implements HasForms
                             ->options([
                                 'fa' => 'فارسی',
                                 'en' => 'English',
-                                'tr' => 'Türkçe',
                             ])
                             ->default('fa')
                             ->selectablePlaceholder(false),
