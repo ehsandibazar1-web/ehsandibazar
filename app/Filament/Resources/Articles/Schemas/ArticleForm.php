@@ -56,6 +56,20 @@ class ArticleForm
                     ->nullable()
                     ->helperText('اختیاری — اگر این نسخه‌ی زبانِ دیگرِ یک مقاله‌ی موجود است، آن را اینجا انتخاب کنید.'),
 
+                // دسته‌بندی — به رابطه‌ی categories() (morphToMany روی categorizables) وصل است و فقط
+                // دسته‌های نوعِ مقاله (type=Article، فعال) را نشان می‌دهد. همان دسته‌هایی که storefront
+                // (/category/…) و فهرستِ مقاله‌ها از آن استفاده می‌کنند — بدونِ تغییرِ جدول.
+                Select::make('categories')
+                    ->label('دسته‌بندی')
+                    ->relationship('categories', 'title', fn ($query) => $query
+                        ->where('type', Article::class)
+                        ->where('status', 1)
+                        ->orderBy('sorting'))
+                    ->multiple()
+                    ->preload()
+                    ->searchable()
+                    ->helperText('دسته‌های مقاله که روی سایت و صفحه‌ی /category نمایش داده می‌شوند.'),
+
                 // فیلدِ برچسب — به رابطه‌ی موجودِ tags() (morphToMany روی taggables) وصل است، نه به
                 // کلاسِ خاص. وقتی در موج ۵ MorphMap فعال و جدولِ tags همگرا شود، این کد بدونِ بازنویسی
                 // کار می‌کند (حداکثر 'title' به 'name' تغییر می‌کند). صفر تغییرِ جدول/URL الان.
