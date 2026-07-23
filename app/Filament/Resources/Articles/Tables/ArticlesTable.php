@@ -18,6 +18,7 @@ use Filament\Notifications\Notification;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
@@ -95,6 +96,13 @@ class ArticlesTable
                 SelectFilter::make('lang')
                     ->label('زبان')
                     ->options(['fa' => 'فارسی', 'en' => 'English']),
+
+                // مقاله‌های فارسی که هنوز نسخه‌ی انگلیسی ندارند (کاندیدِ ترجمه).
+                Filter::make('needs_en_translation')
+                    ->label('فارسیِ بدونِ ترجمه‌ی انگلیسی')
+                    ->query(fn ($query) => $query
+                        ->where('lang', 'fa')
+                        ->whereDoesntHave('translations', fn ($q) => $q->where('lang', 'en'))),
             ])
             ->recordActions([
                 self::previewAction(),
