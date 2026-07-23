@@ -36,9 +36,9 @@ class Comment extends Model
         $v = verta($value);
         switch (app()->getLocale()) {
             case('fa');
-                return $this->attributes['created_at'] = $v->formatGregorian('H:i Y/m/d ');
+                return $v->formatGregorian('H:i Y/m/d ');
             case('en');
-                return $this->attributes['created_at'] = $v->format('%d %B %Y H:i');
+                return $v->format('%d %B %Y H:i');
 
         }
     }

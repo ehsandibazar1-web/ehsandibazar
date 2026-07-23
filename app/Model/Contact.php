@@ -25,6 +25,6 @@ class Contact extends Model
     public function getCreatedAtAttribute($value)
     {
         $v = verta($value);
-        return $this->attributes['created_at'] = $v->format('%d %B %Y - H:i');
+        return $v->format('%d %B %Y - H:i');
     }
 }

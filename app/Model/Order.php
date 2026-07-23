@@ -70,12 +70,14 @@ class Order extends Model
 
     public function getCreatedAtAttribute($value)
     {
+        // بدونِ نوشتنِ دوباره در attributes (نگاه کنید به Article): وگرنه بارِ دومِ خواندن در
+        // رندرِ Livewire/Filament، verta() را روی رشته‌ی شمسیِ ساخته‌شده اجرا می‌کرد و فتال می‌داد.
         $v = verta($value);
         switch (app()->getLocale()) {
             case('fa');
-                return $this->attributes['created_at'] = $v->format('%d %B %Y H:i');
+                return $v->format('%d %B %Y H:i');
             case('en');
-                return $this->attributes['created_at'] = $v->formatGregorian('d m Y');
+                return $v->formatGregorian('d m Y');
         }
     }
 

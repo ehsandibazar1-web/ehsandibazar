@@ -169,9 +169,9 @@ class Product extends Model
         $v = verta($value);
         switch (app()->getLocale()) {
             case('fa');
-                return $this->attributes['created_at'] = $v->format('%d %B %Y H:i:s');
+                return $v->format('%d %B %Y H:i:s');
             case('en');
-                return $this->attributes['created_at'] = $v->formatGregorian('d m Y H:i:s');
+                return $v->formatGregorian('d m Y H:i:s');
         }
     }
 
@@ -180,9 +180,9 @@ class Product extends Model
         $v = verta($value);
         switch (app()->getLocale()) {
             case('fa');
-                return $this->attributes['created_at'] = $v->format('%d %B %Y H:i:s');
+                return $v->format('%d %B %Y H:i:s');
             case('en');
-                return $this->attributes['created_at'] = $v->formatGregorian('d m Y H:i:s');
+                return $v->formatGregorian('d m Y H:i:s');
         }
     }
 
