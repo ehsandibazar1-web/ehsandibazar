@@ -5,6 +5,7 @@ namespace App\Filament\Pages;
 use App\Filament\Resources\Articles\ArticleResource;
 use App\Model\Article;
 use App\Models\ImportLog;
+use App\Services\ArticleImport\ArticleRoundtripExporter;
 use App\Services\Content\ContentDraftFactory;
 use BackedEnum;
 use Filament\Forms\Components\Select;
@@ -53,6 +54,13 @@ class AiImport extends Page implements HasForms
 
     /** اطلاعاتِ آخرین ایمپورتِ موفق — برای نمایشِ کارتِ نتیجه در ویو. */
     public ?array $importedInfo = null;
+
+    /**
+     * حالتِ «ویرایشِ مقاله‌ی موجود» — وقتی فایلِ ورودی idِ مقاله دارد. پیش‌نمایشِ تغییرات و
+     * payload ذخیره می‌شود تا با تأییدِ کاربر اعمال شود.
+     * @var array{article_id:int, title:string, slug:string, changes:array, slug_ignored:bool, incoming_slug:?string, conflict:bool, payload:array}|null
+     */
+    public ?array $pendingUpdate = null;
 
     public function mount(): void
     {
@@ -151,6 +159,15 @@ class AiImport extends Page implements HasForms
             return;
         }
 
+        // چرخه‌ی ویرایشِ AI: اگر فایل idِ مقاله داشته باشد، به‌جای ساختِ درافتِ جدید، پیش‌نمایشِ
+        // آپدیتِ همان مقاله را نشان می‌دهیم (اعمال با تأییدِ کاربر). عنوان/متن اینجا الزامی نیستند
+        // چون ممکن است AI فقط سئو را عوض کرده باشد.
+        if (filled($payload['id'] ?? null)) {
+            $this->prepareUpdatePreview((int) $payload['id'], $payload);
+
+            return;
+        }
+
         if (blank($payload['title'] ?? null) || blank($payload['body'] ?? null)) {
             Notification::make()->danger()->title('عنوان و متن مقاله الزامی‌اند')->send();
 
@@ -204,6 +221,100 @@ class AiImport extends Page implements HasForms
         ]);
 
         Notification::make()->success()->title('مقاله ایمپورت شد: '.$article->title)->send();
+    }
+
+    /** ساختِ پیش‌نمایشِ آپدیت (بدونِ ذخیره) وقتی فایل idِ مقاله دارد. */
+    private function prepareUpdatePreview(int $articleId, array $payload): void
+    {
+        $article = Article::find($articleId);
+        if (! $article) {
+            Notification::make()->danger()->title('مقاله پیدا نشد')
+                ->body('شناسه‌ی داخلِ فایل ('.$articleId.') به هیچ مقاله‌ای اشاره نمی‌کند.')->send();
+
+            return;
+        }
+
+        $result = app(ContentDraftFactory::class)->updateArticleFromPayload($article, $payload, apply: false);
+
+        // تشخیصِ تعارض: هشِ فعلیِ مقاله با هشِ جاسازی‌شده در فایل مقایسه می‌شود.
+        $conflict = false;
+        if (filled($payload['_content_hash'] ?? null)) {
+            $conflict = ArticleRoundtripExporter::contentHash($article) !== $payload['_content_hash'];
+        }
+
+        if ($result['changes'] === [] && ! $result['slug_ignored']) {
+            Notification::make()->info()->title('تغییری یافت نشد')
+                ->body('محتوای فایل با مقاله‌ی فعلی یکسان است.')->send();
+            $this->pendingUpdate = null;
+
+            return;
+        }
+
+        $this->importedInfo = null;
+        $this->pendingUpdate = [
+            'article_id' => $article->id,
+            'title' => (string) $article->title,
+            'slug' => (string) $article->slug,
+            'changes' => $result['changes'],
+            'slug_ignored' => $result['slug_ignored'],
+            'incoming_slug' => $result['incoming_slug'],
+            'conflict' => $conflict,
+            'payload' => $payload,
+        ];
+    }
+
+    /** اعمالِ آپدیتِ پیش‌نمایش‌شده روی همان مقاله (slug/وضعیت/مالک دست‌نخورده). */
+    public function confirmUpdate(): void
+    {
+        if (! $this->pendingUpdate) {
+            return;
+        }
+
+        $article = Article::find($this->pendingUpdate['article_id']);
+        if (! $article) {
+            Notification::make()->danger()->title('مقاله دیگر موجود نیست')->send();
+            $this->pendingUpdate = null;
+
+            return;
+        }
+
+        try {
+            $result = app(ContentDraftFactory::class)
+                ->updateArticleFromPayload($article, $this->pendingUpdate['payload'], apply: true);
+        } catch (Throwable $e) {
+            Notification::make()->danger()->title('به‌روزرسانی ناموفق بود')->body($e->getMessage())->send();
+
+            return;
+        }
+
+        ImportLog::create([
+            'user_id' => auth()->id(),
+            'source' => 'panel',
+            'format' => 'roundtrip',
+            'status' => 'updated',
+            'article_id' => $article->id,
+            'article_title' => $article->title,
+            'locale' => $article->lang,
+        ]);
+
+        $changed = count($result['changes']);
+        $this->pendingUpdate = null;
+        $this->importedInfo = [
+            'title' => $article->title,
+            'published' => (int) $article->status === 1,
+            'edit_url' => ArticleResource::getUrl('edit', ['record' => $article->id]),
+        ];
+
+        $this->form->fill(['locale' => $article->lang, 'status' => 'draft', 'title' => '', 'body' => '', 'excerpt' => '', 'tags' => '', 'json' => '']);
+
+        Notification::make()->success()->title('مقاله به‌روزرسانی شد: '.$article->title)
+            ->body($changed.' فیلد تغییر کرد؛ نشانیِ صفحه (slug) دست‌نخورده ماند.')->send();
+    }
+
+    /** لغوِ پیش‌نمایشِ آپدیت. */
+    public function cancelUpdate(): void
+    {
+        $this->pendingUpdate = null;
     }
 
     /**
@@ -271,6 +382,9 @@ class AiImport extends Page implements HasForms
         $tags = $raw['tags'] ?? null;
 
         $payload = [
+            // شناسه‌ی چرخه‌ی ویرایشِ AI — اگر باشد، به‌جای ساختِ درافتِ جدید، همان مقاله آپدیت می‌شود.
+            'id' => $raw['id'] ?? $raw['article_id'] ?? null,
+            '_content_hash' => $raw['_content_hash'] ?? null,
             'locale' => $raw['locale'] ?? $raw['language'] ?? $raw['lang'] ?? null,
             'title' => $raw['title'] ?? null,
             'slug' => $raw['slug'] ?? null,

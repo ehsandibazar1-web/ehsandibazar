@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Articles\Tables;
 
 use App\Model\Article;
+use App\Services\ArticleImport\ArticleRoundtripExporter;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
@@ -113,6 +114,7 @@ class ArticlesTable
             ])
             ->recordActions([
                 self::previewAction(),
+                self::exportForAiAction(),
                 self::duplicateAction(),
                 self::cloneTranslationAction(),
                 EditAction::make(),
@@ -161,6 +163,34 @@ class ArticlesTable
                 $copy->save();
 
                 Notification::make()->success()->title('مقاله به‌عنوانِ پیش‌نویسِ جدید تکثیر شد')->send();
+            });
+    }
+
+    // چرخه‌ی ویرایشِ AI: مقاله را به فرمتِ قابلِ‌فهمِ AI Import دانلود می‌کند (با idِ مخفی) تا بعد از
+    // ویرایشِ AI، از همان صفحه‌ی AI Import دوباره وارد شود و «همین مقاله» آپدیت شود (نه درافتِ جدید).
+    private static function exportForAiAction(): Action
+    {
+        return Action::make('exportForAi')
+            ->label('دانلود برای ویرایشِ AI')
+            ->icon('heroicon-o-arrow-down-tray')
+            ->color('gray')
+            ->modalHeading('دانلود برای ویرایشِ هوشِ مصنوعی')
+            ->modalDescription('فایل شاملِ یک شناسه‌ی مخفی است؛ بعد از ویرایشِ AI، همین فایل را در صفحه‌ی «AI Import» بارگذاری کنید تا همین مقاله به‌روزرسانی شود. نشانیِ صفحه (slug) هرگز تغییر نمی‌کند.')
+            ->schema([
+                Select::make('format')
+                    ->label('فرمت')
+                    ->options(['json' => 'JSON (پیشنهادی — بدونِ افتِ داده)', 'markdown' => 'Markdown'])
+                    ->default('json')
+                    ->required(),
+            ])
+            ->action(function (Article $record, array $data) {
+                $export = app(ArticleRoundtripExporter::class)->export($record, $data['format'] ?? 'json');
+
+                return response()->streamDownload(
+                    fn () => print ($export['content']),
+                    $export['filename'],
+                    ['Content-Type' => $export['mime'].'; charset=UTF-8'],
+                );
             });
     }
 

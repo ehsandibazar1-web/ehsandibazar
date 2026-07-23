@@ -68,6 +68,69 @@ class ContentDraftFactory
         return $article;
     }
 
+    /** فیلدهایی که در چرخه‌ی «خروجی → ویرایشِ AI → ورودی» قابلِ به‌روزرسانی‌اند (فقط محتوا/سئو). */
+    public const ROUNDTRIP_UPDATABLE = [
+        'title', 'body', 'excerpt',
+        'seo_title', 'meta_description', 'canonical_url', 'robots',
+        'og_title', 'og_description',
+        'image_alt', 'author_name', 'reading_time',
+    ];
+
+    /**
+     * به‌روزرسانیِ یک مقاله‌ی موجود از payload — فقط فیلدهای محتوا/سئو. خطوطِ قرمز که هرگز از فایل
+     * عوض نمی‌شوند: slug (URL)، status/published_at (وضعیتِ انتشار)، user_id، lang، translation_of،
+     * viewCount. اگر $apply=false باشد چیزی ذخیره نمی‌شود (برای پیش‌نمایش). خروجی:
+     *   ['changes' => [field => ['old'=>..,'new'=>..]], 'slug_ignored' => bool, 'incoming_slug' => ?string]
+     *
+     * @return array{changes: array<string, array{old: mixed, new: mixed}>, slug_ignored: bool, incoming_slug: ?string}
+     */
+    public function updateArticleFromPayload(Article $article, array $payload, bool $apply = true): array
+    {
+        $changes = [];
+        $dirty = [];
+
+        foreach (self::ROUNDTRIP_UPDATABLE as $field) {
+            if (! array_key_exists($field, $payload) || $payload[$field] === null) {
+                continue;
+            }
+            $new = $payload[$field];
+            $old = $article->getAttribute($field);
+            if ((string) $old !== (string) $new) {
+                $changes[$field] = ['old' => $old, 'new' => $new];
+                $dirty[$field] = $new;
+            }
+        }
+
+        // faqs (آرایه) — مقایسه‌ی ساختاری.
+        if (array_key_exists('faqs', $payload) && is_array($payload['faqs'])) {
+            $oldFaqs = is_array($article->faqs) ? $article->faqs : [];
+            if (json_encode($oldFaqs, JSON_UNESCAPED_UNICODE) !== json_encode($payload['faqs'], JSON_UNESCAPED_UNICODE)) {
+                $changes['faqs'] = ['old' => count($oldFaqs).' مورد', 'new' => count($payload['faqs']).' مورد'];
+                $dirty['faqs'] = $payload['faqs'];
+            }
+        }
+
+        // خطِ قرمزِ URL: slug هرگز از فایل تغییر نمی‌کند — فقط تشخیص می‌دهیم که AI عوضش کرده یا نه.
+        $incomingSlug = $payload['slug'] ?? null;
+        $slugIgnored = filled($incomingSlug) && (string) $incomingSlug !== (string) $article->slug;
+
+        if ($apply && $dirty !== []) {
+            // فقط $dirty نوشته می‌شود؛ slug/status/user_id/lang در آن نیستند پس دست‌نخورده می‌مانند.
+            $article->update($dirty);
+
+            // تگ‌ها (اگر در فایل آمده) دوباره همگام می‌شوند.
+            if (isset($payload['tags']) && is_array($payload['tags'])) {
+                $this->attachTags($article, $payload, $article->lang);
+            }
+        }
+
+        return [
+            'changes' => $changes,
+            'slug_ignored' => $slugIgnored,
+            'incoming_slug' => $incomingSlug,
+        ];
+    }
+
     /**
      * ساختِ پیش‌نویسِ Page از payloadِ شکل‌گرفته‌ی Contract.
      */
