@@ -138,7 +138,8 @@
 
                                                                     </table>
                                                                     <hr>
-                                                                    @if($detailsUser['addressSession'])
+                                                                    {{-- گاردِ ایمنی: روی دیتای ناقص، $detailsUser می‌تواند false شود؛ isset از کرشِ array-offset-on-false جلوگیری می‌کند. --}}
+                                                                    @if(isset($detailsUser['addressSession']->province->id))
                                                                         <p> @lang('cms.address-1') : </p>
                                                                         <p> {!! \App\Utility\getProvinceAndCity::getProvinceAndCity($detailsUser['addressSession']->province->id , $detailsUser['addressSession']->city_id)  !!} </p>
                                                                         <p> {{$detailsUser['addressSession']->fullAddress ?? ""}} </p>
@@ -172,7 +173,8 @@
 
                                                                     @foreach($order->orderItem as $orderItems)
                                                                         @if(isset($orderItems->details) && !empty($orderItems->details))
-                                                                            @php $unserializeOrderItems = unserialize($orderItems->details); @endphp
+                                                                            @php $unserializeOrderItems = @unserialize($orderItems->details); @endphp
+                                                                            @if(is_array($unserializeOrderItems) && isset($unserializeOrderItems['item']))
                                                                             <tr>
                                                                                 <td class="text-center">{{$loop->iteration}}</td>
                                                                                 <td class="text-center"><img
@@ -191,12 +193,12 @@
                                                                                 <td class="text-center">{{isset($orderItems->product->variations[0]) && !empty($orderItems->product->variations[0]) ? number_format($orderItems->product->variations[0]->price) : 'قیمت در دسترس نیست' }}</td>
                                                                                 <td class="text-center">
                                                                                     @if(!$orderItems->order->user->isColleague())
-                                                                                        @if(isset($orderItems->amount_discount) && $orderItems->amount_discount > 0 && !empty($orderItems->amount_discount) && !empty($orderItems->discount))
+                                                                                        @if(isset($orderItems->amount_discount) && $orderItems->amount_discount > 0 && !empty($orderItems->amount_discount) && !empty($orderItems->discount) && is_object(@unserialize($orderItems->discount)))
                                                                                             {!! number_format($orderItems->amount_discount) !!}
                                                                                             -( {!!   unserialize($orderItems->discount)->baseon == \App\Utility\DiscountType::cent ? '<b style=color:red>%</b>'.unserialize($orderItems->discount)->cent : number_format(unserialize($orderItems->discount)->cent).' تومان '  !!}
                                                                                             )
 
-                                                                                        @elseif(isset($orderItems->discount) && !empty($orderItems->discount) )
+                                                                                        @elseif(isset($orderItems->discount) && !empty($orderItems->discount) && is_object(@unserialize($orderItems->discount)) )
                                                                                             {{--                                                                        @dd($orderItems->discount)--}}
                                                                                             @if($orderItems->itemCount > unserialize($orderItems->discount)->count_buy)
                                                                                                 ( {!!   unserialize($orderItems->discount)->baseon == \App\Utility\DiscountType::cent ? '<b style=color:red>%</b>'.unserialize($orderItems->discount)->cent : number_format(unserialize($orderItems->discount)->cent).' تومان '  !!}
@@ -222,11 +224,12 @@
                                                                                     @endif
                                                                                 </td>
                                                                             </tr>
+                                                                            @endif
                                                                         @endif
 
                                                                         @php
-                                                                            $totalPrice += $unserializeOrderItems['price'];
-                                                                           $totalDiscount += isset($orderItems->amount_discount) && !empty($orderItems->amount_discount) ? $unserializeOrderItems['item']->price - $orderItems->amount_discount : 0;
+                                                                            $totalPrice += (isset($unserializeOrderItems['price']) ? $unserializeOrderItems['price'] : 0);
+                                                                           $totalDiscount += isset($orderItems->amount_discount) && !empty($orderItems->amount_discount) && isset($unserializeOrderItems['item']) ? $unserializeOrderItems['item']->price - $orderItems->amount_discount : 0;
                                                                         @endphp
 
 
@@ -237,8 +240,8 @@
                                                         </div>
                                                         @if(isset($order) && !empty($order->total_amount))
                                                             <?php
-                                                            $userUnserialize = unserialize($order->user_info);
-                                                            $getLevelForDiscountStoreBrand = $userUnserialize['userLogin'] ?  $userUnserialize['userLogin']->level : '';
+                                                            $userUnserialize = @unserialize($order->user_info);
+                                                            $getLevelForDiscountStoreBrand = (is_array($userUnserialize) && isset($userUnserialize['userLogin'])) ?  $userUnserialize['userLogin']->level : '';
                                                             ?>
                                                             <?php $tax = \App\Utility\taxCalculate::getTax($order->total_amount, $totalPrice); ?>
 
@@ -248,7 +251,7 @@
                                                                     @if($order->user->isColleague())
                                                                         <div class="last-activity">
                                                                             <p style="color: red">تخفیف :
-                                                                                {{ unserialize($order->user_info)['userLogin']->discount_percent }}
+                                                                                {{ (is_array($userUnserialize) && isset($userUnserialize['userLogin'])) ? $userUnserialize['userLogin']->discount_percent : 0 }}
                                                                                 %
                                                                             </p>
                                                                         </div>

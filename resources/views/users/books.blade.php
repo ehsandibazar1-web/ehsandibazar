@@ -73,14 +73,14 @@
                                                                     <div class="price-value">
                                                                         <div class="price-value-wrapper">
                                                                             @if($product->type=App\Utility\ProductType::PDF)
-                                                                                    @if($product->variations && $product->variations[0]->price)
+                                                                                    @if(isset($product->variations[0]) && $product->variations[0]->price)
                                                                                         {{number_format($product->variations[0]->price,0)}} تومان
                                                                                      @else
                                                                                          رایگان
                                                                                      @endif
                                                                             @elseif($product->type=App\Utility\ProductType::SIMPLE)
-                                                                                    @if($product->variations && $product->variations[0]->count)
-                                                                                        @if($product->variations && $product->variations[0]->price)
+                                                                                    @if(isset($product->variations[0]) && $product->variations[0]->count)
+                                                                                        @if(isset($product->variations[0]) && $product->variations[0]->price)
                                                                                             {{number_format($product->variations[0]->price,0)}} تومان
                                                                                         @lese
                                                                                             رایگان
