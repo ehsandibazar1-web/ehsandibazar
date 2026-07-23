@@ -121,6 +121,40 @@ function lazyLoadAparatIframes(string $html): string
 }
 
 /**
+ * Perf Fix: بارگذاری تنبل ویدیوهای آپارات که با کد رسمی embed (نه iframe خام)
+ * جاسازی شده‌اند: <div id="..."><script src="https://www.aparat.com/embed/..."></script></div>
+ * این همان الگویی است که واقعاً در محتوای صفحات/مقالات استفاده شده (نه iframe خام)،
+ * پس lazyLoadAparatIframes() روی این محتوا اثری نداشت.
+ * این تابع تگ <script> را با type="text/plain" غیرفعال (neutralize) می‌کند تا مرورگر
+ * موقع پارس اولیه آن را اجرا نکند؛ یک اسکریپت کوچک سمت کلاینت (در master.blade.php)
+ * وقتی این placeholder به viewport نزدیک شد، دوباره همان <script> را با src واقعی
+ * می‌سازد تا ویجت آپارات مثل قبل اجرا و ویدیو تزریق شود.
+ */
+function lazyLoadAparatScriptEmbeds(string $html): string
+{
+    return preg_replace_callback(
+        '/<script\b([^>]*)>\s*<\/script>/i',
+        function ($matches) {
+            $attrs = $matches[1];
+
+            if (!preg_match('/\bsrc\s*=\s*(["\'])[^"\']*aparat\.com\/embed\/[^"\']*\1/i', $attrs)) {
+                return $matches[0];
+            }
+
+            if (preg_match('/\btype\s*=\s*(["\'])[^"\']*\1/i', $attrs)) {
+                $attrs = preg_replace('/\btype\s*=\s*(["\'])[^"\']*\1/i', 'type="text/plain"', $attrs);
+            } else {
+                $attrs .= ' type="text/plain"';
+            }
+            $attrs .= ' data-aparat-lazy="1"';
+
+            return '<script' . $attrs . '></script>';
+        },
+        $html
+    );
+}
+
+/**
  * CLS Fix: ساخت فهرست مطالب (TOC) به صورت سمت سرور.
  * به جای اینکه جاوااسکریپت بعد از لود صفحه لیست را داخل DOM تزریق کند
  * (که باعث Layout Shift در #article-content می‌شد)، این تابع از قبل

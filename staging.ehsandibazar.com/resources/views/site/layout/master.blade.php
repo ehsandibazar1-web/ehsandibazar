@@ -186,6 +186,42 @@
 <script src="{{ asset('site_themes/js/main-min.js') }}"></script>
 <script src="{{ asset('site_themes/js/script.js') }}"></script>
 <script>
+    // Perf Fix: فعال‌سازی تنبل embed های آپارات که سمت سرور با type="text/plain"
+    // غیرفعال شده‌اند (lazyLoadAparatScriptEmbeds در app/Helper/Helper.php).
+    // وقتی placeholder به viewport نزدیک شد، همان <script src="...aparat.com/embed/...">
+    // را دوباره می‌سازیم تا ویجت آپارات مثل حالت عادی اجرا و ویدیو تزریق شود.
+    (function() {
+        var placeholders = document.querySelectorAll('script[data-aparat-lazy]');
+        if (!placeholders.length) return;
+
+        function activate(ph) {
+            var real = document.createElement('script');
+            real.src = ph.getAttribute('src');
+            real.async = true;
+            ph.parentNode.insertBefore(real, ph);
+            ph.parentNode.removeChild(ph);
+        }
+
+        if (!('IntersectionObserver' in window)) {
+            Array.prototype.forEach.call(placeholders, activate);
+            return;
+        }
+
+        var io = new IntersectionObserver(function(entries) {
+            entries.forEach(function(entry) {
+                if (!entry.isIntersecting) return;
+                io.unobserve(entry.target);
+                var ph = entry.target.querySelector('script[data-aparat-lazy]');
+                if (ph) activate(ph);
+            });
+        }, {rootMargin: '800px 0px'});
+
+        Array.prototype.forEach.call(placeholders, function(ph) {
+            io.observe(ph.parentElement || ph);
+        });
+    })();
+</script>
+<script>
     // Video Modal Fix: modal ساده بدون پلاگین (رفع باگ چند modal همزمان)
     (function() {
         if (!window._videoQueue || !window._videoQueue.length) return;
