@@ -94,6 +94,33 @@ function fixImageDimensions(string $html): string
 }
 
 /**
+ * Perf Fix: بارگذاری تنبل (lazy) iframeهای ویدیوی آپارات.
+ * هر ویدیوی آپارات به‌تنهایی چند مگابایت پلیر/فونت جاوااسکریپت بارگذاری می‌کند؛
+ * وقتی چند ویدیو در یک صفحه باشد، بارگذاری هم‌زمان همه‌ی آن‌ها صفحه را بسیار کند می‌کند.
+ * با افزودن loading="lazy" مرورگر تا نزدیک‌شدن iframe به viewport صبر می‌کند.
+ */
+function lazyLoadAparatIframes(string $html): string
+{
+    return preg_replace_callback(
+        '/<iframe([^>]*)>/i',
+        function ($matches) {
+            $attrs = $matches[1];
+
+            if (!preg_match('/\bsrc\s*=\s*(["\'])[^"\']*aparat\.com[^"\']*\1/i', $attrs)) {
+                return $matches[0];
+            }
+
+            if (!preg_match('/\bloading\s*=\s*"/i', $attrs)) {
+                $attrs .= ' loading="lazy"';
+            }
+
+            return '<iframe' . $attrs . '>';
+        },
+        $html
+    );
+}
+
+/**
  * CLS Fix: ساخت فهرست مطالب (TOC) به صورت سمت سرور.
  * به جای اینکه جاوااسکریپت بعد از لود صفحه لیست را داخل DOM تزریق کند
  * (که باعث Layout Shift در #article-content می‌شد)، این تابع از قبل
