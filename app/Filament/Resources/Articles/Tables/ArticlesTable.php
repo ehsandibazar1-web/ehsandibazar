@@ -103,6 +103,13 @@ class ArticlesTable
                     ->query(fn ($query) => $query
                         ->where('lang', 'fa')
                         ->whereDoesntHave('translations', fn ($q) => $q->where('lang', 'en'))),
+
+                // مقاله‌های منتشرشده‌ی بدونِ توضیحاتِ متا (شکافِ سئو — برای گوگل مهم است).
+                Filter::make('missing_meta_description')
+                    ->label('منتشرشده‌ی بدونِ توضیحاتِ متا')
+                    ->query(fn ($query) => $query
+                        ->where('status', 1)
+                        ->where(fn ($q) => $q->whereNull('meta_description')->orWhere('meta_description', ''))),
             ])
             ->recordActions([
                 self::previewAction(),
