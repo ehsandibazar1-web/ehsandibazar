@@ -43,12 +43,19 @@ class ArticlesTable
                     ->height(40)
                     ->square()
                     ->getStateUsing(function (Article $record): ?string {
+                        // ۱) image_path روی دیسکِ public — فقط اگر فایلش واقعاً موجود باشد.
+                        if (filled($record->image_path)
+                            && \Illuminate\Support\Facades\Storage::disk('public')->exists($record->image_path)) {
+                            return \Illuminate\Support\Facades\Storage::disk('public')->url($record->image_path);
+                        }
+                        // ۲) رابطه‌ی زنده‌ی image() — فقط اگر فایلش روی سرور باشد (استیجینگ ممکن است
+                        // رکوردِ عکس را داشته باشد ولی فایلش را نه؛ در آن صورت به‌جای عکسِ شکسته، خالی).
                         $img = $record->image->first();
                         if ($img && ($raw = $img->getRawOriginal('url'))) {
-                            return url($raw);
-                        }
-                        if (filled($record->image_path)) {
-                            return \Illuminate\Support\Facades\Storage::disk('public')->url($record->image_path);
+                            $rel = ltrim((string) $raw, '/');
+                            if ($rel !== '' && is_file(public_path($rel))) {
+                                return url($raw);
+                            }
                         }
 
                         return null;
