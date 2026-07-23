@@ -22,11 +22,21 @@ class LoginController extends Controller
 
     public function redirectTo()
     {
-        if (auth()->user()->isSuperAdmin() || auth()->user()->isAdmin()) {
-            return 'panel/manager/';
-        } else {
-            return '/panel/users/';
+        $user = auth()->user();
+
+        // ادمین/سوپرادمین → پنلِ جدیدِ Filament. فقط همین‌ها canAccessPanel دارند
+        // (متدِ User::canAccessPanel = isSuperAdminOrAdmin)، پس دقیقاً همین شرط تا حلقه‌ی ۴۰۳ رخ ندهد.
+        if ($user->isSuperAdminOrAdmin()) {
+            return '/adminpanel';
         }
+
+        // اپراتور و سایرِ کارکنانِ پنلِ قدیمی که هنوز به پنلِ جدید دسترسی ندارند → پنلِ قدیمی.
+        if ($user->isAdmin() || $user->isOperator()) {
+            return 'panel/manager/';
+        }
+
+        // مشتریِ عادی → داشبوردِ کاربریِ خودش (بدونِ تغییر).
+        return '/panel/users/';
     }
     public function __construct()
     {
