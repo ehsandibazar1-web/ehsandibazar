@@ -119,6 +119,55 @@ Route::group(['middleware' => ['auth:web'], 'prefix' => 'panel'], function () {
         })->name('panel.media-backfill');
         // ============================== Media Library backfill ================
 
+        // ============================== storage symlink fix ==================
+        // روی production سایت با rewrite از public_html به main-app/public سرو می‌شود و APP_URL به
+        // «/public» ختم می‌شود، پس Image::url آدرسِ /public/storage/... می‌سازد. فایل‌های آپلودشده‌ی
+        // موجود در public_html/storage/app/public هستند، ولی symlinkِ /public/storage → storage/app/public
+        // وجود ندارد، برای همین همه‌ی عکس‌های اصلیِ محصول/مقاله می‌شکنند. این ابزار آن symlink را می‌سازد
+        // (فقط اضافه می‌کند؛ هیچ فایلی حذف/جابه‌جا نمی‌شود) و استوریجِ اپ را هم با انبارِ مشترک یکی می‌کند
+        // تا آپلودهای جدید هم همان‌جا بروند. idempotent و امن.
+        Route::get('maintenance/storage-fix', function () {
+            $out = [];
+            $publicHtml = dirname(base_path());               // .../public_html  (اپ در public_html/main-app است)
+            $shared = $publicHtml.'/storage/app/public';       // جای واقعیِ فایل‌های موجود
+            $out[] = 'shared: '.$shared.'  '.(is_dir($shared) ? '[exists ✓]' : '[MISSING ✗]');
+
+            // ۱) لینکِ وب: public_html/public/storage → shared  (تا /public/storage/... باز شود)
+            $webParent = $publicHtml.'/public';
+            if (! is_dir($webParent) && ! is_link($webParent)) {
+                @mkdir($webParent, 0755, true);
+            }
+            $webLink = $webParent.'/storage';
+            if (is_link($webLink) || is_dir($webLink)) {
+                $out[] = 'web link /public/storage: already there';
+            } else {
+                $ok = @symlink($shared, $webLink);
+                $out[] = 'web link /public/storage: '.($ok ? 'CREATED ✓' : 'FAILED ✗ ('.(error_get_last()['message'] ?? '?').')');
+            }
+
+            // ۲) یکی‌کردنِ استوریجِ اپِ جدید با انبارِ مشترک (تا آپلودهای جدید هم دیده شوند). فقط اگر
+            //    پوشه‌ی فعلی خالی باشد — وگرنه دست نمی‌زنیم تا چیزی گم نشود.
+            $appStore = base_path('storage/app/public');
+            if (is_link($appStore)) {
+                $out[] = 'app storage: already linked ✓';
+            } elseif (is_dir($appStore)) {
+                $entries = array_values(array_diff(scandir($appStore) ?: [], ['.', '..', '.gitignore']));
+                if ($entries === []) {
+                    @unlink($appStore.'/.gitignore');
+                    $ok = @rmdir($appStore) && @symlink($shared, $appStore);
+                    $out[] = 'app storage: '.($ok ? 'LINKED to shared ✓' : 'could not link (بماند دستی)');
+                } else {
+                    $out[] = 'app storage: has files ['.implode(', ', array_slice($entries, 0, 6)).'] — skipped (دستی merge شود)';
+                }
+            }
+
+            $out[] = '';
+            $out[] = 'حالا یک عکسِ محصول/مقاله را روی سایت چک کن.';
+
+            return response('<pre dir="ltr" style="font:14px/1.7 monospace;padding:1rem">'.e(implode("\n", $out)).'</pre>');
+        })->name('panel.storage-fix');
+        // ============================== storage symlink fix ==================
+
         // ============================== maintenance (admin-only) ==============
         // Shell-less host: these let the admin run deploy-time artisan tasks
         // safely from the browser after each "Update from Remote".
