@@ -17,8 +17,10 @@ class RequestproductsTable
                     ->label('شناسه')
                     ->sortable(),
 
-                TextColumn::make('user.name')
+                // مدلِ Requestproduct رابطه‌ی user() ندارد؛ نام را از روی user_id بازیابی می‌کنیم.
+                TextColumn::make('user_id')
                     ->label('کاربر')
+                    ->formatStateUsing(fn ($state) => optional(\App\User::find($state))->name ?? $state)
                     ->placeholder('—'),
 
                 TextColumn::make('product.title')
