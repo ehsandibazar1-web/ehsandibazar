@@ -1,3 +1,9 @@
+{{-- فازِ فریزِ legacy: این پنل در حالِ بازنشستگی است؛ قابلیتِ جدیدی به آن اضافه نمی‌شود. --}}
+<div style="background:#b45309;color:#fff;text-align:center;padding:6px 12px;font-size:13px;">
+    ⚠️ این پنل در حالِ انتقال به پنلِ جدید است — لطفاً کارهای روزمره را از
+    <a href="{{ url('/adminpanel') }}" style="color:#fde68a;text-decoration:underline;">پنلِ جدید</a>
+    انجام دهید. این پنل فقط برای موارِد باقی‌مانده نگه داشته شده.
+</div>
 <nav class="navbar">
     <div class="container-fluid">
         <div class="navbar-header">

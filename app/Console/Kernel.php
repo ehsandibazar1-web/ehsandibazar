@@ -36,6 +36,11 @@ class Kernel extends ConsoleKernel
         $schedule->command('articles:publish-due')->everyFiveMinutes()->withoutOverlapping();
         // پشتیبان‌گیریِ روزانه‌ی دیتابیس.
         $schedule->command('db:backup')->dailyAt('03:00');
+        // ضربانِ کرون: هر اجرا مهرِ زمانی در cache می‌گذارد تا ویجتِ «سلامتِ سیستم» در پنل
+        // نشان دهد کرونِ cPanel زنده است یا از کار افتاده.
+        $schedule->call(function () {
+            cache()->forever('cron.last_run', now()->toIso8601String());
+        })->everyMinute();
     }
 
     /**
