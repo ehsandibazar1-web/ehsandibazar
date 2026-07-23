@@ -27,12 +27,29 @@
                     انتشارِ فایل‌های طراحی
                 </x-filament::button>
 
+                <x-filament::button wire:click="runPublishDue" icon="heroicon-o-rocket-launch" color="success" wire:loading.attr="disabled">
+                    انتشارِ مقاله‌های سررسیده
+                </x-filament::button>
+
                 <span wire:loading class="text-xs text-gray-400">در حالِ اجرا…</span>
             </div>
 
             <p class="mt-3 text-xs text-gray-500 dark:text-gray-400">
                 «انتشارِ فایل‌های طراحی» فایل‌های ظاهریِ پنل و symlinkِ رسانه را تازه می‌کند — بعد از هر «Update from Remote» بزنید.
             </p>
+
+            <div class="mt-4 rounded-lg border border-primary-200 bg-primary-50 p-3 text-xs dark:border-primary-500/30 dark:bg-primary-500/10">
+                <div class="mb-1 font-semibold text-primary-700 dark:text-primary-300">انتشارِ خودکارِ مقاله‌های زمان‌بندی‌شده</div>
+                <p class="mb-2 text-gray-600 dark:text-gray-400">
+                    برای اینکه مقاله‌های «زمان‌بندی‌شده» سرِ ساعت خودکار منتشر شوند (بدونِ نیاز به زدنِ دستیِ دکمه‌ی بالا)،
+                    این آدرس را به یک سرویسِ رایگانِ زمان‌بند (مثلِ cron-job.org) بدهید تا هر ۵ دقیقه یک‌بار بازش کند:
+                </p>
+                <code dir="ltr" class="block select-all overflow-x-auto rounded bg-white px-2 py-1 text-[11px] text-gray-800 dark:bg-black/30 dark:text-gray-200">{{ $this->pingerUrl() }}</code>
+                <p class="mt-2 text-gray-500 dark:text-gray-500">
+                    این آدرس با یک توکنِ مخفی محافظت می‌شود. اگر cPanel شما Cron Job دارد، به‌جای این می‌توانید
+                    <code dir="ltr" class="text-[11px]">php artisan schedule:run</code> را هر دقیقه اجرا کنید.
+                </p>
+            </div>
 
             @if ($output !== null)
                 <pre dir="ltr" class="mt-4 max-h-72 overflow-auto whitespace-pre-wrap rounded bg-gray-950 p-3 text-xs leading-6 text-gray-100">{{ $output }}</pre>

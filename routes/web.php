@@ -17,6 +17,22 @@ Route::get('/robots.txt', function () {
 });
 
 /*
+ | تریگرِ عمومیِ «انتشارِ مقاله‌های زمان‌بندی‌شده» برای سرویس‌های uptime-pinger (روی هاستِ بدونِ cron).
+ | با یک توکنِ ثابتِ مشتق از APP_KEY محافظت می‌شود (بدونِ APP_KEY قابلِ حدس نیست). آدرسِ کامل با توکن
+ | در صفحه‌ی System Maintenance به ادمین نمایش داده می‌شود. یک سرویسِ رایگان (cron-job.org و…) این را
+ | هر چند دقیقه یک‌بار می‌زند تا مقاله‌های سررسیده خودکار منتشر شوند.
+ */
+Route::get('/cron/publish-due', function () {
+    $expected = hash_hmac('sha256', 'publish-due', (string) config('app.key'));
+
+    abort_unless(hash_equals($expected, (string) request()->query('token')), 403, 'Invalid token.');
+
+    Artisan::call('articles:publish-due');
+
+    return response(trim(Artisan::output()) ?: 'OK', 200)->header('Content-Type', 'text/plain');
+})->name('cron.publish-due');
+
+/*
  | English content lives on its own dedicated site (trainwithehsan.com), hosted
  | outside Iran. To avoid duplicate-content / keyword-cannibalisation between the
  | two domains — and to consolidate all English SEO authority onto the English

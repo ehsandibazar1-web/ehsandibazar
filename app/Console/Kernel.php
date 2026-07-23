@@ -31,6 +31,11 @@ class Kernel extends ConsoleKernel
         $schedule->command('command:checkPayment')->everyTenMinutes();
         $schedule->command('command:checkDiscountTime')->everyMinute();
         $schedule->command('start:discount')->everyMinute();
+
+        // انتشارِ خودکارِ مقاله‌های زمان‌بندی‌شده (اگر cPanel cronِ «php artisan schedule:run» فعال باشد).
+        $schedule->command('articles:publish-due')->everyFiveMinutes()->withoutOverlapping();
+        // پشتیبان‌گیریِ روزانه‌ی دیتابیس.
+        $schedule->command('db:backup')->dailyAt('03:00');
     }
 
     /**

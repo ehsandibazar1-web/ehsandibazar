@@ -79,7 +79,19 @@ class SystemMaintenance extends Page
                 ['filament:assets', []],
                 ['storage:link', []],
             ],
+            // انتشارِ دستیِ مقاله‌های زمان‌بندی‌شده‌ای که زمانشان رسیده.
+            'publish-due' => [
+                ['articles:publish-due', []],
+            ],
         ];
+    }
+
+    /** آدرسِ توکن‌دارِ pinger برای انتشارِ خودکار (به سرویسِ uptime-pinger بدهید). */
+    public function pingerUrl(): string
+    {
+        $token = hash_hmac('sha256', 'publish-due', (string) config('app.key'));
+
+        return url('/cron/publish-due').'?token='.$token;
     }
 
     private function run(string $action): void
@@ -126,6 +138,11 @@ class SystemMaintenance extends Page
     {
         $this->run('publish-design');
         $this->checkMediaLink(); // ممکن است symlink تازه ساخته شده باشد
+    }
+
+    public function runPublishDue(): void
+    {
+        $this->run('publish-due');
     }
 
     // ============================ پشتیبان‌گیریِ دیتابیس ============================
