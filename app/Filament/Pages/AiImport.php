@@ -113,13 +113,26 @@ class AiImport extends Page implements HasForms
                             ->columnSpanFull(),
                     ]),
 
-                Section::make('پیشرفته: چسباندنِ JSON')
-                    ->description('اگر این کادر پر باشد، بر فیلدهای بالا اولویت دارد. باید یک شیءِ JSON با کلیدهای Contract باشد (locale، title، body، excerpt?، faqs?، tags?، seo_title?، meta_description? و …).')
+                Section::make('پیشرفته: چسباندنِ محتوا (چند فرمت)')
+                    ->description('اگر این کادر پر باشد، بر فیلدهای بالا اولویت دارد. پنج فرمت پشتیبانی می‌شود: JSON، XML (‎<article>‎)، HTML، Markdown (با front matter و بخشِ ## FAQ)، و نشانه‌گذارِ سفارشی [[FIELD]]. فرمت به‌صورتِ خودکار تشخیص داده می‌شود؛ می‌توانید آن را دستی هم انتخاب کنید.')
                     ->collapsed()
                     ->schema([
+                        Select::make('format')
+                            ->label('فرمت')
+                            ->options([
+                                'auto' => 'تشخیصِ خودکار',
+                                'json' => 'JSON',
+                                'xml' => 'XML',
+                                'html' => 'HTML',
+                                'markdown' => 'Markdown',
+                                'custom' => 'نشانه‌گذارِ [[FIELD]]',
+                            ])
+                            ->default('auto')
+                            ->native(false),
+
                         Textarea::make('json')
-                            ->label('payload به‌صورت JSON')
-                            ->rows(10),
+                            ->label('محتوا (JSON / XML / HTML / Markdown / [[FIELD]])')
+                            ->rows(12),
                     ]),
             ])
             ->statePath('data');
@@ -198,15 +211,21 @@ class AiImport extends Page implements HasForms
      */
     private function buildPayload(array $state): array
     {
-        // مسیرِ JSON: هرچه در payload باشد مستقیم به کارخانه می‌رود؛ فقط locale را در نبودش پر می‌کنیم.
+        // مسیرِ چسبانده‌شده: ورودی از طریقِ ImportFormatParser می‌گذرد که فرمت را تشخیص می‌دهد
+        // (JSON/XML/HTML/Markdown/نشانه‌گذارِ [[FIELD]]) و به آرایه‌ی خام تبدیل می‌کند.
         if (! empty($state['json'])) {
-            $decoded = json_decode((string) $state['json'], true);
+            $parsed = app(\App\Services\ArticleImport\ImportFormatParser::class)
+                ->parse((string) $state['json'], $state['format'] ?? null);
 
-            if (! is_array($decoded)) {
-                throw new \RuntimeException('ساختارِ JSON قابلِ خواندن نیست.');
+            if ($parsed['errors'] !== []) {
+                throw new \RuntimeException(implode(' ', $parsed['errors']));
             }
 
-            $normalized = $this->normalizeImportPayload($decoded);
+            if (! is_array($parsed['data']) || $parsed['data'] === []) {
+                throw new \RuntimeException('ورودی قابلِ خواندن نیست.');
+            }
+
+            $normalized = $this->normalizeImportPayload($parsed['data']);
             $normalized['locale'] ??= $state['locale'] ?? 'fa';
 
             return $normalized;
