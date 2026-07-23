@@ -145,19 +145,46 @@ Route::group(['middleware' => ['auth:web'], 'prefix' => 'panel'], function () {
                 $out[] = 'web link /public/storage: '.($ok ? 'CREATED ✓' : 'FAILED ✗ ('.(error_get_last()['message'] ?? '?').')');
             }
 
-            // ۲) یکی‌کردنِ استوریجِ اپِ جدید با انبارِ مشترک (تا آپلودهای جدید هم دیده شوند). فقط اگر
-            //    پوشه‌ی فعلی خالی باشد — وگرنه دست نمی‌زنیم تا چیزی گم نشود.
+            // ۲) یکی‌کردنِ استوریجِ اپِ جدید با انبارِ مشترک تا آپلودهای جدیدِ پنل هم از همان آدرسِ
+            //    /public/storage سرو شوند. اگر پوشه خالی باشد فقط symlink می‌شود؛ اگر فایل داشته باشد
+            //    (آپلودهای انجام‌شده) فقط با ?merge=1 محتوا را به انبارِ مشترک «منتقل» و بعد symlink می‌کند.
+            //    انتقال با rename (روی همان فایل‌سیستم) است — امن و بدونِ کپیِ سنگین؛ فایلی پاک نمی‌شود.
             $appStore = base_path('storage/app/public');
             if (is_link($appStore)) {
-                $out[] = 'app storage: already linked ✓';
+                $out[] = 'app storage: already linked to shared ✓';
             } elseif (is_dir($appStore)) {
                 $entries = array_values(array_diff(scandir($appStore) ?: [], ['.', '..', '.gitignore']));
                 if ($entries === []) {
                     @unlink($appStore.'/.gitignore');
                     $ok = @rmdir($appStore) && @symlink($shared, $appStore);
                     $out[] = 'app storage: '.($ok ? 'LINKED to shared ✓' : 'could not link (بماند دستی)');
+                } elseif (request()->query('merge') === '1') {
+                    // انتقالِ بازگشتیِ محتوا به انبارِ مشترک (merge؛ در تعارض، نسخه‌ی مشترک می‌ماند)
+                    $move = function (string $src, string $dst) use (&$move): void {
+                        if (! is_dir($dst)) {
+                            @mkdir($dst, 0775, true);
+                        }
+                        foreach (array_diff(scandir($src) ?: [], ['.', '..']) as $e) {
+                            $s = $src.'/'.$e;
+                            $d = $dst.'/'.$e;
+                            if (is_dir($s) && ! is_link($s)) {
+                                $move($s, $d);
+                                @rmdir($s);
+                            } elseif (! file_exists($d)) {
+                                @rename($s, $d);
+                            } else {
+                                @unlink($s);
+                            }
+                        }
+                    };
+                    $move($appStore, $shared);
+                    @unlink($appStore.'/.gitignore');
+                    $ok = @rmdir($appStore) && @symlink($shared, $appStore);
+                    $out[] = 'app storage: MERGED into shared + linked '.($ok ? '✓' : '(انتقال شد ولی symlink ناموفق)');
                 } else {
-                    $out[] = 'app storage: has files ['.implode(', ', array_slice($entries, 0, 6)).'] — skipped (دستی merge شود)';
+                    $out[] = 'app storage: has files ['.implode(', ', array_slice($entries, 0, 6)).']';
+                    $out[] = '   → برای یکی‌کردن، همین آدرس را با ?merge=1 باز کن:';
+                    $out[] = '     /panel/manager/maintenance/storage-fix?merge=1';
                 }
             }
 
