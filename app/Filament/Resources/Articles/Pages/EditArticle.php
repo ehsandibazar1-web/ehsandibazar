@@ -25,6 +25,17 @@ class EditArticle extends EditRecord
         return ArticleResource::applyPublishState($data);
     }
 
+    /**
+     * فقط وقتی ادمین در همین ذخیره تصویرِ شاخص را عوض کرده باشد، رابطه‌ی image() (که storefront
+     * می‌خواند) را هماهنگ می‌کنیم تا تغییر روی سایت اعمال شود. مقاله‌های دست‌نخورده تغییر نمی‌کنند.
+     */
+    protected function afterSave(): void
+    {
+        if ($this->record->wasChanged('image_path')) {
+            ArticleResource::syncFeaturedImageRelation($this->record);
+        }
+    }
+
     protected function getHeaderActions(): array
     {
         return [

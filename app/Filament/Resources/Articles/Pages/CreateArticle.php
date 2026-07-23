@@ -19,4 +19,15 @@ class CreateArticle extends CreateRecord
 
         return ArticleResource::applyPublishState($data);
     }
+
+    /**
+     * مقاله‌ی تازه با تصویرِ شاخص: رابطه‌ی image() را می‌سازیم تا هیرو روی سایت (که رابطه را
+     * می‌خواند) نمایش داده شود — نه فقط در OG. اگر تصویری انتخاب نشده باشد، کاری نمی‌کنیم.
+     */
+    protected function afterCreate(): void
+    {
+        if (filled($this->record->image_path)) {
+            ArticleResource::syncFeaturedImageRelation($this->record);
+        }
+    }
 }

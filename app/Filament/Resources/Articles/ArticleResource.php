@@ -82,4 +82,51 @@ class ArticleResource extends Resource
 
         return $data;
     }
+
+    /**
+     * همگام‌سازیِ تصویرِ شاخصِ فرم (ستونِ image_path) با رابطه‌ی image() که storefront می‌خواند.
+     *
+     * چرا لازم است: storefront تصویرِ شاخص را همیشه اول از رابطه‌ی image() می‌خواند
+     * (`$article->image[0]->url` در article/articles blade و JSON-LD و OG) و فقط وقتی آن خالی
+     * باشد به image_path برمی‌گردد. پس تغییرِ تصویر از پنلِ جدید (که فقط image_path را می‌نوشت)
+     * روی سایت دیده نمی‌شد. این متد رابطه را با انتخابِ جدید هماهنگ می‌کند تا تغییر واقعاً اعمال شود.
+     *
+     * ایمنی (خطِ قرمزِ سئو):
+     *  - فقط از صفحاتِ ادمین و فقط وقتی image_path در همان ذخیره «تغییر کرده» صدا زده می‌شود
+     *    (wasChanged/filled) — مقاله‌های موجودی که ادمین دستشان نمی‌زند کاملاً دست‌نخورده می‌مانند.
+     *  - هیچ ویو/کنترلرِ storefront تغییر نمی‌کند؛ فقط داده‌ی رابطه با کنشِ عمدیِ ادمین هماهنگ می‌شود.
+     *  - مقدارِ ذخیره‌شده در رابطه دقیقاً همان قراردادِ fallbackِ خودِ storefront است
+     *    (`/storage/` + image_path)، پس رندر بایت‌به‌بایت با مسیرِ image_path یکی است.
+     *  - خالی‌کردنِ فیلد، رابطه را حذف نمی‌کند (حذفِ هیروِ ایندکس‌شده خطرناک است) — برای جایگزینی،
+     *    ادمین یک تصویرِ تازه انتخاب می‌کند.
+     */
+    public static function syncFeaturedImageRelation(Article $record): void
+    {
+        $imagePath = $record->image_path;
+
+        if (blank($imagePath)) {
+            return; // خالی — رابطه را دست نمی‌زنیم (سازگاریِ عقب‌رو)
+        }
+
+        // نشانیِ ریشه‌ایِ عمومیِ همان فایل (بدونِ هاست) — همان قراردادی که storefront برای fallbackِ
+        // image_path دارد: asset('storage/'.$image_path). Image::getUrlAttribute یک‌بار APP_URL را
+        // جلو می‌گذارد، پس اینجا فقط مسیرِ ریشه‌ای ذخیره می‌شود تا دوبار پیشوند نخورد.
+        $rawUrl = '/storage/'.ltrim((string) $imagePath, '/');
+
+        $image = $record->image()->first();
+
+        if ($image) {
+            if ($image->getRawOriginal('url') !== $rawUrl) {
+                $image->url = $rawUrl; // setUrlAttribute فقط APP_URL را حذف می‌کند → خام همین می‌ماند
+                $image->save();
+            }
+
+            return;
+        }
+
+        $record->image()->create([
+            'url' => $rawUrl,
+            'user_id' => auth()->id() ?? $record->user_id,
+        ]);
+    }
 }
