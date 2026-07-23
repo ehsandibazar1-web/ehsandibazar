@@ -43,7 +43,6 @@ class OrdersTable
 
                 TextColumn::make('created_at')
                     ->label('تاریخ')
-                    ->dateTime('Y/m/d')
                     ->sortable(),
             ])
             ->filters([

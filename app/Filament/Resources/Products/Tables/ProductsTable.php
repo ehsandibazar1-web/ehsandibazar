@@ -60,7 +60,6 @@ class ProductsTable
 
                 TextColumn::make('created_at')
                     ->label('تاریخِ ثبت')
-                    ->dateTime('Y/m/d')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
