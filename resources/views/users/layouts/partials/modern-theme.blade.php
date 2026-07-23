@@ -3,9 +3,9 @@
      (main.css) لود می‌شود تا آن را بازتعریف کند. برای بازگشت: این include از styles حذف شود. --}}
 <style>
     .profile-user-page {
-        --ux-accent: #c1121f;
-        --ux-accent-2: #e11d2a;
-        --ux-accent-soft: #fdeaec;
+        --ux-accent: #d4af3a;
+        --ux-accent-2: #b8912f;
+        --ux-accent-soft: #faf3da;
         --ux-ink: #1f2937;
         --ux-muted: #6b7280;
         --ux-line: #ecedf1;
@@ -77,8 +77,8 @@
     .profile-user-page .profile-menu-items li a i { font-size: 17px; opacity: .85; }
     .profile-user-page .profile-menu-items li a:hover { background: #f3f4f6; color: var(--ux-accent); }
     .profile-user-page .profile-menu-items li a.active {
-        background: var(--ux-accent); color: #fff !important;
-        box-shadow: 0 6px 16px rgba(193,18,31,.26);
+        background: var(--ux-accent); color: #4a3a00 !important;
+        box-shadow: 0 6px 16px rgba(184,145,47,.26);
     }
 
     /* منوی موبایلِ collapse */
@@ -139,8 +139,8 @@
         font-weight: 700; background: transparent; transition: all .16s ease;
     }
     .profile-user-page .btn-link-border:hover,
-    .profile-user-page .form-account-link:hover { background: var(--ux-accent); color: #fff; }
-    .profile-user-page .btn-primary { background: var(--ux-accent); border-color: var(--ux-accent); border-radius: 11px; font-weight: 700; }
+    .profile-user-page .form-account-link:hover { background: var(--ux-accent); color: #4a3a00; }
+    .profile-user-page .btn-primary { background: var(--ux-accent); border-color: var(--ux-accent); color: #4a3a00; border-radius: 11px; font-weight: 700; }
     .profile-user-page .btn { border-radius: 11px; font-weight: 700; }
 
     /* ---------- فرم‌ها ---------- */
@@ -158,7 +158,7 @@
     .profile-user-page select:focus,
     .profile-user-page textarea:focus {
         border-color: var(--ux-accent) !important;
-        box-shadow: 0 0 0 3px rgba(193,18,31,.12) !important; outline: none;
+        box-shadow: 0 0 0 3px rgba(184,145,47,.12) !important; outline: none;
     }
 
     /* ---------- کارتِ محصولِ دیجیتال ---------- */
@@ -190,6 +190,6 @@
     .account-page .uk-table th { background: #fafbfc; color: #6b7280; font-weight: 700; padding: 13px 14px; }
     .account-page .uk-table td { padding: 13px 14px; }
     .account-page .uk-button { border-radius: 11px; font-weight: 700; }
-    .account-page .uk-button-primary { background: #c1121f; }
+    .account-page .uk-button-primary { background: #d4af3a; }
     .account-page .uk-alert-warning { border-radius: 14px; background: #fffbeb; color: #92400e; }
 </style>
