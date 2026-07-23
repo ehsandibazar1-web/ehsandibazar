@@ -68,6 +68,7 @@ class PageForm
                     ->required()
                     ->fileAttachmentsDisk('public')
                     ->fileAttachmentsDirectory('pages/inline')
+                    ->plugins([\App\Filament\RichContent\MediaLibraryRichContentPlugin::make('pages/inline')])
                     ->columnSpanFull(),
 
                 // انتخابگرِ رسانه — به‌جای آپلودِ ساده، تصویر را از کتابخانه‌ی رسانه انتخاب می‌کند.

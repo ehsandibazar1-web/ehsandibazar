@@ -95,6 +95,7 @@ class ArticleForm
                     ->required()
                     ->fileAttachmentsDisk('public')
                     ->fileAttachmentsDirectory('articles/inline')
+                    ->plugins([\App\Filament\RichContent\MediaLibraryRichContentPlugin::make('articles/inline')])
                     ->columnSpanFull(),
 
                 // انتخابگرِ رسانه — به‌جای آپلودِ ساده، تصویر را از کتابخانه‌ی رسانه انتخاب می‌کند
