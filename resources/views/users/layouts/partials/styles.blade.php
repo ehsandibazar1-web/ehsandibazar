@@ -27,3 +27,5 @@
 {{--<script src="{{ asset('users_theme/assets/js/plugins/JsLocalSearch.js') }}" type="text/javascript"></script>--}}
 <!-- Main Js -->
 {{--<script src="{{ asset('users_theme/assets/js/main.js') }}" type="text/javascript"></script>--}}
+{{-- لایه‌ی ظاهریِ مدرن (فقط CSS، بعد از now-ui-kit تا آن را بازتعریف کند) --}}
+@include('users.layouts.partials.modern-theme')
