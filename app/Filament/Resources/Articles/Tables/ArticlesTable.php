@@ -33,12 +33,26 @@ class ArticlesTable
     public static function configure(Table $table): Table
     {
         return $table
+            // eager-load رابطه‌ی image تا هر ردیف کوئریِ جدا نزند (N+1).
+            ->modifyQueryUsing(fn ($query) => $query->with('image'))
             ->columns([
-                ImageColumn::make('image_path')
+                // تصویرِ هیرو: اولویت با رابطه‌ی زنده‌ی image() (همان که storefront نشان می‌دهد)؛
+                // اگر نبود، fallback به ستونِ image_path (مقاله‌های ایمپورت‌شده‌ی جدید).
+                ImageColumn::make('hero_image')
                     ->label('')
-                    ->disk('public')
                     ->height(40)
-                    ->square(),
+                    ->square()
+                    ->getStateUsing(function (Article $record): ?string {
+                        $img = $record->image->first();
+                        if ($img && ($raw = $img->getRawOriginal('url'))) {
+                            return url($raw);
+                        }
+                        if (filled($record->image_path)) {
+                            return \Illuminate\Support\Facades\Storage::disk('public')->url($record->image_path);
+                        }
+
+                        return null;
+                    }),
 
                 TextColumn::make('title')
                     ->label('عنوان')
