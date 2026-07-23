@@ -8,6 +8,7 @@ use App\Models\ImportLog;
 use App\Services\ArticleImport\ArticleRoundtripExporter;
 use App\Services\Content\ContentDraftFactory;
 use BackedEnum;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -125,6 +126,23 @@ class AiImport extends Page implements HasForms
                     ->description('اگر این کادر پر باشد، بر فیلدهای بالا اولویت دارد. پنج فرمت پشتیبانی می‌شود: JSON، XML (‎<article>‎)، HTML، Markdown (با front matter و بخشِ ## FAQ)، و نشانه‌گذارِ سفارشی [[FIELD]]. فرمت به‌صورتِ خودکار تشخیص داده می‌شود؛ می‌توانید آن را دستی هم انتخاب کنید.')
                     ->collapsed()
                     ->schema([
+                        FileUpload::make('upload_file')
+                            ->label('آپلودِ فایل (JSON / Markdown / HTML / XML)')
+                            ->helperText('فایلِ خروجی‌گرفته‌شده از لیستِ مقالات را اینجا بگذارید؛ محتوایش خودکار داخلِ کادرِ پایین می‌آید. اگر id داشته باشد، همان مقاله به‌روزرسانی می‌شود.')
+                            ->acceptedFileTypes(['application/json', 'text/plain', 'text/markdown', 'text/html', 'application/xml', 'text/xml'])
+                            ->storeFiles(false)
+                            ->live()
+                            ->afterStateUpdated(function ($state, callable $set): void {
+                                $file = is_array($state) ? reset($state) : $state;
+                                if ($file && is_object($file) && method_exists($file, 'get')) {
+                                    try {
+                                        $set('json', (string) $file->get());
+                                    } catch (\Throwable) {
+                                        // فایلِ ناخوانا — کاربر می‌تواند دستی بچسباند.
+                                    }
+                                }
+                            }),
+
                         Select::make('format')
                             ->label('فرمت')
                             ->options([
