@@ -33,7 +33,10 @@ class DatabaseBackupService
         $disk = Storage::disk($this->disk);
         $disk->makeDirectory($this->dir);
 
-        $filename = 'backup-'.($dbName !== '' ? $dbName.'-' : '').date('Ymd-His').'.sql.gz';
+        // نامِ دیتابیس را برای استفاده در نامِ فایل امن می‌کنیم (روی SQLite این یک مسیرِ کامل با «/»
+        // است؛ روی MySQL یک شناسه‌ی ساده). هر کاراکترِ غیرمجاز به «_» تبدیل می‌شود.
+        $safeDb = trim((string) preg_replace('/[^A-Za-z0-9_-]+/', '_', basename($dbName)), '_');
+        $filename = 'backup-'.($safeDb !== '' ? $safeDb.'-' : '').date('Ymd-His').'.sql.gz';
         $relPath = $this->dir.'/'.$filename;
         $fullPath = $disk->path($relPath);
 
@@ -85,9 +88,15 @@ class DatabaseBackupService
             }
 
             gzwrite($gz, "\nSET FOREIGN_KEY_CHECKS=1;\n");
-        } finally {
+        } catch (\Throwable $e) {
+            // اگر وسطِ کار خطا داد، فایلِ نیمه‌کاره‌ی خراب را حذف کن تا به‌اشتباه «بکاپ» به‌نظر نرسد.
             gzclose($gz);
+            $disk->delete($relPath);
+
+            throw $e;
         }
+
+        gzclose($gz);
 
         $this->prune();
 
