@@ -13,8 +13,10 @@
 | بالا | Articles · Newsletter · Pages | ✅ |
 | AI Studio | AI Import · Draft Queue · **Import History** · AI Templates · Prompt Library · Brand Memory · AI Profiles · AI Providers · API Tokens · AI Routing · AI Usage Logs · **AI Agent** | ✅ |
 | Content Planner | **Planner** · Content Plans · Workflow Stages · **Tags** | ✅ نو |
-| بالا | About / Footer / Homepage Settings | ⛔ معوق (محتوای storefront؛ نیازِ نگاشتِ فیلد) |
-| Knowledge Base | Knowledge Entries (RAG) | ⛔ معوق (تصمیمِ کاربر) |
+| بالا | **About / Footer / Homepage Settings** | ✅ نو — روی انبارِ مستقلِ `site_settings`؛ هنوز به قالبِ سایت وصل نیست (صفر ریسک) |
+| Knowledge Base | **Knowledge Entries** | ✅ نو — CRUD کامل؛ indexingِ برداری stub است (RAG موکول) |
+
+پاریتیِ منو **کامل** است. دو مورد بالا عمداً «staged»اند: صفحاتِ Settings دیتای خود را ذخیره می‌کنند ولی storefront هنوز آن‌ها را نمی‌خواند (اتصال یک قدمِ جدا و gate‌شده)؛ Knowledge Entries فایل/ورودی را ذخیره می‌کند ولی embedding انجام نمی‌دهد.
 
 ### تفاوت‌های عمدیِ تطبیقی (نه نقص)
 - **AI Agent**: نسخه‌ی فارسی **فقط-خواندنی** است (بدونِ auto-fix که مقاله‌ی زنده را تغییر می‌دهد) — خط قرمزِ سئو.
@@ -25,10 +27,11 @@
 
 ## ۲) جدول‌های جدید (نیازمندِ migration)
 
-`content_plans` · `content_tasks` · `content_plan_stage_transitions`
-(migrationها: `database/migrations/2026_07_23_000001..000003_*`)
+- Content Planner: `content_plans` · `content_tasks` · `content_plan_stage_transitions` (`2026_07_23_000001..000003`)
+- Knowledge Base: `knowledge_entries` · `knowledge_entry_attachments` · `knowledge_chunks` · `ai_generation_knowledge_entry` (`2026_07_23_000005..000008`)
+- Settings: `site_settings` (`2026_07_23_000009`)
 
-بقیه‌ی کارها بدونِ جدولِ جدیدند (روی مدل‌های موجود).
+بقیه‌ی کارها بدونِ جدولِ جدیدند (روی مدل‌های موجود). همه‌ی migrationها با «اجرای Migration» در System Maintenance اجرا می‌شوند.
 
 ## ۳) استقرار روی استگینگ (تست)
 
