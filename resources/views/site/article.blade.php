@@ -6724,7 +6724,7 @@ background-attachment: fixed;
                             </div>
 
                             @php
-                                $tocData = buildTableOfContents(lazyLoadAparatIframes(fixImageDimensions($article->body)));
+                                $tocData = buildTableOfContents(lazyLoadAparatScriptEmbeds(lazyLoadAparatIframes(fixImageDimensions($article->body))));
                             @endphp
                             {{-- CLS Fix: TOC به‌صورت سمت سرور ساخته می‌شود تا بعد از لود، ارتفاع جعبه تغییر نکند --}}
                             <div id="toc-container" class="toc-box @if($tocData['count'] < 2) toc-box--hidden @endif">

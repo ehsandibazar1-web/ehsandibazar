@@ -113,7 +113,7 @@
                         </div>
 
                         @php
-                            $tocData = buildTableOfContents(lazyLoadAparatIframes(fixImageDimensions($page->body)), ['h2']);
+                            $tocData = buildTableOfContents(lazyLoadAparatScriptEmbeds(lazyLoadAparatIframes(fixImageDimensions($page->body))), ['h2']);
                         @endphp
                         <div id="toc-container" class="toc-box @if($tocData['count'] < 2) toc-box--hidden @endif">
                             <h2><i class="fas fa-list-ul"></i> فهرست مطالب</h2>
