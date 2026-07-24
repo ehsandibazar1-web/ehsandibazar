@@ -38,8 +38,35 @@ class ArticleRoundtripExporter
         return substr(hash('sha256', json_encode($data, JSON_UNESCAPED_UNICODE)), 0, 16);
     }
 
+    /**
+     * سئوی «مؤثر» را با همان fallbackِ storefront برمی‌گرداند: اول ستون‌های canonicalِ جدید، بعد
+     * رابطه‌ی legacyِ Seo (title/description/keyword)، بعد عنوان. مقاله‌های قدیمی seo_title/meta خالی
+     * دارند ولی سئوشان در رابطه‌ی Seo است؛ بدونِ این، اکسپورت خالی می‌آمد.
+     *
+     * @return array{seo_title: string, meta_description: ?string, og_title: string, og_description: ?string, keyword: ?string}
+     */
+    private function effectiveSeo(Article $article): array
+    {
+        $seo = \App\Model\Seo::where('seoable_id', $article->id)
+            ->where('seoable_type', 'article')
+            ->first();
+
+        $seoTitle = filled($article->seo_title) ? $article->seo_title : ($seo->title ?? $article->title);
+        $metaDescription = filled($article->meta_description) ? $article->meta_description : ($seo->description ?? null);
+
+        return [
+            'seo_title' => (string) $seoTitle,
+            'meta_description' => $metaDescription !== null ? (string) $metaDescription : null,
+            'og_title' => filled($article->og_title) ? (string) $article->og_title : (string) $seoTitle,
+            'og_description' => filled($article->og_description) ? (string) $article->og_description : ($metaDescription !== null ? (string) $metaDescription : null),
+            'keyword' => $seo->keyword ?? null,
+        ];
+    }
+
     private function toJson(Article $article): string
     {
+        $seo = $this->effectiveSeo($article);
+
         $payload = [
             'id' => $article->id,
             '_note' => 'این فایل برای ویرایشِ همین مقاله است. مقدارِ id را تغییر ندهید. slug قفل است (تغییرش نادیده گرفته می‌شود).',
@@ -49,12 +76,13 @@ class ArticleRoundtripExporter
             'title' => $article->title,
             'excerpt' => $article->excerpt,
             'body' => $article->body,
-            'seo_title' => $article->seo_title,
-            'meta_description' => $article->meta_description,
+            'seo_title' => $seo['seo_title'],
+            'meta_description' => $seo['meta_description'],
+            'meta_keywords' => $seo['keyword'],
             'canonical_url' => $article->canonical_url,
             'robots' => $article->robots,
-            'og_title' => $article->og_title,
-            'og_description' => $article->og_description,
+            'og_title' => $seo['og_title'],
+            'og_description' => $seo['og_description'],
             'image_alt' => $article->image_alt,
             'author_name' => $article->author_name,
             'reading_time' => $article->reading_time,
@@ -66,6 +94,8 @@ class ArticleRoundtripExporter
 
     private function toMarkdown(Article $article): string
     {
+        $seo = $this->effectiveSeo($article);
+
         $fm = [
             'id' => $article->id,
             'slug' => $article->slug.'   # قفل — تغییر ندهید',
@@ -73,10 +103,11 @@ class ArticleRoundtripExporter
             'lang' => $article->lang,
             'title' => $article->title,
             'excerpt' => (string) $article->excerpt,
-            'seo_title' => (string) $article->seo_title,
-            'meta_description' => (string) $article->meta_description,
-            'og_title' => (string) $article->og_title,
-            'og_description' => (string) $article->og_description,
+            'seo_title' => $seo['seo_title'],
+            'meta_description' => (string) $seo['meta_description'],
+            'meta_keywords' => (string) $seo['keyword'],
+            'og_title' => $seo['og_title'],
+            'og_description' => (string) $seo['og_description'],
             'image_alt' => (string) $article->image_alt,
             'author_name' => (string) $article->author_name,
             'reading_time' => (string) $article->reading_time,
