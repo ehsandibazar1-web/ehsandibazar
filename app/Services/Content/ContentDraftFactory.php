@@ -101,12 +101,19 @@ class ContentDraftFactory
             }
         }
 
-        // faqs (آرایه) — مقایسه‌ی ساختاری.
+        // faqs (آرایه) — مقایسه‌ی ساختاری با FAQِ «مؤثرِ» فعلی (اول ستونِ legacyِ faq، بعد faqs) —
+        // همان اولویتی که storefront دارد، تا برای مقاله‌های قدیمی درست مقایسه شود.
         if (array_key_exists('faqs', $payload) && is_array($payload['faqs'])) {
-            $oldFaqs = is_array($article->faqs) ? $article->faqs : [];
+            $oldFaqs = (is_array($article->faq) && $article->faq !== [])
+                ? $article->faq
+                : (is_array($article->faqs) ? $article->faqs : []);
             if (json_encode($oldFaqs, JSON_UNESCAPED_UNICODE) !== json_encode($payload['faqs'], JSON_UNESCAPED_UNICODE)) {
                 $changes['faqs'] = ['old' => count($oldFaqs).' مورد', 'new' => count($payload['faqs']).' مورد'];
                 $dirty['faqs'] = $payload['faqs'];
+                // ستونِ قدیمیِ faq را خالی می‌کنیم تا storefront (faq ?: faqs) نسخه‌ی جدید را نشان دهد.
+                if (is_array($article->faq) && $article->faq !== []) {
+                    $dirty['faq'] = [];
+                }
             }
         }
 

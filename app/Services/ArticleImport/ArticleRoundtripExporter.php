@@ -38,6 +38,24 @@ class ArticleRoundtripExporter
         return substr(hash('sha256', json_encode($data, JSON_UNESCAPED_UNICODE)), 0, 16);
     }
 
+    /** FAQِ «مؤثر»: اول ستونِ legacyِ faq (سایتِ قدیمی)، بعد ستونِ جدیدِ faqs — همان اولویتی که
+     * storefront دارد (`$article->faq ?: $article->faqs`). بدونِ این، مقاله‌هایی که FAQشان در ستونِ
+     * قدیمی است، در اکسپورت خالی می‌آمدند. */
+    private function effectiveFaqs(Article $article): array
+    {
+        if (is_array($article->faq) && $article->faq !== []) {
+            return $article->faq;
+        }
+
+        return is_array($article->faqs) ? $article->faqs : [];
+    }
+
+    /** برچسب‌های مقاله (نام‌ها) — برای دیده‌شدن و ویرایش در چرخه. */
+    private function tagNames(Article $article): array
+    {
+        return $article->tags->pluck('title')->filter()->values()->all();
+    }
+
     /**
      * سئوی «مؤثر» را با همان fallbackِ storefront برمی‌گرداند: اول ستون‌های canonicalِ جدید، بعد
      * رابطه‌ی legacyِ Seo (title/description/keyword)، بعد عنوان. مقاله‌های قدیمی seo_title/meta خالی
@@ -86,7 +104,8 @@ class ArticleRoundtripExporter
             'image_alt' => $article->image_alt,
             'author_name' => $article->author_name,
             'reading_time' => $article->reading_time,
-            'faqs' => is_array($article->faqs) ? $article->faqs : [],
+            'tags' => $this->tagNames($article),
+            'faqs' => $this->effectiveFaqs($article),
         ];
 
         return json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
@@ -111,6 +130,7 @@ class ArticleRoundtripExporter
             'image_alt' => (string) $article->image_alt,
             'author_name' => (string) $article->author_name,
             'reading_time' => (string) $article->reading_time,
+            'tags' => implode(', ', $this->tagNames($article)),
         ];
 
         $lines = ['---'];
@@ -122,11 +142,12 @@ class ArticleRoundtripExporter
         $lines[] = '';
         $lines[] = (string) $article->body;
 
-        // FAQ به شکلی که parserِ Markdown می‌فهمد (## FAQ سپس ### پرسش / پاسخ).
-        if (is_array($article->faqs) && $article->faqs !== []) {
+        // FAQ به شکلی که parserِ Markdown می‌فهمد (## FAQ سپس ### پرسش / پاسخ). از FAQِ مؤثر (قدیمی یا جدید).
+        $faqsForMd = $this->effectiveFaqs($article);
+        if ($faqsForMd !== []) {
             $lines[] = '';
             $lines[] = '## FAQ';
-            foreach ($article->faqs as $faq) {
+            foreach ($faqsForMd as $faq) {
                 $q = is_array($faq) ? ($faq['question'] ?? '') : '';
                 $a = is_array($faq) ? ($faq['answer'] ?? '') : '';
                 if ($q === '') {
