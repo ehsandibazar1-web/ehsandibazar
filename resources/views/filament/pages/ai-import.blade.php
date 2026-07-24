@@ -1,4 +1,54 @@
 <x-filament-panels::page>
+    {{-- راهنمای ساختارِ JSON — همیشه دمِ دست، بازشونده (پیش‌فرض بسته) --}}
+    <details style="margin-bottom: 1.25rem; border: 1px solid #e5e7eb; border-radius: 0.7rem; background: #f9fafb; padding: 0.4rem 0.9rem;">
+        <summary style="cursor: pointer; font-weight: 700; padding: 0.5rem 0; color: #374151;">
+            📄 راهنمای ساختارِ JSON برای ایمپورت (کلیک کنید)
+        </summary>
+        <div dir="rtl" style="font-size: 0.85rem; line-height: 1.9; color: #374151; padding: 0.5rem 0 0.8rem;">
+            <p style="margin: 0.3rem 0;"><b>دو حالت:</b> برای <b>مقاله‌ی جدید</b> کلیدِ <code>id</code> را نگذارید. برای <b>ویرایشِ مقاله‌ی موجود</b> کلیدِ <code>id</code> را بگذارید (آن‌وقت <b>slug قفل</b> می‌شود).</p>
+
+            <p style="margin: 0.6rem 0 0.2rem;"><b>نمونه:</b></p>
+            <pre dir="ltr" style="overflow-x: auto; background: #0f172a; color: #e2e8f0; padding: 0.8rem; border-radius: 0.5rem; font-size: 0.78rem; line-height: 1.6;">{
+  "id": 139,                         // فقط برای ویرایش؛ برای مقاله‌ی جدید حذف کنید
+  "lang": "fa",
+  "title": "همه چیز در مورد کاراته",
+  "slug": "همه-چیز-در-مورد-کاراته",   // فارسی مجاز و عیناً حفظ می‌شود
+  "excerpt": "خلاصه‌ی کوتاه.",
+  "body": "&lt;p&gt;متنِ کاملِ HTML با لینک‌های داخلی و عکس‌ها...&lt;/p&gt;",
+  "seo_title": "...",
+  "meta_description": "...",
+  "og_title": "...",
+  "og_description": "...",
+  "image": "media/library/foo.webp", // تصویرِ شاخص از کتابخانه‌ی رسانه
+  "image_alt": "متنِ جایگزینِ تصویر",
+  "author_name": "احسان دیبازر",
+  "reading_time": 17,
+  "tags": ["کاراته", "دفاع شخصی"],
+  "faqs": [{ "question": "؟", "answer": "..." }],
+  "status": "published"              // draft | published
+}</pre>
+
+            <table style="width: 100%; border-collapse: collapse; margin-top: 0.6rem; font-size: 0.8rem;">
+                <thead><tr style="text-align: right; color: #6b7280; border-bottom: 1px solid #e5e7eb;">
+                    <th style="padding: 0.35rem;">کلید</th><th style="padding: 0.35rem;">توضیح</th>
+                </tr></thead>
+                <tbody>
+                    <tr style="border-bottom:1px solid #f3f4f6;"><td style="padding:0.35rem;"><code>title</code> / <code>body</code></td><td style="padding:0.35rem;"><b>الزامی.</b> body عیناً ذخیره می‌شود (لینک‌ها و HTML حفظ).</td></tr>
+                    <tr style="border-bottom:1px solid #f3f4f6;"><td style="padding:0.35rem;"><code>slug</code></td><td style="padding:0.35rem;">فارسی عیناً حفظ می‌شود. نگذارید = از عنوان ساخته می‌شود. در ویرایش قفل است.</td></tr>
+                    <tr style="border-bottom:1px solid #f3f4f6;"><td style="padding:0.35rem;"><code>image</code></td><td style="padding:0.35rem;">تصویرِ شاخص. مسیرِ نسبی (<code>media/library/x.webp</code>)، یا <code>/storage/…</code>، یا آدرسِ کاملِ همان تصویر از سایت — همه درست تبدیل می‌شوند. (جایگزین: <code>image_path</code>، <code>featured_image</code>)</td></tr>
+                    <tr style="border-bottom:1px solid #f3f4f6;"><td style="padding:0.35rem;"><code>image_alt</code></td><td style="padding:0.35rem;">متنِ جایگزینِ تصویر (ALT).</td></tr>
+                    <tr style="border-bottom:1px solid #f3f4f6;"><td style="padding:0.35rem;"><code>tags</code></td><td style="padding:0.35rem;">آرایه‌ای از نامِ برچسب‌ها. (فقط اضافه می‌کند.)</td></tr>
+                    <tr style="border-bottom:1px solid #f3f4f6;"><td style="padding:0.35rem;"><code>faqs</code></td><td style="padding:0.35rem;">آرایه‌ای از <code>{question, answer}</code>.</td></tr>
+                    <tr style="border-bottom:1px solid #f3f4f6;"><td style="padding:0.35rem;">سئو</td><td style="padding:0.35rem;"><code>seo_title</code>, <code>meta_description</code>, <code>og_title</code>, <code>og_description</code>, <code>canonical_url</code>, <code>robots</code>.</td></tr>
+                    <tr><td style="padding:0.35rem;">دیگر</td><td style="padding:0.35rem;"><code>excerpt</code>, <code>author_name</code>, <code>reading_time</code>, <code>published_at</code>, <code>translation_of</code>, <code>lang</code>.</td></tr>
+                </tbody>
+            </table>
+
+            <p style="margin: 0.7rem 0 0.2rem;"><b>🔒 خطِ قرمز:</b> در حالتِ ویرایش، <code>slug</code> (URL)، زبان و مالک هیچ‌وقت عوض نمی‌شوند؛ هر فیلدی که در فایل نباشد دست‌نخورده می‌ماند (چیزی پاک نمی‌شود).</p>
+            <p style="margin: 0.3rem 0 0; color: #6b7280;">دسته‌بندی و تغییراتِ ساختاری از فرمِ ویرایشِ مقاله انجام می‌شوند، نه این فایل.</p>
+        </div>
+    </details>
+
     <form wire:submit="runImport">
         {{ $this->form }}
 
