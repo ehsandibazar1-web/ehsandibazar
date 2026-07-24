@@ -47,10 +47,31 @@
                         </thead>
                         <tbody>
                             @foreach ($pendingUpdate['changes'] as $field => $vals)
+                                @php
+                                    // پیش‌نمایش تگ‌ها را برای خوانایی حذف می‌کند، ولی خودِ بادیِ کامل (با همه‌ی
+                                    // لینک‌های داخلی و HTML) بی‌کم‌وکاست ذخیره می‌شود. برای فیلدِ body شمارشِ
+                                    // کاراکتر و «لینکِ داخلی» را هم نشان می‌دهیم تا کاربر مطمئن شود چیزی گم نشده.
+                                    $isBody = $field === 'body';
+                                    $limit = $isBody ? 500 : 160;
+                                    $oldTxt = strip_tags((string) $vals['old']);
+                                    $newTxt = strip_tags((string) $vals['new']);
+                                    $oldLinks = substr_count((string) $vals['old'], '<a ');
+                                    $newLinks = substr_count((string) $vals['new'], '<a ');
+                                @endphp
                                 <tr style="border-bottom: 1px solid #f3f4f6; vertical-align: top;">
                                     <td style="padding: 0.5rem; font-weight: 700; white-space: nowrap;">{{ $field }}</td>
-                                    <td style="padding: 0.5rem; color: #991b1b;">{{ \Illuminate\Support\Str::limit(strip_tags((string) $vals['old']), 160) ?: '—' }}</td>
-                                    <td style="padding: 0.5rem; color: #065f46;">{{ \Illuminate\Support\Str::limit(strip_tags((string) $vals['new']), 160) }}</td>
+                                    <td style="padding: 0.5rem; color: #991b1b;">
+                                        {{ \Illuminate\Support\Str::limit($oldTxt, $limit) ?: '—' }}
+                                        @if ($isBody)
+                                            <div style="color:#6b7280; font-size:0.72rem; margin-top:0.4rem;">{{ mb_strlen($oldTxt) }} کاراکتر · {{ $oldLinks }} لینکِ داخلی</div>
+                                        @endif
+                                    </td>
+                                    <td style="padding: 0.5rem; color: #065f46;">
+                                        {{ \Illuminate\Support\Str::limit($newTxt, $limit) }}
+                                        @if ($isBody)
+                                            <div style="color:#6b7280; font-size:0.72rem; margin-top:0.4rem;">{{ mb_strlen($newTxt) }} کاراکتر · {{ $newLinks }} لینکِ داخلی — کلِ HTML و لینک‌ها کامل ذخیره می‌شوند</div>
+                                        @endif
+                                    </td>
                                 </tr>
                             @endforeach
                         </tbody>
