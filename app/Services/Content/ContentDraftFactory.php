@@ -73,7 +73,7 @@ class ContentDraftFactory
         'title', 'body', 'excerpt',
         'seo_title', 'meta_description', 'canonical_url', 'robots',
         'og_title', 'og_description',
-        'image_alt', 'author_name', 'reading_time',
+        'image_path', 'image_alt', 'author_name', 'reading_time',
     ];
 
     /**
@@ -269,20 +269,40 @@ class ContentDraftFactory
      */
     private function uniqueSlug(string $modelClass, ?string $slug, string $title, string $lang): string
     {
-        $base = $slug !== null && trim($slug) !== '' ? Str::slug($slug) : Str::slug($title);
+        // اسلاگِ داده‌شده «عیناً» پذیرفته می‌شود (فقط نرمال‌سازیِ امنِ URL که حروفِ فارسی/عربی را حفظ
+        // می‌کند)؛ فقط اگر اسلاگ نبود از عنوان ساخته می‌شود. Str::slug عمداً استفاده نمی‌شود چون فارسی
+        // را به لاتین ترانسلیت می‌کند و همه‌ی اسلاگ‌های موجودِ سایت فارسی‌اند (مثل «همه-چیز-در-مورد-کاراته»).
+        $provided = $slug !== null && trim($slug) !== '';
+        $base = self::normalizeSlug($provided ? $slug : $title);
 
-        // Str::slug روی متنِ فارسی می‌تواند رشته‌ی خالی بدهد — در آن صورت یک پایه‌ی تصادفیِ امن.
         if ($base === '') {
-            $base = Str::lower(Str::random(8));
+            $base = 'article-'.Str::lower(Str::random(6));
         }
 
         $candidate = $base;
+        $i = 2;
 
         while ($modelClass::where('lang', $lang)->where('slug', $candidate)->exists()) {
-            $candidate = $base.'-'.Str::lower(Str::random(4));
+            $candidate = $base.'-'.$i;
+            $i++;
         }
 
         return $candidate;
+    }
+
+    /**
+     * اسلاگِ URL-امن که حروفِ فارسی/عربی را حفظ می‌کند: فاصله/نیم‌فاصله/آندرلاین → خط تیره، و فقط
+     * حرف (هر زبان)، رقم و خط تیره نگه داشته می‌شود. برخلافِ Str::slug که فارسی را حذف/لاتین می‌کند،
+     * این دقیقاً الگوی اسلاگ‌های موجودِ سایت را تولید می‌کند. (verbatim برای ورودیِ تمیزِ فارسی.)
+     */
+    public static function normalizeSlug(string $value): string
+    {
+        $value = trim($value);
+        $value = preg_replace('/[\s\x{200c}_]+/u', '-', $value);   // فاصله/نیم‌فاصله/آندرلاین → -
+        $value = preg_replace('/[^\p{L}\p{N}\-]+/u', '', $value);  // فقط حرف/رقم/خط‌تیره را نگه دار
+        $value = preg_replace('/-{2,}/', '-', $value);             // خط‌تیره‌های تکراری → یکی
+
+        return trim((string) $value, '-');
     }
 
     /**

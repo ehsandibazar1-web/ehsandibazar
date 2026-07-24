@@ -101,6 +101,9 @@ class ArticleRoundtripExporter
             'robots' => $article->robots,
             'og_title' => $seo['og_title'],
             'og_description' => $seo['og_description'],
+            // تصویرِ شاخص = مسیرِ نسبیِ دیسک (image_path). برای مقاله‌های قدیمی که هیرو در رابطه‌ی
+            // image() است، این خالی است؛ برای ست/جایگزینیِ هیرو یک مسیرِ کتابخانه‌ی رسانه اینجا بگذارید.
+            'image' => $article->image_path ?: null,
             'image_alt' => $article->image_alt,
             'author_name' => $article->author_name,
             'reading_time' => $article->reading_time,

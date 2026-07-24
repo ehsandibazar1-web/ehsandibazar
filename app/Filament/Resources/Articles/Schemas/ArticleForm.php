@@ -38,9 +38,10 @@ class ArticleForm
                     ->live(onBlur: true)
                     ->afterStateUpdated(function ($state, callable $set, $get) {
                         // فقط هنگام خالی‌بودنِ slug (ایجادِ تازه) خودکار پر می‌شود تا slugِ مقاله‌ی
-                        // موجود (که در گوگل ایندکس شده) تصادفی عوض نشود.
+                        // موجود (که در گوگل ایندکس شده) تصادفی عوض نشود. از نرمال‌سازیِ فارسی‌محور
+                        // استفاده می‌کنیم (نه Str::slug که فارسی را به لاتین ترانسلیت می‌کند).
                         if (blank($get('slug'))) {
-                            $set('slug', Str::slug($state ?? ''));
+                            $set('slug', \App\Services\Content\ContentDraftFactory::normalizeSlug((string) ($state ?? '')));
                         }
                     }),
 

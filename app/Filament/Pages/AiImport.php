@@ -194,6 +194,12 @@ class AiImport extends Page implements HasForms
 
         try {
             $article = app(ContentDraftFactory::class)->createArticleDraft($payload);
+
+            // اگر تصویرِ شاخص (image_path) ست شده، رابطه‌ی image() را هم بساز تا هیرو روی خودِ سایت
+            // (که رابطه را می‌خواند) نمایش داده شود — نه فقط در OG. مثلِ رفتارِ فرمِ پنل.
+            if (filled($article->image_path)) {
+                \App\Filament\Resources\Articles\ArticleResource::syncFeaturedImageRelation($article);
+            }
         } catch (Throwable $e) {
             ImportLog::create([
                 'user_id' => auth()->id(),
@@ -299,6 +305,11 @@ class AiImport extends Page implements HasForms
         try {
             $result = app(ContentDraftFactory::class)
                 ->updateArticleFromPayload($article, $this->pendingUpdate['payload'], apply: true);
+
+            // اگر تصویرِ شاخص در همین ویرایش عوض شده، رابطه‌ی image() را هماهنگ کن تا روی سایت دیده شود.
+            if ($article->wasChanged('image_path') && filled($article->image_path)) {
+                \App\Filament\Resources\Articles\ArticleResource::syncFeaturedImageRelation($article);
+            }
         } catch (Throwable $e) {
             Notification::make()->danger()->title('به‌روزرسانی ناموفق بود')->body($e->getMessage())->send();
 
@@ -391,10 +402,10 @@ class AiImport extends Page implements HasForms
         $seo = is_array($raw['seo'] ?? null) ? $raw['seo'] : [];
         $og = is_array($raw['og'] ?? null) ? $raw['og'] : [];
 
-        $image = $raw['image_path'] ?? $raw['featured_image'] ?? null;
-        if (filled($image) && Str::startsWith((string) $image, ['http://', 'https://'])) {
-            $image = $this->downloadImage((string) $image); // null در صورتِ شکست
-        }
+        // تصویرِ شاخص از هر یک از این کلیدها پذیرفته می‌شود: image_path | featured_image | image | hero_image.
+        $image = $this->resolveFeaturedImage(
+            $raw['image_path'] ?? $raw['featured_image'] ?? $raw['image'] ?? $raw['hero_image'] ?? null
+        );
 
         $faqs = $raw['faqs'] ?? $raw['faq'] ?? null;
         $tags = $raw['tags'] ?? null;
@@ -428,6 +439,39 @@ class AiImport extends Page implements HasForms
 
         // مقادیرِ null/'' حذف — تا کلیدِ خالی چیزی را بازننویسد و translation_of=''باعثِ خطای FK نشود.
         return array_filter($payload, fn ($v) => $v !== null && $v !== '');
+    }
+
+    /**
+     * مقدارِ تصویرِ شاخصِ ورودی را به «مسیرِ نسبیِ دیسکِ public» تبدیل می‌کند (همان چیزی که ستونِ
+     * image_path نگه می‌دارد و پنل/سایت با Storage::disk('public')->url() سرو می‌کنند):
+     *   - اگر به storage همین سایت اشاره کند (URLِ کامل، یا /storage/…، یا public/storage/…) → مسیرِ
+     *     نسبی بعد از /storage/ (مثلِ media/library/foo.webp) بدونِ دانلود.
+     *   - اگر URLِ خارجی باشد → دانلود و مسیرِ نسبی.
+     *   - اگر از قبل مسیرِ نسبیِ دیسک باشد (media/library/… یا articles/…) → همان.
+     */
+    private function resolveFeaturedImage(mixed $value): ?string
+    {
+        $value = trim((string) ($value ?? ''));
+
+        if ($value === '') {
+            return null;
+        }
+
+        // اشاره به کتابخانه‌ی رسانه‌ی همین سایت (چه URLِ کامل، چه /storage/…، چه public/storage/…)
+        $pos = strpos($value, '/storage/');
+        if ($pos !== false) {
+            $rel = ltrim(substr($value, $pos + strlen('/storage/')), '/');
+
+            return $rel !== '' ? $rel : null;
+        }
+
+        // URLِ خارجی → دانلود
+        if (Str::startsWith($value, ['http://', 'https://'])) {
+            return $this->downloadImage($value);
+        }
+
+        // مسیرِ نسبیِ دیسک (از قبل درست)
+        return ltrim($value, '/') ?: null;
     }
 
     /**
