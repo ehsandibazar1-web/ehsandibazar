@@ -7,26 +7,28 @@
         <div dir="rtl" style="font-size: 0.85rem; line-height: 1.9; color: #374151; padding: 0.5rem 0 0.8rem;">
             <p style="margin: 0.3rem 0;"><b>دو حالت:</b> برای <b>مقاله‌ی جدید</b> کلیدِ <code>id</code> را نگذارید. برای <b>ویرایشِ مقاله‌ی موجود</b> کلیدِ <code>id</code> را بگذارید (آن‌وقت <b>slug قفل</b> می‌شود).</p>
 
-            <p style="margin: 0.6rem 0 0.2rem;"><b>نمونه:</b></p>
+            <p style="margin: 0.6rem 0 0.2rem;"><b>نمونه (JSONِ معتبر — بدونِ کامنت، قابلِ کپیِ مستقیم):</b>
+                <span style="color:#6b7280;">برای مقاله‌ی جدید، سطرِ <code>"id"</code> را حذف کنید.</span></p>
             <pre dir="ltr" style="overflow-x: auto; background: #0f172a; color: #e2e8f0; padding: 0.8rem; border-radius: 0.5rem; font-size: 0.78rem; line-height: 1.6;">{
-  "id": 139,                         // فقط برای ویرایش؛ برای مقاله‌ی جدید حذف کنید
+  "id": 139,
   "lang": "fa",
   "title": "همه چیز در مورد کاراته",
-  "slug": "همه-چیز-در-مورد-کاراته",   // فارسی مجاز و عیناً حفظ می‌شود
+  "slug": "همه-چیز-در-مورد-کاراته",
   "excerpt": "خلاصه‌ی کوتاه.",
   "body": "&lt;p&gt;متنِ کاملِ HTML با لینک‌های داخلی و عکس‌ها...&lt;/p&gt;",
   "seo_title": "...",
   "meta_description": "...",
   "og_title": "...",
   "og_description": "...",
-  "image": "media/library/foo.webp", // تصویرِ شاخص از کتابخانه‌ی رسانه
+  "image": "media/library/foo.webp",
   "image_alt": "متنِ جایگزینِ تصویر",
   "author_name": "احسان دیبازر",
   "reading_time": 17,
   "tags": ["کاراته", "دفاع شخصی"],
   "faqs": [{ "question": "؟", "answer": "..." }],
-  "status": "published"              // draft | published
+  "status": "published"
 }</pre>
+            <p style="margin:0.3rem 0 0; color:#6b7280;">مقدارِ <code>status</code> یکی از <code>draft</code> یا <code>published</code>.</p>
 
             <table style="width: 100%; border-collapse: collapse; margin-top: 0.6rem; font-size: 0.8rem;">
                 <thead><tr style="text-align: right; color: #6b7280; border-bottom: 1px solid #e5e7eb;">

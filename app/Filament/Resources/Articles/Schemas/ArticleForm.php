@@ -194,7 +194,9 @@ class ArticleForm
                     ->seconds(false)
                     ->visible(fn (Get $get): bool => in_array($get('publish_state'), ['scheduled', 'published'], true))
                     ->required(fn (Get $get): bool => $get('publish_state') === 'scheduled')
-                    ->minDate(fn (Get $get) => $get('publish_state') === 'scheduled' ? now() : null)
+                    // ابتدای دقیقه (بدونِ ثانیه) تا با فیلدِ seconds(false) هماهنگ باشد؛ وگرنه مرورگر
+                    // min را با ثانیه می‌گیرد و مقدارِ روی-دقیقه (مثلِ ۶:۲۵:۰۰) را «نامعتبر» می‌داند.
+                    ->minDate(fn (Get $get) => $get('publish_state') === 'scheduled' ? now()->startOfMinute() : null)
                     ->helperText('برای «زمان‌بندی‌شده» یک تاریخِ آینده بگذارید — سیستم در همان لحظه خودکار منتشر می‌کند.'),
             ]);
     }
